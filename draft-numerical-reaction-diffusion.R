@@ -121,20 +121,22 @@ plot_u_x_t(x_grid,u_x_t_6_vector,6)
 u_x_t_7_vector = u_x_t_plus_1(u_x_t_6_vector,x_grid,D,k)
 plot_u_x_t(x_grid,u_x_t_7_vector,7)
 
-# gganimate
-#install.packages("gganimate")
-#install.packages("magick")
-#install.packages("transformr")
-
 # animate plot that shows u_x_t to t=7
+
+#install.packages("gifski") # for gif output
+#install.packages("av")
+
+library(gifski)
+library(av)
 library(tidyverse)
-library(gganimate)
 library(transformr)
+library(gganimate)
+library(magick)
 
 n = length(x_grid)
-u_values = c(u_x_t_vector,u_x_t_2_vector)
-x_values = c(x_grid,x_grid)
-t_values = c(rep(1,n), rep(2,n))
+u_values = c(u_x_t_vector,u_x_t_2_vector, u_x_t_3_vector)
+x_values = c(x_grid,x_grid,x_grid)
+t_values = c(rep(1,n), rep(2,n),rep(3,n))
 u_x_t_tibble = tibble(u = u_values, x = x_values, time = t_values)
 
 p = ggplot(data = u_x_t_tibble, aes(x = x, y = u)) + 
@@ -142,7 +144,10 @@ p = ggplot(data = u_x_t_tibble, aes(x = x, y = u)) +
   labs(x = "x", y = "u(x,t)") 
 
 
-p + transition_time(time) + labs(title = "t: {frame_time}")
+anim = p + transition_time(time) + labs(title = "t: {frame_time}")
+
+anim = animate(anim, fps = 20, duration = 7,renderer = magick_renderer())
+magick::image_write(anim, path="myanimation.gif")
 
 # plug in the solution curve for Fisher
 
@@ -167,9 +172,9 @@ wave3 = u_x_t_plus_1(wave2, x_grid, D,k)
 wave4 = u_x_t_plus_1(wave3, x_grid, D,k)
 
 n = length(wave1)
-wave_vector = c(wave1,wave2,wave3,wave4)
-x_values = c(x_grid,x_grid,x_grid,x_grid)
-t_values = c(rep(1,n), rep(2,n),rep(3,n),rep(4,n))
+wave_vector = c(wave1,wave2)
+x_values = c(x_grid,x_grid)
+t_values = c(rep(1,n), rep(2,n))
 wave_tibble = tibble(u = wave_vector, x = x_values, time = t_values)
 pw = ggplot(data = wave_tibble, aes(x = x, y = u)) + 
   geom_line(color = "red") +
@@ -177,6 +182,9 @@ pw = ggplot(data = wave_tibble, aes(x = x, y = u)) +
 
 
 pw = pw + transition_time(time) + labs(title = "t: {frame_time}")
+
+anim = animate(pw, renderer = magick_renderer())
+
 anim_save(filename = "Fisher-wave-k=0.7.gif")
 
 magick::image_write(pw, path="myanimation.gif")
