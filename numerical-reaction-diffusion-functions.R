@@ -2,7 +2,6 @@ library(tidyverse)
 library(ggplot2)
 library(gifski)
 library(av)
-library(tidyverse)
 library(transformr)
 library(gganimate)
 library(magick)
@@ -162,7 +161,6 @@ plot_wave = function(results,save_as = NULL, add_hline = NULL){
     plot = plot + geom_hline(yintercept = add_hline, color = "grey")
   }
 
-  
   if (is.null(save_as)){
     return(plot)
   } else{
@@ -279,5 +277,6 @@ critical_area = function(x_grid, u_x, u_hat, plot = TRUE, print_to_screen=TRUE){
   
   return(list(critical_area = crit_area))
 }
+
 
 

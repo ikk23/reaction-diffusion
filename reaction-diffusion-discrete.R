@@ -111,8 +111,22 @@ wave_plots$continuous_plot # narrows and then falls
 wave_plots$discrete_plot # the wave falling in the discrete model looks like only the bar at x=0 rising
 # Not sure why this a value doesn't lead to wave spread?
 
-# Increase the u(0,0) more -- try the upper value
+# Increase the u(0,0) more -- try extreme case where a=u(x=0)=1. Do the other bars rise to 1?
+a = 1
+wave_plots= discrete_vs_continuous(u_hat,a,sigma,k,D,time_steps=50)
+wave_plots$continuous_plot # wave rise to 1 everywhere
+wave_plots$discrete_plot # all bars rise to 1 -- SANITY CHECK check
 
+# Where is the critical propagule, where no bars are rising or falling?
+a = 0.34
+wave_plots = discrete_vs_continuous(u_hat,a,sigma,k,D,time_steps=100)
+wave_plots$continuous_plot # clearly the wave is rising, but it only rises around x=0
+wave_plots$discrete_plot # only the x=0 bar rises; the others fall (does this mean failure?)
+run_u_hat(u_hat,x_grid=seq(-5,5,by=0.1),u_x=u_function(seq(-5,5,by=0.1),a=0.34,sigma=1),k=0.1,D=0.01,time_steps=200,get_critical_area = FALSE)$wave_plot  # narrows and then rises at x=0 (the narrowing is what makes the -1 and 1 bars on the discrete model seem to decrease)
 
+# try adding more time steps -- do the -1 and 1 bars eventually rise?
+wave_plots = discrete_vs_continuous(u_hat,a,sigma,k,D,time_steps=300)
+wave_plots$discrete_plot # really strange glitchy behavior
+wave_plots$continuous_plot
 
-
+# Am I simulating the compartment model incorrectly? 
