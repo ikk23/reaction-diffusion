@@ -233,5 +233,11 @@ simulate_discrete_time_wave = function(x_grid,a,b,sigma,k,u_hat,time_steps){
   return(concacenated_results)
 }
 
+# a = 4, b = 0.3, k = 0.99, u_hat = 0.01, sigma = 0.2
 r = simulate_discrete_time_wave(x_grid,a,b,sigma,k,u_hat,time_steps = 6)
-# simulate 
+# simulate a smaller area
+a=1
+r = simulate_discrete_time_wave(x_grid,a,b,sigma,k,u_hat,time_steps = 6)
+# raise u_hat
+u_hat = 0.1
+r = simulate_discrete_time_wave(x_grid,a,b,sigma,k,u_hat,time_steps = 6)
