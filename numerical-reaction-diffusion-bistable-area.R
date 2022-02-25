@@ -4,14 +4,19 @@ library(ggplot2)
 
 source("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/numerical-reaction-diffusion-functions.R")
 
-run_u_hat = function(u_hat,x_grid=seq(-10,10,by=0.01),u_x=dnorm(x_grid),k=0.3,D=0.01,time_steps=100){
+run_u_hat = function(u_hat,x_grid=seq(-10,10,by=0.01),u_x=dnorm(x_grid),k=0.3,D=0.01,time_steps=100,
+                     get_critical_area = TRUE){
   # track the critical area (value and graph), the difference in u(x=0,t=0)-u_hat, and the plot of the wave over time
   alpha = alpha_for_u_hat(u_hat)
   u_x0 = u_x[which(x_grid==0)]
   u_diff = u_x0 - u_hat
-  ca.list = critical_area(x_grid,u_x,u_hat,print_to_screen = FALSE)
-  ca_value = ca.list$critical_area
-  ca_plot = ca.list$plot
+  
+  if (get_critical_area){
+    ca.list = critical_area(x_grid,u_x,u_hat,print_to_screen = FALSE)
+    ca_value = ca.list$critical_area
+    ca_plot = ca.list$plot  
+  }
+
   
   results = simulate_u_x_t(u=u_x,
                          x_grid=x_grid,
@@ -20,12 +25,17 @@ run_u_hat = function(u_hat,x_grid=seq(-10,10,by=0.01),u_x=dnorm(x_grid),k=0.3,D=
                          REACTION_FUNCTION = bistable_reaction,
                          additional_reaction_arguments = c(k,alpha))
   wave_plot = plot_wave(results,add_hline = u_hat)
+  
+  if (get_critical_area){
+    results.list = list(critical_area = ca_value, 
+                        critical_plot = ca_plot, 
+                        u_difference = u_diff,
+                        wave_plot = wave_plot,
+                        tibble_from_simulation = results)
+  } else {
+    results.list = list(u_difference = u_diff, wave_plot = wave_plot, tibble_from_simulation = results)
+  }
 
-  results.list = list(critical_area = ca_value, 
-                      critical_plot = ca_plot, 
-                      u_difference = u_diff,
-                      wave_plot = wave_plot,
-                      tibble_from_simulation = results)
   return(results.list)
 }
 
