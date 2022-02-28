@@ -3,4 +3,5 @@
 .RData
 .Ruserdata
 
-R-output/
+initial-simulations-output/
+PM-meeting-notes.pdf
