@@ -1,3 +1,3 @@
 # reaction-diffusion
 
-* [Really basic simulations](reaction-diffusion.R)
+* [Examples of bistable waves](scripts/bistable-critical-area.R)
