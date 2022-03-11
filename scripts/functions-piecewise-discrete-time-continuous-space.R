@@ -350,3 +350,16 @@ get_fitness_values(alpha,k)
 # w(drive/drive) = 1
 # w(drive/wt) = 0.8
 # w(wt/wt) = 1
+
+
+comp_ratio = function(beta, pi, expected){
+  denom = ((beta-1)*(pi/expected)) + 1
+  ratio = beta/denom
+  return(ratio)
+}
+
+comp_ratio(3,0,10)
+
+check_for_delta_0_when_b_is_1(0.2,2.1)
+
+
