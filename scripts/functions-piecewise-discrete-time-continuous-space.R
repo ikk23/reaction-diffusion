@@ -139,8 +139,78 @@ bistable_reaction = function(u,k,u_hat){
   return(sol)
 }
 
+
+# The factored formula for AUC at t=1
+theta1 = function(a,b,k,u_hat,sigma){
+  t1 = a*b*((2*k*(b-u_hat)*(1-b)) + 1)
+  
+  t2 = ((sigma*(b^2)*k)* (((25*b)/6) - (3*(1 + u_hat))) )
+  
+  t3 = exp(-a/sigma)*((b^2)*k)*((a*(u_hat - (3*b) + 1)) + (sigma*((3*(1+u_hat)) - ((9/2)*b))))
+  
+  t4 = exp((-2*a)/sigma)*((5*sigma*(b^3)*k)/2)
+  
+  t5 = exp((-3*a)/sigma)*((sigma*(b^3)*k)/3)
+  
+  t6 = exp(-a/(2*sigma))*((sigma*(b^3)*k)/2)
+  
+  sol = t1+t2+t3+t4+t5+t6
+  
+  return(sol)
+}
+
+# The un-simplified formula for AUC at t=1 (should be equal to theta1)
+theta1_before_simplification = function(a,b,k,u_hat,sigma){
+  # Get int1
+  term1 = ((a*b)/2)*((2*k*(b-u_hat)*(1-b))+1)
+  
+  term2_k_inside = (b*((3*b)-2)) + (u_hat*(1 - (2*b)))
+  term2_sigma_b_inside = (k*term2_k_inside) - 0.5
+  term2_factor = sigma*b*term2_sigma_b_inside
+  term2_e = 1 - exp((-a)/sigma)
+  term2 = term2_factor*term2_e
+  
+  term3_factor = ((-k*(b^2))/2)*((3*b) - u_hat - 1)
+  term3_e = (a*exp(-a/sigma)) + ((sigma/2)*(1 - exp((-2*a)/sigma)))
+  term3 = term3_factor*term3_e
+  
+  term4_factor = ((-sigma)*k*(b^3))/4
+  term4_inside1 = (1/3)*(1 - exp((-3*a)/sigma))
+  term4_inside2 = 3*(exp(-a/sigma) - exp((-2*a)/sigma))
+  term4_inside = term4_inside1 + term4_inside2
+  term4 = term4_factor*term4_inside
+  
+  int1 = term1+term2+term3+term4
+  
+  # Get int2
+  
+  term1_factor = sigma*b*(0.5 - (k*u_hat))
+  term1_inside = 1 - exp(-a/sigma)
+  term1 = term1_factor*term1_inside
+  
+  term2_factor = ((sigma*k*(b^2))/2)*(1 + u_hat)
+  term2_inside = (0.5*(1 + exp((-2*a)/sigma))) - exp(-a/sigma)
+  term2 = term2_factor*term2_inside
+  
+  term3_factor = (-sigma*k*(b^3))/4
+  term3_inside = (1/3)*(1 - exp((-3*a)/sigma)) + exp((-2*a)/sigma) - exp(-a/(2*sigma))
+  term3 = term3_factor*term3_inside
+  
+  int2 = term1 + term2 + term3
+  
+  # Sum int1 and int2
+  sum_ints = int1+int2
+  
+  # Multiply by 2
+  sol = 2*sum_ints
+  
+  return(sol)
+}
+
+
+
 # Set up u(x,t=0), model migration with u'(x,t=1), and add the reaction to get u(x,t=1). Plot u(x,t=0) in black, u'(x,t=1) in yellow, and u(x,t=1) in blue. Add a red horizontal line for u_hat and grey vertical lines for -a/2 and a/2. 
-# Return a list with the results in a tibble, the plot, theta0 = a*b, and theta1 = the new AUC.
+# Return a list with the results in a tibble, the plot, theta0 = a*b, theta1_trapz = the new AUC according to the trapezoidal approximation, theta1_factored = the new AUC according to my factored formula, and theta1_unsimplified = the new AUC according to the raw AUC formula -- should equal theta1_factored
 ###     Note: the migration curve will always fall below b due to diffusion.
 ###     But if b > u_hat, we would expect the blue curve to be above the yellow.
 ###     And if b < u_hat, we would expect the blue curve to fall below the yellow.
@@ -193,9 +263,90 @@ u_t0_to_t1 = function(x_grid, a, b, sigma, k, u_hat){
   
   # Get AUC numerically
   theta0 = a*b
-  theta1 = trapz(x_grid, u_x_t1_full_sol_vector)
+  theta1_trapz = trapz(x_grid, u_x_t1_full_sol_vector)
   
-  return(list(results = results, plot = plot, theta0 = theta0, theta1 = theta1))
+  # Get AUC through formulas
+  theta1_factored = theta1(a,b,k,u_hat,sigma)
+  theta1_unsimplified = theta1_before_simplification(a,b,k,u_hat,sigma)
+  
+  return(list(results = results, plot = plot, theta0 = theta0, theta1_trapz = theta1_trapz,
+              theta1_factored = theta1_factored, theta1_unsimplified = theta1_unsimplified))
   
 }
 
+solve_for_a_given_sigma = function(beta,sigma){
+  a = sigma*beta
+  return(a)
+}
+
+solve_for_sigma_given_a = function(beta,a){
+  sigma = a/beta
+  return(sigma)
+}
+
+check_for_delta_0_when_b_is_1 = function(u_hat, beta){
+  term1 = (7/6) - (3*u_hat)
+  left = -1*term1
+  
+  term2_coefficient = (beta*(u_hat - 2)) + ((3*u_hat) - (3/2))
+  term2 = term2_coefficient*exp(-beta)
+  
+  term3 = (5/2)*exp(-2*beta)
+  
+  term4 = (1/3)*exp(-3*beta)
+  
+  term5 = (1/2)*exp(-0.5*beta)
+  
+  right = term2+term3+term4+term5
+  
+  sol = term1+right
+  return(sol)
+}
+
+# Returns vector of fitness values: w(drive/drive), w(drive/wt), w(wt/wt)
+get_fitness_values = function(alpha, k){
+  w_drive_drive = 1 + (2*alpha*k)
+  w_drive_wt = 1 + ((alpha - 1)*k)
+  w_wt_wt = 1
+  
+  print(paste0("w(drive/drive) = ",w_drive_drive, " w(drive/wt) = ",w_drive_wt, " w(wt/wt) = ",w_wt_wt))
+  
+  return(c(w_drive_drive,w_drive_wt,w_wt_wt))
+}
+
+
+u_hat = 0.5
+a = 0.05
+epsilon1 = abs(check_for_delta_0_when_b_is_1(u_hat, beta = 0.798)) # Distance from 0
+epsilon2 = abs(check_for_delta_0_when_b_is_1(u_hat, beta = 0.799))
+epsilon2 < epsilon1 
+epsilon3 = abs(check_for_delta_0_when_b_is_1(u_hat, beta = 0.7981))
+epsilon3 < epsilon1 # TRUE
+epsilon4 = abs(check_for_delta_0_when_b_is_1(u_hat, beta = 0.7982))
+epsilon4 < epsilon3 # TRUE
+epsilon5 = abs(check_for_delta_0_when_b_is_1(u_hat, beta = 0.7983))
+epsilon5 < epsilon4 # TRUE
+epsilon6 = abs(check_for_delta_0_when_b_is_1(u_hat, beta = 0.7984))
+epsilon6 < epsilon5 # FALSE
+# Best beta is between 0.7983 and 0.7984
+beta = 0.7983
+sigma = solve_for_sigma_given_a(beta=beta,a=a) # sigma = 0.0626331
+
+# What happens when beta exceeds this value? if check_for_delta_0_when_b_is_1 is more positive, then the AUC has increased even more
+sigma_up = 0.07
+b = a/sigma_up
+check_for_delta_0_when_b_is_1(u_hat, b) # check
+# so when sigma = 0.07, this should spread
+
+check_for_delta_0_when_b_is_1(u_hat = 0.2, beta = 0.005/0.01)
+
+# Almost equal
+u_hat = 0.5
+beta = 0.7983
+
+# get fitness values when alpha = 0 and k = 0.2
+alpha = 0; k = 0.2
+get_fitness_values(alpha,k)
+# w(drive/drive) = 1
+# w(drive/wt) = 0.8
+# w(wt/wt) = 1

@@ -1,0 +1,159 @@
+initialize() {
+	
+	// 1D model with periodic boundaries
+	initializeSLiMOptions(dimensionality="x", periodicity="x");
+
+	// shape parameters
+	defineConstant("a", 0.005); // width of initial release area (in the middle of the grid)
+	defineConstant("sigma",0.01); // average dispersal distance	
+	defineConstant("beta", a/sigma);
+	defineConstant("m", 0.005); // mating radius
+	defineConstant("X_MAX", 1); // x ranges from 0 to X_MAX
+	
+	// reaction parameters
+	defineConstant("k", 0.2);
+	defineConstant("u_hat", 0.2);
+	defineConstant("alpha", 1 - 2*u_hat);
+	catn("-----------------------------------");
+	print(paste("Frequency threshold of:", u_hat, " and alpha of: " + alpha));
+ 
+	
+	
+	// determine fitness values 
+	// if using mating weights as probability of acception or rejection: then divide by the max fitness value if any are greater than 1
+	// if returning a vector of mating weights in mateChoice(), then these values can be greater than 1.
+	d_d_fitness = 	1 + (2*alpha*k);
+	d_wt_fitness = 1 + ((alpha-1)*k);
+	wt_wt_fitness = 1;
+	fitnesses = c(d_d_fitness, d_wt_fitness, wt_wt_fitness);
+	//if (any(fitnesses > 1)) {
+	//	fitnesses = fitnesses/max(fitnesses);
+	//}
+	defineConstant("drive_homozygote_fitness", fitnesses[0]);
+	defineConstant("drive_heterozygote_fitness", fitnesses[1]);
+	defineConstant("wt_homozygote_fitness", fitnesses[2]);
+	print(paste("d/d fitness:",drive_homozygote_fitness, "d/wt fitness:", drive_heterozygote_fitness, "wt/wt fitness:", wt_homozygote_fitness));
+	catn("-----------------------------------");
+
+	
+	// other parameters
+	defineConstant("POPSIZE", 10000);
+	defineConstant("CHROM_LENGTH", 1);
+	
+	// Define a chromosome of length 1. The mutation can either be drive or wt.
+	initializeMutationRate(0.0);
+	initializeRecombinationRate(0.0);
+	wt = initializeMutationType("m1", 0.5, "f", 0.0);
+	dr = initializeMutationType("m2", 0.5, "f", 0.0);
+	variations = c(wt, dr);
+	initializeGenomicElementType("g1", variations, c(1, 1)); 
+	initializeGenomicElement(g1, 0, CHROM_LENGTH-1);
+	
+	// Define an interaction for mating
+	initializeInteractionType(1, "x", reciprocal=T, maxDistance=m); // i1
+}
+
+// create a population of individuals, scattered randomly
+// make the individuals that end up in the spatial bounds of the -a/2, a/2 range be drive homozygotes and individuals that are outside of this range be wild-types
+1 {
+	sim.addSubpop("p1", POPSIZE);
+	
+	all = p1.individuals;	
+	all.x = runif(POPSIZE, min = 0, max = X_MAX);
+	
+	midpoint = X_MAX/2;
+	range_left = midpoint - (a/2);
+	range_right = midpoint + (a/2);
+	
+	in_range = (all.x >= range_left & all.x <= range_right);
+	drive = all[in_range];
+	wildtype = all[!in_range];
+	
+	wildtype.genomes.addNewDrawnMutation(m1, seqLen(CHROM_LENGTH));
+	drive.genomes.addNewDrawnMutation(m2, seqLen(CHROM_LENGTH));
+	
+	// Define fitness values
+	wildtype.fitnessScaling = wt_homozygote_fitness;
+	drive.fitnessScaling = drive_homozygote_fitness;
+	
+	// Color
+	wildtype.color = "blue";
+	drive.color = "red";
+}
+
+1: early() {
+	// calculate the distances between everyone for mating
+	i1.evaluate();
+}
+
+1: mateChoice() {
+	all_neighbors = i1.nearestInteractingNeighbors(individual, count = POPSIZE);
+	
+	// if parent1 is in empty area, it can't mate. Redraw parent1.
+	if (size(all_neighbors) == 0){
+		catn("no mate found"); // see how frequent this is
+		return float(0);
+	}	
+	
+	// have the probability of choosing each individual in this radius be equal to their fitness value
+	fitness_values = all_neighbors.fitnessScaling;
+	mate_weights = rep(0.0, p1.individualCount);
+	mate_weights[all_neighbors.index] = fitness_values;
+	
+	return mate_weights;
+}
+
+
+1: modifyChild() {
+
+	// assign fitness value based on genotype and color
+	wildtype = child.countOfMutationsOfType(m1) == 2*CHROM_LENGTH;
+	drive_hom = child.countOfMutationsOfType(m2) == 2*CHROM_LENGTH;
+	drive_het = (child.countOfMutationsOfType(m1) == CHROM_LENGTH) & (child.countOfMutationsOfType(m2) == CHROM_LENGTH);
+	
+	if (wildtype){
+		child.fitnessScaling = wt_homozygote_fitness;
+		child.color = "blue";
+	} else if (drive_hom) {
+		child.fitnessScaling = drive_homozygote_fitness;
+		child.color = "red";
+	} else if (drive_het) {
+		child.fitnessScaling = drive_heterozygote_fitness;
+		child.color = "red";
+	} else {
+		print("Unknown genotype -- there are ",child.countOfMutationsOfType(m1), " wt mutations and " + child.countOfMutationsOfType(m2) + " drives"); // check
+	}
+	
+	// draw a displacement distance from the exponential distribution with an average dispersal distance of sigma
+	distance = rexp(1,mu = sigma);
+	
+	// if this draw is 1, go right. If it's 0, go left.
+	right = rbinom(1, 1, 0.5);
+	if (right){
+		position = parent1.x + distance;
+	} else {
+		position = parent1.x - distance;
+	}
+	child.setSpatialPosition(p1.pointPeriodic(position));
+	
+	return T;
+}
+
+1: late(){
+	all = p1.individuals;
+	num_drive_alleles = sum(all.genomes.countOfMutationsOfType(m2)==CHROM_LENGTH);
+	rate_dr = num_drive_alleles/(2*POPSIZE);
+	gen = sim.generation;
+	
+	catn("Generation: " + gen + " rate_dr: " + rate_dr);
+	
+	if (rate_dr == 0){
+		sim.simulationFinished();
+	}
+}
+
+
+// output samples of 10 genomes periodically, all fixed mutations at end
+100 late() {
+	sim.simulationFinished();
+}

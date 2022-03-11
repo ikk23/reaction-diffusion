@@ -1,0 +1,215 @@
+// set up a simple neutral nonWF simulation
+initialize() {
+	initializeSLiMModelType("nonWF");
+
+	// 1D model with periodic boundaries
+	initializeSLiMOptions(dimensionality="x", periodicity="x");
+	initializeSex("A");  // now modeling males and females
+
+	
+	// shape parameters
+	defineConstant("a", 0.05); // width of initial release area (in the middle of the grid)
+	defineConstant("sigma",0.01); // average dispersal distance	
+	defineConstant("beta", a/sigma);
+	defineConstant("m", 0.005); // mating radius
+	defineConstant("X_MAX", 1); // x ranges from 0 to X_MAX
+	
+	
+	// reaction parameters
+	defineConstant("k", 0.2);
+	defineConstant("u_hat", 0.2);
+	defineConstant("alpha", 1 - 2*u_hat);
+	catn("-----------------------------------");
+	print(paste("Frequency threshold of:", u_hat, " and alpha of: " + alpha));
+ 
+	
+	// determine fitness values 
+	// if using mating weights as probability of acception or rejection: then divide by the max fitness value if any are greater than 1
+	// if returning a vector of mating weights in mateChoice(), then these values can be greater than 1.
+	d_d_fitness = 	1 + (2*alpha*k);
+	d_wt_fitness = 1 + ((alpha-1)*k);
+	wt_wt_fitness = 1;
+	fitnesses = c(d_d_fitness, d_wt_fitness, wt_wt_fitness);
+	//if (any(fitnesses > 1)) {
+	//	fitnesses = fitnesses/max(fitnesses);
+	//}
+	defineConstant("drive_homozygote_fitness", fitnesses[0]);
+	defineConstant("drive_heterozygote_fitness", fitnesses[1]);
+	defineConstant("wt_homozygote_fitness", fitnesses[2]);
+	print(paste("d/d fitness:",drive_homozygote_fitness, "d/wt fitness:", drive_heterozygote_fitness, "wt/wt fitness:", wt_homozygote_fitness));
+	catn("-----------------------------------");
+
+	// other parameters
+	defineConstant("POPSIZE", 10000);
+	defineConstant("CHROM_LENGTH", 1);
+	
+	// nonWF model specific
+	defineConstant("GROWTH_AT_ZERO_DENSITY", 1.5); // CHECK OVER
+	defineConstant("DENSITY_INTERACTION_DISTANCE", m*0.1); // 10% of the mating radius
+	defineConstant("EXPECTED_ADULT_COMPETITION", POPSIZE * 2*DENSITY_INTERACTION_DISTANCE);
+	
+	// Define a chromosome of length 1. The mutation can either be drive or wt.
+	initializeMutationRate(0.0);
+	initializeRecombinationRate(0.0);
+	wt = initializeMutationType("m1", 0.5, "f", 0.0);
+	dr = initializeMutationType("m2", 0.5, "f", 0.0);
+	variations = c(wt, dr);
+	initializeGenomicElementType("g1", variations, c(1, 1)); 
+	initializeGenomicElement(g1, 0, CHROM_LENGTH-1);
+	
+	// Define an interaction for mating
+	initializeInteractionType(1, "x", reciprocal=T, maxDistance=m); // i1
+	
+	// Define an interaction for the local density around a female
+	initializeInteractionType(2, "x", reciprocal=T, maxDistance=DENSITY_INTERACTION_DISTANCE);
+
+}
+
+1 {
+	sim.addSubpop("p1", POPSIZE);
+	
+	all = p1.individuals;	
+	all.x = runif(POPSIZE, min = 0, max = X_MAX);
+	
+	midpoint = X_MAX/2;
+	range_left = midpoint - (a/2);
+	range_right = midpoint + (a/2);
+	
+	in_range = (all.x >= range_left & all.x <= range_right);
+	drive = all[in_range];
+	wildtype = all[!in_range];
+	
+	wildtype.genomes.addNewDrawnMutation(m1, seqLen(CHROM_LENGTH));
+	drive.genomes.addNewDrawnMutation(m2, seqLen(CHROM_LENGTH));
+	
+	// Color
+	wildtype.color = "blue";
+	drive.color = "red";
+	
+	// tag individuals based on their fitness
+	wildtype.tagF = wt_homozygote_fitness;
+	drive.tagF = drive_homozygote_fitness;
+}
+
+// nonWF specific 
+// not sure if the 1: is necessary
+// find male neighbors and let their mating weight = their fitness value
+1: reproduction(NULL, "F") {
+
+	all_neighbors = i1.nearestNeighbors(individual, subpop.individualCount);
+	neighbors = all_neighbors[all_neighbors.sex == "M"]; // male neighbors
+	num_neighbors = length(neighbors);
+	
+	// females in empty areas cannot mate
+	if (num_neighbors == 0){
+		catn("empty area - can't mate");
+		return;
+	}
+	
+	// get the fitness values of each male in this circle and sample based on these mating weights
+	mating_weights = neighbors.tagF;
+	mate_id = sample(x = seqLen(num_neighbors), size = 1, weights = mating_weights);
+	
+	selected_mate = neighbors[mate_id];
+	
+	// determine the female's fecundity based on her fitness and the number of individuals surrounding her
+	female_fitness = individual.tagF;
+	adult_density_force = i2.totalOfNeighborStrengths(individual);
+	competition_ratio = adult_density_force / EXPECTED_ADULT_COMPETITION;
+	actual_competition_factor = GROWTH_AT_ZERO_DENSITY/ ((GROWTH_AT_ZERO_DENSITY-1) * competition_ratio + 1);
+	
+	// LOOK OVER
+	p = female_fitness * actual_competition_factor;
+	expected_value = 2*p;
+	num_offspring = rpois(1,expected_value);
+	for (i in seqLen(num_offspring)) {
+		offspring = subpop.addCrossed(individual, selected_mate);
+	}
+	
+}
+
+
+
+
+1: modifyChild() {
+	// assign fitness value based on genotype and color and place fitness into tagF
+	
+	wildtype = child.countOfMutationsOfType(m1) == 2*CHROM_LENGTH;
+	drive_hom = child.countOfMutationsOfType(m2) == 2*CHROM_LENGTH;
+	drive_het = (child.countOfMutationsOfType(m1) == CHROM_LENGTH) & (child.countOfMutationsOfType(m2) == CHROM_LENGTH);
+	
+	if (wildtype){
+		child.tagF = wt_homozygote_fitness;
+		child.color = "blue";
+	} else if (drive_hom) {
+		child.tagF = drive_homozygote_fitness;
+		child.color = "red";
+	} else if (drive_het) {
+		child.tagF = drive_heterozygote_fitness;
+		child.color = "red";
+	} else {
+		print("Unknown genotype -- there are ",child.countOfMutationsOfType(m1), " wt mutations and " + child.countOfMutationsOfType(m2) + " drives"); // check
+	}
+	
+	// draw a displacement distance from the exponential distribution with an average dispersal distance of sigma
+	distance = rexp(1,mu = sigma);
+	
+	// if this draw is 1, go right. If it's 0, go left.
+	right = rbinom(1, 1, 0.5);
+	if (right){
+		position = parent1.x + distance;
+	} else {
+		position = parent1.x - distance;
+	}
+	child.setSpatialPosition(p1.pointPeriodic(position));
+	
+	return T;
+}
+
+
+// color rules
+1: early(){
+	all = p1.individuals;
+	wildtype = all[all.countOfMutationsOfType(m1) == 2*CHROM_LENGTH];
+	drive_carrier = all[all.countOfMutationsOfType(m2) > 0];
+	
+	wildtype.color = "blue";
+	drive_carrier.color = "red";
+
+}
+
+// Kill off adults
+// why was this in a late() event in our gene drive models?
+1: early() {
+	all = p1.individuals;
+	all[all.age > 0].fitnessScaling = 0.0;
+}
+
+
+// non-WF specific
+// kill off the parental generation (the offspring generated haven't been added yet)
+// output the generation, population size, and frequency of the drive allele
+// evaluate spatial distances for the next round of reproduction
+// end the simulation if the drive is lost or fixed
+1: late() {
+	
+	N = p1.individualCount;
+	all = p1.individuals;
+	num_drive_alleles = sum(all.genomes.countOfMutationsOfType(m2)==CHROM_LENGTH);
+	rate_dr = num_drive_alleles/(2*N);
+	gen = sim.generation;
+	
+	catn("Generation: " + gen + " N: " + N + " rate_dr: " + rate_dr);
+	
+	if (rate_dr == 0){
+		sim.simulationFinished();
+	} else if (rate_dr == 1){
+		sim.simulationFinished();
+	}
+	
+	i1.evaluate();
+	i2.evaluate();
+}
+
+//Stop the simulation after 100 generations
+100 late() { sim.simulationFinished(); }

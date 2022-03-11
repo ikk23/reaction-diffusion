@@ -210,201 +210,20 @@ x_grid = seq(-50,50,by=0.1)
 res = u_t0_to_t1(x_grid,a,b,sigma,k,u_hat)
 
 
-real_reaction = res$results$u_x_prime_t1 + res$results$u_x_t1_two_step
-res$plot + geom_point(aes(y = real_reaction), color = "purple")
-
-left = res$results %>% filter(x < -a/2)
-diff = abs(left$u_x_t1_full_sol - (left$u_x_prime_t1 + bistable_reaction(left$u_x_prime_t1, k, u_hat))) 
-
-i=1
-(left$u_x_prime_t1[1] + bistable_reaction(left$u_x_prime_t1[1], k, u_hat))
-left$u_x_t1_full_sol[1]
-
-
-
-results = res$results
-View(results)
-left = results %>% filter(x >= -10 & x <= -5)
-right = results %>% filter(x >= 5 & x <= 10)
-weird = rbind(left,right)
-
-
-
-
-# Checking math for expansion of e -- works for e_term^2
-a = 10
-x = -10
-sigma = 2
-sig_recip = -1/sigma
-inner_e1 = (a/2)-x
-e1 = exp(sig_recip*inner_e1)
-
-inner_e2 = (-a/2)-x
-e2 = exp(sig_recip*inner_e2)
-e_term = e1 - e2
-
-e_term_sq = e_term^2
-
-e1_f = exp((-2/sigma)*((a/2)-x))
-e2_f = 2*exp((1/sigma)*2*x)
-e3_f = exp((-2/sigma)*((-a/2)-x))
-e1_f - e2_f + e3_f
-
-
-e_term_cubed = e_term^3
-a_half_pos = a/2
-a_half_neg = -a/2
-
-e1 = exp((-3/sigma)*(a_half_pos-x))
-e2 = exp((-3/sigma)*(a_half_neg - x))
-e3 = 2*exp((1/sigma)*((3*x) + a_half_pos))
-e4 = 2*exp((1/sigma)*((3*x) - a_half_pos))
-e5 = exp((-1/sigma)*(a_half_neg - (3*x)))
-e6 = exp((-1/sigma)*(a_half_pos - (3*x)))
-
-sol = e1 - e2 + e3 - e4 + e5 - e6
-sol
-e_term_cubed
-
-
-# Checking u(x,t=1) for x in [-a/2, a/2]
-a = 10
-b = 0.5
-u_hat = 0.4
-k = 0.1
-sigma = 1
-
-# x in range
-x = 1
-
-# 1. C = prime of u; u(x,t=1) = C + f(C)
-C = u_prime_x1(x,a,b,sigma)
-u_x_two_step = C + bistable_reaction(C,k,u_hat)
-
-# 2. full formula
-sig_n_recip = -1/sigma
-e_1_inner = x + (a/2)
-e_1 = exp(sig_n_recip*e_1_inner)
-e_2_inner = (a/2) - x
-e_2 = exp(sig_n_recip*e_2_inner)
-e_term = e_1 + e_2
-
-constants = (2*k*b*(1-b)*(b-u_hat)) + b
-
-c_e1_inner = (b*((3*b)-(2*u_hat)-2)) + u_hat
-c_e1 = (k*b*c_e1_inner) - (b/2)
-e1_term = c_e1*e_term
-
-c_e2 = ((-k*(b^2))/2)*((3*b) - u_hat - 1)
-e2_term = c_e2*(e_term^2)
-
-c_e3 = ((k*(b^3))/4)
-e3_term = c_e3*(e_term^3)
-
-sol = constants + e1_term + e2_term + e3_term
-sol == u_x_two_step # CHECK, good
-
-
-# Checking u(x,t=1) for x < -a/2
-a = 10
-b = 0.5
-u_hat = 0.4
-k = 0.1
-sigma = 1
-
-# x < -a/2
-x = -6
-
-# 1. C = prime of u; u(x,t=1) = C + f(C)
-C = u_prime_x1(x,a,b,sigma)
-u_x_two_step = C + bistable_reaction(C,k,u_hat)
-
-# 2. full formula
-sig_n_recip = -1/sigma
-e1_inner = (a/2)-x
-e1 = exp(sig_n_recip*e1_inner)
-e2_inner = (-a/2)-x
-e2 = exp(sig_n_recip*e2_inner)
-e_term = e1 - e2
-
-c_e1 = b*((k*u_hat) - 0.5)
-e1_term = c_e1*e_term
-
-c_e2 = ((k*(b^2))/2)*(1+u_hat)
-e2_term = c_e2*(e_term^2)
-
-c_e3 = ((k*(b^3))/4)
-e3_term = c_e3*(e_term^3)
-
-sol = e1_term + e2_term + e3_term
-
-sol == u_x_two_step # TRUE
-
-# x > a/2
-x = 10
-# 1. C = prime of u; u(x,t=1) = C + f(C)
-C = u_prime_x1(x,a,b,sigma)
-u_x_two_step = C + bistable_reaction(C,k,u_hat)
-
-# 2. full formula
-sig_n_recip = -1/sigma
-e1_inner = x - (a/2)
-e1 = exp(sig_n_recip*e1_inner)
-e2_inner = x + (a/2)
-e2 = exp(sig_n_recip*e2_inner)
-e_term = e1 - e2
-
-c_e1 = b*(0.5 - (k*u_hat))
-e1_term = c_e1*e_term
-
-c_e2 = ((k*(b^2))/2)*(1 + u_hat)
-e2_term = c_e2*(e_term^2)
-
-c_e3 = (-k*(b^3))/4
-e3_term = c_e3*(e_term^3)
-  
-  
-sol = e1_term + e2_term + e3_term
-sol == u_x_two_step # CHECK
-
-# ex:
-a = 10
-b = 0.5
-u_hat = 0.3
-sigma = 1
-k = 0.1
-
-x_grid = seq(-100,100,by=0.1)
-res = u_t0_to_t1(x_grid,a,b,sigma,k,u_hat)
-theta1_approx = res$theta1 # 5.05875
-a*b
-
-theta1_e1 = theta1(a,b,k,u_hat,sigma)
-print(paste("Trapz approx:",theta1_approx, "equation solution:",theta1_e1))
-# These are not equal
-
 theta1 = function(a,b,k,u_hat,sigma){
-  term1 = a*b*((2*k*(b-u_hat)*(1-b)) + 1)
+  t1 = a*b*((2*k*(b-u_hat)*(1-b)) + 1)
   
-  term2_inner = ((b^2)/3) - (b*((6*k)+(u_hat/2))) + (4*k*(1+u_hat))
-  term2_factor2 = 2 -(b*term2_inner)
-  term2 = sigma*b*term2_factor2
+  t2 = ((sigma*(b^2)*k)* (((25*b)/6) - (3*(1 + u_hat))) )
   
-  e_term1 = exp(-a/sigma)
-  term3_sigma = sigma*((3*(1+u_hat)) - (7*b))
-  term3_inside = (a*(1 + u_hat)) - (3*b) + term3_sigma
-  term3 = e_term1*(b^2)*k*term3_inside
+  t3 = exp(-a/sigma)*((b^2)*k)*((a*(u_hat - (3*b) + 1)) + (sigma*((3*(1+u_hat)) - ((9/2)*b))))
   
-  e_term2 = exp((-2*a)/sigma)
-  term4_f1 = sigma*(b^2)*k
-  term4_f2 = b + 1 + (u_hat/2)
-  term4 = e_term2*term4_f1*term4_f2
+  t4 = exp((-2*a)/sigma)*((5*sigma*(b^3)*k)/2)
   
-  e_term3 = exp((-3*a)/sigma)
-  term5_f1 = (sigma*(b^3)*k)/3
-  term5 = e_term3*term5_f1
+  t5 = exp((-3*a)/sigma)*((sigma*(b^3)*k)/3)
   
-  sol = term1 + term2 + term3+ term4 + term5
+  t6 = exp(-a/(2*sigma))*((sigma*(b^3)*k)/2)
+  
+  sol = t1+t2+t3+t4+t5+t6
   
   return(sol)
 }
@@ -457,9 +276,74 @@ theta1_before_simplification = function(a,b,k,u_hat,sigma){
 }
 
 
-theta1_no_factor = theta1_before_simplification(a,b,k,u_hat,sigma)
-theta1_factored = theta1(a,b,k,u_hat,sigma)
+# CHECKS
+
+# ex:
+a = 10
+b = 0.3
+u_hat = 0.3
+sigma = 1
+k = 0.1
+
+
+x_grid = seq(-500,500,by=0.1)
+length(x_grid)
+res = u_t0_to_t1(x_grid,a,b,sigma,k,u_hat)
+theta1_approx = res$theta1
+theta0 = a*b
+
+theta1_no_factor = theta1_before_simplification(a,b,k,u_hat,sigma) 
+theta1_factored = theta1(a,b,k,u_hat,sigma) 
 print(paste("Before factored:",theta1_no_factor, "after factored:",theta1_factored,
             "trapz approx:",theta1_approx))
 
-# The "before factored" is closer to the trapezoidal approximation than the factored form, so there must be a mistake in the algebra somewhere -- look for it.
+
+a = 30
+b = 0.32
+u_hat = 0.3
+sigma = 1
+k = 0.1
+res = u_t0_to_t1(x_grid,a,b,sigma,k,u_hat)
+theta1_approx = res$theta1
+theta0 = a*b
+
+theta1_no_factor = theta1_before_simplification(a,b,k,u_hat,sigma) 
+theta1_factored = theta1(a,b,k,u_hat,sigma) 
+print(paste("Before factored:",theta1_no_factor, "after factored:",theta1_factored,
+            "trapz approx:",theta1_approx, " -- theta0 was", res$theta0))
+
+################################## 
+# Very wide x-grid to approximate -infinity to +infinity
+
+x_grid = seq(-500,500,by=0.1)
+length(x_grid) # 10001
+a = 25
+k = 0.1
+sigma = 1
+u_hat = 0.2
+
+# b = u_hat
+b = u_hat
+
+res = u_t0_to_t1(x_grid,a,b,sigma,k,u_hat)
+print(paste0("a*b = ",res$theta0,".      theta1 by trapz approx: ",res$theta1_trapz, ", theta1 by factored formula: ",res$theta1_factored,", theta1 by unsimplified formula: ",res$theta1_unsimplified,".    error of trapz approx - factored formula = ",res$theta1_trapz-res$theta1_factored)) 
+# AUC slightly decreases from 5 to 4.99; the formula values are essentially equal; the trapezoidal approximation is very close to the formula values (error of 2.7e-4)
+
+# b > u_hat by 0.1
+b = 0.3
+res = u_t0_to_t1(x_grid,a,b,sigma,k,u_hat)
+print(paste0("a*b = ",res$theta0,".      theta1 by trapz approx: ",res$theta1_trapz, ", theta1 by factored formula: ",res$theta1_factored,", theta1 by unsimplified formula: ",res$theta1_unsimplified,".    error of trapz approx - factored formula = ",res$theta1_trapz-res$theta1_factored)) 
+# AUC increases from 7.5 to 7.58. Formula values are almost exactly the same. The trapezoidal approximation is only 9e-4 off.
+
+# b < u_hat by a lot
+b = 0.05
+res = u_t0_to_t1(x_grid,a,b,sigma,k,u_hat)
+print(paste0("a*b = ",res$theta0,".      theta1 by trapz approx: ",res$theta1_trapz, ", theta1 by factored formula: ",res$theta1_factored,", theta1 by unsimplified formula: ",res$theta1_unsimplified,".    error of trapz approx - factored formula = ",res$theta1_trapz-res$theta1_factored)) 
+# AUC decreases from 1.25 to 1.21; formulas give the same value; error for trapz approximation is even smaller: 4.17e-6.
+
+# Check that as a--> infinity and b = u_hat, AUC stays around the same
+a = 1000
+b = u_hat
+res = u_t0_to_t1(x_grid,a,b,sigma,k,u_hat)
+print(paste0("a*b = ",res$theta0,".      theta1 by trapz approx: ",res$theta1_trapz, ", theta1 by factored formula: ",res$theta1_factored,", theta1 by unsimplified formula: ",res$theta1_unsimplified,".    error of trapz approx - factored formula = ",res$theta1_trapz-res$theta1_factored)) 
+# AUC is initially at 200. The formulas both approximate a theta1 of 199.98893 (about 200); trapezoidal approximation is slightly lower (error or -0.194).
