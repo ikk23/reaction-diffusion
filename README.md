@@ -1,4 +1,4 @@
-# reaction-diffusion
+# Modeling the spread of underdominance drives
 
 ## R scripts:
 * [Simulating reaction-diffusion waves](scripts/numerical-reaction-diffusion-functions.R)
