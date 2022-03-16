@@ -27,7 +27,7 @@ initialize() {
 	// checks
 	defineConstant("CHECK_MATING_CODE", F); // whether to check the competition factor code
 	defineConstant("RELEASE_DRIVE_EVERYWHERE", T); // if F, only release between -a/2 and a/2
-	defineConstant("b", 0.15); // if releasing the drive uniformly, make b < 1. Drive released at this introduction frequency everywhere
+	defineConstant("b", 0.18); // if releasing the drive uniformly, make b < 1. Drive released at this introduction frequency everywhere
 	
 	// Fitness values are based on alpha (1 - 2u_hat) and k
 	d_d_fitness = 	1 + (2*alpha*k);
@@ -78,10 +78,10 @@ initialize() {
 		
 		wildtype.genomes.addNewDrawnMutation(m1, seqLen(CHROM_LENGTH));
 		drive.genomes.addNewDrawnMutation(m2, seqLen(CHROM_LENGTH));
-	
+		
 		wildtype.color = "blue";
 		drive.color = "red";
-	
+		
 		// tag individuals based on their fitness
 		wildtype.tagF = wt_homozygote_fitness;
 		drive.tagF = drive_homozygote_fitness;
@@ -96,7 +96,7 @@ initialize() {
 		num_initial_wt = POPSIZE - num_initial_homozygous_drive_carriers;
 		
 		// sample num_initial_homozygous_drive_carriers random ids to convert to drive
-		drive_ids = sample(x = seqLen(POPSIZE), size = num_initial_homozygous_drive_carriers, replace = F); 
+		drive_ids = sample(x = seqLen(POPSIZE), size = num_initial_homozygous_drive_carriers, replace = F);
 		
 		for (i in seqLen(POPSIZE)){
 			ind = all[i];
@@ -111,8 +111,8 @@ initialize() {
 			}
 		}
 	}
-	
-	
+
+
 }
 
 reproduction(NULL, "F") {
@@ -128,13 +128,22 @@ reproduction(NULL, "F") {
 	}
 	
 	// get the fitness values of each male in this circle and sample based on these mating weights
-	mating_weights = neighbors.tagF;
-	mate_id = sample(x = seqLen(num_neighbors), size = 1, weights = mating_weights);
 	
-	selected_mate = neighbors[mate_id];
+	if (sim.generation > 2){
+		mating_weights = neighbors.tagF;
+		mate_id = sample(x = seqLen(num_neighbors), size = 1, weights = mating_weights);
+		selected_mate = neighbors[mate_id];
+	} else {
+		selected_mate = sample(neighbors,1);
+	}
 	
 	// determine the female's fecundity based on her fitness and the number of individuals surrounding her
-	female_fitness = individual.tagF;
+	
+	if (sim.generation > 2){
+		female_fitness = individual.tagF;
+	} else {
+		female_fitness = 1;
+	}
 	adult_density_force = i1.totalOfNeighborStrengths(individual);
 	competition_ratio = adult_density_force / EXPECTED_ADULT_COMPETITION;
 	actual_competition_factor = GROWTH_AT_ZERO_DENSITY/ ((GROWTH_AT_ZERO_DENSITY-1) * competition_ratio + 1);
@@ -202,7 +211,6 @@ early() {
 
 
 // non-WF specific
-// kill off the parental generation (the offspring generated haven't been added yet)
 // output the generation, population size, and frequency of the drive allele
 // evaluate spatial distances for the next round of reproduction
 // end the simulation if the drive is lost or fixed
@@ -214,12 +222,19 @@ late() {
 	rate_dr = num_drive_alleles/(2*N);
 	gen = sim.generation;
 	
-	catn("Generation: " + gen + " N: " + N + " rate_dr: " + rate_dr);
+	// Separate drive homozygotes and drive heterozygotes
+	drive_homozygotes = all[all.countOfMutationsOfType(m2) == 2*CHROM_LENGTH];
+	drive_heterogzygotes = all[all.countOfMutationsOfType(m2)==CHROM_LENGTH];
+	homoz_freq = length(drive_homozygotes)/N; // freq(DD)
+	het_freq = length(drive_heterogzygotes)/N; // freq(Dd)
+	
+	catn("Generation: " + gen + " N: " + N + " rate_dr: " + rate_dr + " freq(DD) = "+homoz_freq+" freq(Dd) = "+het_freq);
+	
 	
 	if (rate_dr == 0){
 		sim.simulationFinished();
 	} // else if (rate_dr == 1){
-		//sim.simulationFinished();
+	//sim.simulationFinished();
 	//}
 	
 	i1.evaluate();
