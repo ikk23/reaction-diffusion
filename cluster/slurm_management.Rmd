@@ -33,7 +33,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 * Use `plot_cluster_csv_results.R` to create figures
 
-## Jobs
+## Job1: `u_hat = 0.2, k = 0.2 (s.t. d/d fitness is 1.24, d/wt fitness is 0.92, and wt/wt fitness is 1.0), sigma = 0.05 --> 0.01, N = 10,000 --> 30,000`
 
 ### Did the default job:
   + sigma = 0.05
@@ -42,8 +42,6 @@ knitr::opts_chunk$set(echo = TRUE)
   + k = 0.2
   + N = 10,000
   + 10 replicates
-  + csv output: `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/scripts/defaults_a_summary.csv`
-  + figure output: `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/scripts/defaults_a_p_increase_plot.png`
   
 ### Increasing N, decreasing sigma, increasing nreps (a from 0.05 to 0.15)
 
@@ -58,12 +56,13 @@ knitr::opts_chunk$set(echo = TRUE)
 source("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/scripts/functions-main-model.R")
 u_hat = 0.2
 sigma = 0.01
+k = 0.2
 
 a_vec = seq(0.05, 0.15, length.out = 30)
 delta_vec = rep(-1,20)
 for (i in 1:20){
   a = a_vec[i]
-  delta = check_for_delta_0_when_b_is_1(u_hat, a/sigma)
+  delta = check_for_delta_0_when_b_is_1(u_hat, a/sigma, sigma, k)
   delta_vec[i] = delta
   #print(paste("a =",a,"--> delta=",delta))
 }
@@ -80,7 +79,7 @@ print(paste("predicted lowest delta=",min_delta,"at a=",min_a))
   + Same python and SLiM script
 * Results:
   + Always showed increase
-  + Summary csv: `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/scripts/uhat_20_a_0.05_to_0.15_summary.csv` -- append to this later
+  + Summary csv -- append to this later
 
 ### Increasing N, decreasing sigma, increasing nreps (a from 0.009 to 0.049)
 * Set up:
@@ -98,11 +97,109 @@ print(paste("predicted lowest delta=",min_delta,"at a=",min_a))
 * Results:
   + Looks like a sharp boundary point between a = 0.02 and a = 0.03
   + Narrow in on this in the next run
-  + Current summary: `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/scripts/uhat_20_a_0.009_to_0.15.csv`
+
   
-## Focusing on the boundary range
+### Focusing on the boundary range
 
 * a = seq(0.018, 0.025, length.out=30)
 * Text file: `slurm_text_a_in_range_u20.txt`
 * SLURM script: `vary_a_in_range_u20.sh`
 * Merge script: `merge_a_in_range_u20.sh`
+
+
+### Final output
+
+* See `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/csvs/uhat_20_a_full_summary.csv` for summary of all of the a-values
+* Figures are in `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/figures/`
+```{r}
+knitr::include_graphics("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/figures/zoomed_in_uhat_20_sigma0.01_uhat_0.2_k_0.2.png")
+```
+* The value of a that minimized AUC1-AUC0 was **a = 0.0145 (delta = 0.0003)**, but the value of a that produced a probability of drive increase closest to 50% was **a = 0.0226 (delta = 0.0005)**
+* Still a lot of stochasticity, even with 50 replicates and N = 30,000
+
+## Job2: `u_hat = 0.1, k = 0.2 (d/d fitness = 1.32, d/wt fitness = 0.96, wt/wt fitness = 1), sigma = 0.01, N = 30,000`
+
+```{r}
+k = 0.2
+u_hat = 0.1
+get_fitness_values(alpha = 1 - (2*u_hat), 0.2)
+```
+
+What do I expect *a* to be around?
+```{r}
+k = 0.2
+u_hat = 0.1
+sigma = 0.01
+
+a_trial = 0.01
+
+a_seqs = seq(0.008, 0.05, length.out = 20)
+delta_vector = rep(-1,20)
+for (i in 1:20){
+  a_trial = a_seqs[i]
+  delta_vector[i] = check_for_delta_0_when_b_is_1(u_hat, beta = a_trial/sigma, sigma, k)
+}
+ind = which.min(delta_vector)
+a_min = a_seqs[ind]
+delta_min = delta_vector[ind]
+print(paste("The value of a that minimizes delta (such that delta is", delta_min, " is a*=",a_min))
+
+```
+* I initially expect a* to be around 0.0124, so we should make the grid for a between 0.005 and 0.02
+```{r}
+grid = seq(0.005, 0.02, length.out = 100)
+```
+* Let's do 100 total jobs
+* SLiM model: `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/slim/nonWF-model.slim`
+  + On the cluster: `/home/ikk23/underdom/main_scripts/nonWF-model.slim`
+* python driver: `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/python_driver.py`
+  + On the cluster: `/home/ikk23/underdom/main_scripts/python_driver.py`
+* python helper: `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/slimutil.py`
+  + On the cluster: `/home/ikk23/underdom/main_scripts/slimutil.py`
+* SLURM text: `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.1_run/slurm_text/a_0.005_to_0.02.txt`
+  + On the cluster: `/home/ikk23/underdom/text_files/a_0.005_to_0.02.txt`
+* SLURM main script: `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.1_run/slurm_main/`
+  + On the cluster: `/home/ikk23/underdom/vary_a_scripts/vary_a_0.005_to_0.02.sh`
+* SLURM merge script: `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.1_run/slurm_merge/merge_a_0.005_to_0.02.sh`
+  + On the cluster: `/home/ikk23/underdom/merge_scripts/merge_a_0.005_to_0.02.sh`
+
+Submitted
+
+
+## Job3: `u_hat = 0.05, k = 0.2 (d/d fitness = 1.36, d/wt fitness = 0.98, wt/wt fitness = 1), sigma = 0.01, N = 30,000`
+
+```{r}
+u_hat = 0.05
+k = 0.2
+get_fitness_values(alpha = 1-(2*u_hat), k)
+```
+
+Which *a* value?
+```{r}
+k = 0.2
+u_hat = 0.05
+sigma = 0.01
+
+a_trial = 0.01
+
+a_seqs = seq(0.006, 0.1, length.out = 1000)
+delta_vector = rep(-1,20)
+for (i in 1:20){
+  a_trial = a_seqs[i]
+  delta_vector[i] = check_for_delta_0_when_b_is_1(u_hat, beta = a_trial/sigma, sigma, k)
+}
+ind = which.min(delta_vector)
+a_min = a_seqs[ind]
+delta_min = delta_vector[ind]
+print(paste("The value of a that minimizes delta (such that delta is", delta_min, " is a*=",a_min))
+```
+
+Let's look at a between 0.005 to 0.02, as before (100 jobs)
+* SLURM text: `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.05_run/slurm_text/u005_a_0.005_to_0.02.txt`
+  + On the cluster: `/home/ikk23/underdom/text_files/u005_a_0.005_to_0.02.txt`
+* SLURM vary a script: `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.05_run/slurm_main/u005_vary_a_005_to_002.sh`
+  + On the cluster: `/home/ikk23/underdom/vary_a_scripts/u005_vary_a_005_to_002.sh`
+* SLURM merge script: `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.05_run/slurm_merge/merge_u5_a_0.005_to_0.02.sh`
+  + On the cluster: `/home/ikk23/underdom/merge_scripts/merge_u5_a_0.005_to_0.02.sh`
+
+Submitted

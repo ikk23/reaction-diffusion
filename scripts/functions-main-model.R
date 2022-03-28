@@ -284,7 +284,7 @@ solve_for_sigma_given_a = function(beta,a){
   return(sigma)
 }
 
-check_for_delta_0_when_b_is_1 = function(u_hat, beta){
+check_for_delta_0_when_b_is_1 = function(u_hat, beta, sigma, k){
   term1 = (7/6) - (3*u_hat)
 
   term2_coefficient = (beta*(u_hat - 2)) + ((3*u_hat) - (3/2))
