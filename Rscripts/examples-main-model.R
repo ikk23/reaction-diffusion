@@ -1,4 +1,4 @@
-source("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/scripts/functions-piecewise-discrete-time-continuous-space.R")
+source("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/scripts/functions-main-model.R")
 
 
 # Check for a smooth function
@@ -87,7 +87,77 @@ x_grid = seq(-20,20,by=0.1)
 k = 0.1
 sigma = 2
 print(paste("ratio of sigma to a = ",sigma/a))
-res = u_t0_to_t1(x_grid,a,b,sigma,k,u_hat) # HERE, u(x,t=1) < 0 between -a/2 and a/2?
+res = u_t0_to_t1(x_grid,a,b,sigma,k,u_hat) # HERE, u(x,t=1) < 0 between -a/2 and a/2
+
+dir = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/figures/"
+ggsave(plot = res$plot, filename = paste0(dir, "b=u_hat=0.3_k=0.1.png"))
+
+# Our parameters (3/16/2022)
+sigma = 0.05
+k = 0.2
+u_hat = 0.2
+a = 0.105
+delta = check_for_delta_0_when_b_is_1(u_hat = 0.2, beta = a/sigma)
+print(paste("When a =",a,"beta =",a/sigma,"and delta =",delta)) # 0.002
+
+
+a = 0.1
+delta = check_for_delta_0_when_b_is_1(u_hat = 0.2, beta = a/sigma)
+print(paste("When a =",a,"beta =",a/sigma,"and delta =",delta)) # 0.00188
+
+a  = 0.09
+delta = check_for_delta_0_when_b_is_1(u_hat = 0.2, beta = a/sigma)
+print(paste("When a =",a,"beta =",a/sigma,"and delta =",delta)) # 0.0016
+
+
+a  = 0.05
+delta = check_for_delta_0_when_b_is_1(u_hat = 0.2, beta = a/sigma)
+print(paste("When a =",a,"beta =",a/sigma,"and delta =",delta)) # 0.002; increased from before, so the optimal a is between 0.05 and 0.09
+
+a = 0.07
+delta = check_for_delta_0_when_b_is_1(u_hat = 0.2, beta = a/sigma)
+print(paste("When a =",a,"beta =",a/sigma,"and delta =",delta)) # 0.0013; new best
+
+a = 0.06
+delta = check_for_delta_0_when_b_is_1(u_hat = 0.2, beta = a/sigma)
+print(paste("When a =",a,"beta =",a/sigma,"and delta =",delta)) # 0.0016; optimal might be between 0.07 and 0.06
+
+a = 0.068
+delta = check_for_delta_0_when_b_is_1(u_hat = 0.2, beta = a/sigma)
+print(paste("When a =",a,"beta =",a/sigma,"and delta =",delta)) # not as good as 0.07
+
+a = 0.069
+delta = check_for_delta_0_when_b_is_1(u_hat = 0.2, beta = a/sigma)
+print(paste("When a =",a,"beta =",a/sigma,"and delta =",delta)) # not as good as 0.07
+
+a = 0.072
+delta = check_for_delta_0_when_b_is_1(u_hat = 0.2, beta = a/sigma)
+print(paste("When a =",a,"beta =",a/sigma,"and delta =",delta)) # less than 0.07's
+
+a = 0.08
+delta = check_for_delta_0_when_b_is_1(u_hat = 0.2, beta = a/sigma)
+print(paste("When a =",a,"beta =",a/sigma,"and delta =",delta)) # greater than 0.072's
+
+a = 0.075
+delta = check_for_delta_0_when_b_is_1(u_hat = 0.2, beta = a/sigma)
+print(paste("When a =",a,"beta =",a/sigma,"and delta =",delta)) # not as good
+
+a = 0.073
+delta = check_for_delta_0_when_b_is_1(u_hat = 0.2, beta = a/sigma)
+print(paste("When a =",a,"beta =",a/sigma,"and delta =",delta)) # new best
+
+
+a = 0.08
+delta = check_for_delta_0_when_b_is_1(u_hat = 0.2, beta = a/sigma)
+print(paste("When a =",a,"beta =",a/sigma,"and delta =",delta))
+
+# a = 0.073 seems best here. beta = 1.48
+
+# beta = a / sigma
+# a = sigma*beta
+
+
+
 
 # b < u_hat
 b = 0.2
@@ -347,3 +417,50 @@ b = u_hat
 res = u_t0_to_t1(x_grid,a,b,sigma,k,u_hat)
 print(paste0("a*b = ",res$theta0,".      theta1 by trapz approx: ",res$theta1_trapz, ", theta1 by factored formula: ",res$theta1_factored,", theta1 by unsimplified formula: ",res$theta1_unsimplified,".    error of trapz approx - factored formula = ",res$theta1_trapz-res$theta1_factored)) 
 # AUC is initially at 200. The formulas both approximate a theta1 of 199.98893 (about 200); trapezoidal approximation is slightly lower (error or -0.194).
+
+
+# March 24, 2022
+# what a* is going to lead to that "critical propagule" when we have default parameters
+sigma = 0.05
+m = 0.005
+k = 0.2
+u_hat = 0.2
+alpha = 1-(2*u_hat)
+get_fitness_values(alpha,k) # d/d fitness = 1.24; d/wt fitness = 0.92; wt/wt fitness = 1.0
+
+a = 0.05
+
+# Try to get delta as close to 0 as possible
+epsilon = check_for_delta_0_when_b_is_1(u_hat, beta = a/sigma)
+paste0("a = ",a," --> beta = ", a/sigma, " --> delta = ",epsilon)
+
+a = 0.04 # increase a from 0.05
+paste0("a = ",a," --> beta = ", a/sigma, " --> delta = ",check_for_delta_0_when_b_is_1(u_hat, beta = a/sigma))
+
+a = 0.073241
+paste0("a = ",a," --> beta = ", a/sigma, " --> delta = ",check_for_delta_0_when_b_is_1(u_hat, beta = a/sigma))
+
+seq_of_a = seq(0.04, 0.09, length.out=20)
+epsilon_vector = rep(-1,20)
+for (i in 1:20){
+  a = seq_of_a[i]
+  epsilon_vector[i] = check_for_delta_0_when_b_is_1(u_hat, beta = a/sigma)
+}
+tib = tibble(a = seq_of_a, delta = epsilon_vector)
+View(tib)
+ind = which.min(epsilon_vector)
+a_min = seq_of_a[ind]
+delta_min = epsilon_vector[ind]
+# sweet spot for a is between 0.07157895 and 0.07684211
+
+a_min_vec = seq(0.07157895, 0.07684211, length.out = 20)
+epsilon_min_vec = rep(-1,20)
+for (i in 1:20){
+  a = a_min_vec[i]
+  epsilon_min_vec[i] = check_for_delta_0_when_b_is_1(u_hat, beta = a/sigma)
+}
+tib_min = tibble(a = a_min_vec, delta = epsilon_min_vec)
+View(tib_min)
+min(tib_min$delta) # 0.001273019
+a_value = tib_min$a[which.min(tib_min$delta)] # a = 0.073241
+beta = a_value / sigma # 1.46482

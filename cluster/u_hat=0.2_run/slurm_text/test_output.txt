@@ -1,0 +1,47 @@
+// Initial random seed:
+2132776613402
+
+// RunInitializeCallbacks():
+initializeSLiMModelType(modelType = 'nonWF');
+initializeSLiMOptions(dimensionality = 'x', periodicity = 'x');
+initializeSex("A");
+-----------------------------------
+a = 0.1106 sigma = 0.05 so beta = 2.212
+-----------------------------------
+"Frequency threshold of: 0.2  and alpha of: 0.6"
+-----------------------------------
+EXPECTED_ADULT_COMPETITION when m is 0.005 = 100.0
+"d/d fitness: 1.24 d/wt fitness: 0.92 wt/wt fitness: 1.0"
+-----------------------------------
+initializeMutationRate(0);
+initializeRecombinationRate(0);
+initializeMutationType(1, 0.5, "f", 0);
+initializeMutationType(2, 0.5, "f", 0);
+initializeGenomicElementType(1, c(m1, m2), c(1, 1));
+initializeGenomicElement(g1, 0, 0);
+initializeInteractionType(1, "x", reciprocal=T, maxDistance=0.005);
+
+// Starting run at generation <start>:
+1 
+
+-----------------------------------
+drive is between 0.4447 and 0.5553
+with dispersal, drive goes from 0.444779 to 0.555277
+-----------------------------------
+OUTPUT
+Generation: 1 N: 10000 rate_dr: 0.1106 freq(DD) = 0.1106 freq(Dd) = 0.0
+Generation: 2 N: 10362 rate_dr: 0.129029 freq(DD) = 0.127099 freq(Dd) = 0.00386026
+Generation: 3 N: 10297 rate_dr: 0.139555 freq(DD) = 0.0733223 freq(Dd) = 0.132466
+Generation: 4 N: 10135 rate_dr: 0.145042 freq(DD) = 0.0646275 freq(Dd) = 0.160829
+Generation: 5 N: 9832 rate_dr: 0.150071 freq(DD) = 0.0562449 freq(Dd) = 0.187653
+Generation: 6 N: 10318 rate_dr: 0.159915 freq(DD) = 0.0541772 freq(Dd) = 0.211475
+Generation: 7 N: 10072 rate_dr: 0.158509 freq(DD) = 0.0453733 freq(Dd) = 0.226271
+Generation: 8 N: 9871 rate_dr: 0.163357 freq(DD) = 0.0527809 freq(Dd) = 0.221153
+Generation: 9 N: 9957 rate_dr: 0.160591 freq(DD) = 0.0476047 freq(Dd) = 0.225972
+Generation: 10 N: 10175 rate_dr: 0.168845 freq(DD) = 0.0443243 freq(Dd) = 0.249042
+Generation: 11 N: 9941 rate_dr: 0.171713 freq(DD) = 0.0426516 freq(Dd) = 0.258123
+Generation: 12 N: 10135 rate_dr: 0.169117 freq(DD) = 0.0431179 freq(Dd) = 0.251998
+Generation: 13 N: 9763 rate_dr: 0.167059 freq(DD) = 0.0393322 freq(Dd) = 0.255454
+Generation: 14 N: 10211 rate_dr: 0.175252 freq(DD) = 0.0408383 freq(Dd) = 0.268828
+Generation: 15 N: 10022 rate_dr: 0.172321 freq(DD) = 0.0380164 freq(Dd) = 0.268609
+Generation: 16 N: 9793 rate_dr: 0.171909 freq(DD) = 0.0371694 freq(Dd) = 0.269478

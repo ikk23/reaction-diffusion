@@ -286,8 +286,7 @@ solve_for_sigma_given_a = function(beta,a){
 
 check_for_delta_0_when_b_is_1 = function(u_hat, beta){
   term1 = (7/6) - (3*u_hat)
-  left = -1*term1
-  
+
   term2_coefficient = (beta*(u_hat - 2)) + ((3*u_hat) - (3/2))
   term2 = term2_coefficient*exp(-beta)
   
@@ -297,9 +296,8 @@ check_for_delta_0_when_b_is_1 = function(u_hat, beta){
   
   term5 = (1/2)*exp(-0.5*beta)
   
-  right = term2+term3+term4+term5
+  sol = (term1+term2+term3+term4+term5)*sigma*k
   
-  sol = term1+right
   return(sol)
 }
 
@@ -314,52 +312,5 @@ get_fitness_values = function(alpha, k){
   return(c(w_drive_drive,w_drive_wt,w_wt_wt))
 }
 
-
-u_hat = 0.5
-a = 0.05
-epsilon1 = abs(check_for_delta_0_when_b_is_1(u_hat, beta = 0.798)) # Distance from 0
-epsilon2 = abs(check_for_delta_0_when_b_is_1(u_hat, beta = 0.799))
-epsilon2 < epsilon1 
-epsilon3 = abs(check_for_delta_0_when_b_is_1(u_hat, beta = 0.7981))
-epsilon3 < epsilon1 # TRUE
-epsilon4 = abs(check_for_delta_0_when_b_is_1(u_hat, beta = 0.7982))
-epsilon4 < epsilon3 # TRUE
-epsilon5 = abs(check_for_delta_0_when_b_is_1(u_hat, beta = 0.7983))
-epsilon5 < epsilon4 # TRUE
-epsilon6 = abs(check_for_delta_0_when_b_is_1(u_hat, beta = 0.7984))
-epsilon6 < epsilon5 # FALSE
-# Best beta is between 0.7983 and 0.7984
-beta = 0.7983
-sigma = solve_for_sigma_given_a(beta=beta,a=a) # sigma = 0.0626331
-
-# What happens when beta exceeds this value? if check_for_delta_0_when_b_is_1 is more positive, then the AUC has increased even more
-sigma_up = 0.07
-b = a/sigma_up
-check_for_delta_0_when_b_is_1(u_hat, b) # check
-# so when sigma = 0.07, this should spread
-
-check_for_delta_0_when_b_is_1(u_hat = 0.2, beta = 0.005/0.01)
-
-# Almost equal
-u_hat = 0.5
-beta = 0.7983
-
-# get fitness values when alpha = 0 and k = 0.2
-alpha = 0; k = 0.2
-get_fitness_values(alpha,k)
-# w(drive/drive) = 1
-# w(drive/wt) = 0.8
-# w(wt/wt) = 1
-
-
-comp_ratio = function(beta, pi, expected){
-  denom = ((beta-1)*(pi/expected)) + 1
-  ratio = beta/denom
-  return(ratio)
-}
-
-comp_ratio(3,0,10)
-
-check_for_delta_0_when_b_is_1(0.2,2.1)
 
 

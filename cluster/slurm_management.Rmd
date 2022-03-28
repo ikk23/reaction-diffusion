@@ -1,0 +1,108 @@
+---
+title: "SLURM job monitoring"
+author: "Isabel Kim"
+date: "3/25/2022"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Files
+
+### Processing pre-cluster
+* `create_slurm_text_file.R` -- creates a text file (`slurm_text.txt`) that will be used to give command-line arguments to each job in the area.
+
+### Needed for the cluster
+
+* `nonWF-model.slim`
+* `python_driver.py`
+* `slimutil.py` - Sam's SLiM functions
+* `slurm_text.txt` - command arguments for each job in the array
+  + Created by `create_slurm_text_file.R` -- local file
+* `vary_a_slurm.sh`
+  + Separates the job into an array with length = the number of lines in `slurm_text.txt`
+  + For each array job, takes the a value (and sigma, k, and u_hat values if they're different than the default), runs slim nrep times (default 10), and records whether the drive increased (last_rate > initial_rate) or decreased (last_rate < initial_rate). Writes nrep lines into a `.part` file 
+    * The `.part` files for each job array are written into `/home/ikk23/underdom/out`
+* `merge_a_parts.sh`
+  + Submit this *after the entire job array is complete*
+  + This simply goes into the `/home/ikk23/underdom/out` and merges all the files into a big csv, `vary_a.csv` which will be placed in `/home/ikk23/underdom/csvs`
+  
+### After the cluster
+
+* Use `plot_cluster_csv_results.R` to create figures
+
+## Jobs
+
+### Did the default job:
+  + sigma = 0.05
+  + a ranges from 0.01 to 0.99 (`seq(0.01, 0.99, length.out = 100)`)
+  + u_hat = 0.2
+  + k = 0.2
+  + N = 10,000
+  + 10 replicates
+  + csv output: `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/scripts/defaults_a_summary.csv`
+  + figure output: `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/scripts/defaults_a_p_increase_plot.png`
+  
+### Increasing N, decreasing sigma, increasing nreps (a from 0.05 to 0.15)
+
+* Set up:
+  + sigma = 0.01
+  + u_hat = 0.2
+  + k = 0.2
+  + N = 30,000
+  + 50 replicates
+  + a should focus on the range between 0.05 and 0.15 (`seq(0.05, 0.15, length.out = 30)`)
+```{r}
+source("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/scripts/functions-main-model.R")
+u_hat = 0.2
+sigma = 0.01
+
+a_vec = seq(0.05, 0.15, length.out = 30)
+delta_vec = rep(-1,20)
+for (i in 1:20){
+  a = a_vec[i]
+  delta = check_for_delta_0_when_b_is_1(u_hat, a/sigma)
+  delta_vec[i] = delta
+  #print(paste("a =",a,"--> delta=",delta))
+}
+
+ind = which.min(delta_vec)
+min_delta = delta_vec[ind]
+min_a  = a_vec[ind]
+print(paste("predicted lowest delta=",min_delta,"at a=",min_a))
+```
+  + Text file: `slurm_text_u_20.txt`
+  + SLURM script: `vary_a_u20.sh`
+  + Merge script: `merge_a_u20.sh`
+    * Creates `vary_a_u20.csv`
+  + Same python and SLiM script
+* Results:
+  + Always showed increase
+  + Summary csv: `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/scripts/uhat_20_a_0.05_to_0.15_summary.csv` -- append to this later
+
+### Increasing N, decreasing sigma, increasing nreps (a from 0.009 to 0.049)
+* Set up:
+  + sigma = 0.01
+  + u_hat = 0.2
+  + k = 0.2
+  + N = 30,000
+  + 50 replicates
+  + a between 0.009 and 0.049
+  + Text file: `slurm_text_a_low_u_20.txt`
+  + SLURM script: `vary_a_low_u20.sh`
+  + Merge script: `merge_a_low_u20.sh`
+    * Creates `vary_a_low_u20.csv`
+  + Same python and SLiM script
+* Results:
+  + Looks like a sharp boundary point between a = 0.02 and a = 0.03
+  + Narrow in on this in the next run
+  + Current summary: `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/scripts/uhat_20_a_0.009_to_0.15.csv`
+  
+## Focusing on the boundary range
+
+* a = seq(0.018, 0.025, length.out=30)
+* Text file: `slurm_text_a_in_range_u20.txt`
+* SLURM script: `vary_a_in_range_u20.sh`
+* Merge script: `merge_a_in_range_u20.sh`

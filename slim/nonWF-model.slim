@@ -4,18 +4,23 @@ initialize() {
 	initializeSLiMOptions(dimensionality="x", periodicity="x");
 	initializeSex("A");
 	
-	defineConstant("a", 0.105); // width of initial release area (in the middle of the grid)
-	defineConstant("sigma",0.05); // average dispersal distance	
+	// Parameters that can be changed at the command line
+	defineCfgParam("a", 0.01037931);
+	defineCfgParam("sigma",0.01); // average dispersal distance	
+	defineCfgParam("k", 0.2);
+	defineCfgParam("u_hat", 0.2);
+	
+	defineConstant("alpha", 1 - 2*u_hat);
 	defineConstant("beta", a/sigma);
+	catn("-----------------------------------");
+	catn("a = " + a + " sigma = " + sigma + " so beta = " + beta);
 	defineConstant("m", 0.005); // mating radius
 	defineConstant("X_MAX", 1); // x ranges from 0 to X_MAX, default 1.0
-	defineConstant("k", 0.2);
-	defineConstant("u_hat", 0.2);
-	defineConstant("alpha", 1 - 2*u_hat);
+
 	catn("-----------------------------------");
 	print(paste("Frequency threshold of:", u_hat, " and alpha of: " + alpha));
 	
-	defineConstant("POPSIZE", 10000);
+	defineConstant("POPSIZE", 30000);
 	defineConstant("CHROM_LENGTH", 1);
 	defineConstant("GROWTH_AT_ZERO_DENSITY", 2); // in empty areas, the expected # of offspring is 2*fitness*this value 
 	defineConstant("EXPONENT_OF_COMPETITION_FACTOR", 2); // increase from 1 to make the penalty for crowded individuals more severe
@@ -26,8 +31,13 @@ initialize() {
 	
 	// checks
 	defineConstant("CHECK_MATING_CODE", F); // whether to check the competition factor code
-	defineConstant("RELEASE_DRIVE_EVERYWHERE", T); // if F, only release between -a/2 and a/2
+	defineConstant("RELEASE_DRIVE_EVERYWHERE", F); // if F, only release between -a/2 and a/2
 	defineConstant("b", 0.18); // if releasing the drive uniformly, make b < 1. Drive released at this introduction frequency everywhere
+	
+	// Only 1 can be true
+	// DRIVE_DISPERSAL=T is default
+	defineConstant("DRIVE_DISPERSAL", T);
+	defineConstant("MATING_DEACTIVATION", F);
 	
 	// Fitness values are based on alpha (1 - 2u_hat) and k
 	d_d_fitness = 	1 + (2*alpha*k);
@@ -59,6 +69,17 @@ initialize() {
 
 }
 
+//// HELPER FUNC FOR CONSTANTS THAT MAY ASLO BE CONFIGURED VIA COMMAND LINE.
+function (void) defineCfgParam(string$ name, lifs value) {
+    if (!exists(name))
+        defineConstant(name, value);
+}
+
+
+
+
+
+
 1 {
 	sim.addSubpop("p1", POPSIZE);
 	
@@ -71,9 +92,33 @@ initialize() {
 		midpoint = X_MAX/2;
 		range_left = midpoint - (a/2);
 		range_right = midpoint + (a/2);
+		catn("-----------------------------------");
+		catn("drive is between " + range_left + " and " + range_right);
+
 		
 		in_range = (all.x >= range_left & all.x <= range_right);
 		drive = all[in_range];
+		
+		if (DRIVE_DISPERSAL){
+			for (i in seqLen(length(POPSIZE))){
+				ind = all[i];
+				distance = rexp(1,mu = sigma);
+				
+				// if this draw is 1, go right. If it's 0, go left.
+				right = rbinom(1, 1, 0.5);
+				if (right){
+					ind.x = ind.x + distance;
+				} else {
+					ind.x = ind.x - distance;
+				}
+			}
+		}
+		catn("with dispersal, drive goes from "+ min(drive.x) + " to " + max(drive.x));
+		catn("-----------------------------------");
+		
+		catn("OUTPUT"); // everything else printed to the SLiM consule is generation-by-generation output
+
+		
 		wildtype = all[!in_range];
 		
 		wildtype.genomes.addNewDrawnMutation(m1, seqLen(CHROM_LENGTH));
@@ -128,22 +173,26 @@ reproduction(NULL, "F") {
 	}
 	
 	// get the fitness values of each male in this circle and sample based on these mating weights
+	// determine the female's fecundity based on her fitness and the number of individuals surrounding her
 	
-	if (sim.generation > 2){
+	
+	if (MATING_DEACTIVATION){
+		if (sim.generation > 2){
+			mating_weights = neighbors.tagF;
+			mate_id = sample(x = seqLen(num_neighbors), size = 1, weights = mating_weights);
+			selected_mate = neighbors[mate_id];
+			female_fitness = individual.tagF;
+		} else {
+			female_fitness = 1.0;
+			selected_mate = sample(neighbors,size=1);
+		}
+	}  else {
 		mating_weights = neighbors.tagF;
 		mate_id = sample(x = seqLen(num_neighbors), size = 1, weights = mating_weights);
 		selected_mate = neighbors[mate_id];
-	} else {
-		selected_mate = sample(neighbors,1);
-	}
-	
-	// determine the female's fecundity based on her fitness and the number of individuals surrounding her
-	
-	if (sim.generation > 2){
 		female_fitness = individual.tagF;
-	} else {
-		female_fitness = 1;
 	}
+	
 	adult_density_force = i1.totalOfNeighborStrengths(individual);
 	competition_ratio = adult_density_force / EXPECTED_ADULT_COMPETITION;
 	actual_competition_factor = GROWTH_AT_ZERO_DENSITY/ ((GROWTH_AT_ZERO_DENSITY-1) * competition_ratio + 1);
@@ -156,10 +205,57 @@ reproduction(NULL, "F") {
 		offspring = subpop.addCrossed(individual, selected_mate);
 	}
 	
-	// For a random 10 females, print out the number of individuals surrounding them, the competition factor, p, and their number of offspring
 	if (CHECK_MATING_CODE){
-		if (any(c(8844,2220,2372,7725,533,9168,7687,38,4562,594) == individual.index)){
-			catn("female's normalized fitness is " + female_fitness + " num inds surrounding female = " + adult_density_force + " competition factor = " + actual_competition_factor_exponentiated + " p = " + p + " num offspring = " + num_offspring);
+		//random_indices = c(9742,194,3606,3348,8057,8125,1215,5109,189,9570,9988,1221, 7720,3688,8129,7110,1190,2817,465,3018);
+		random_indices = seqLen(p1.individualCount);
+		if (any(random_indices == individual.index)){
+			
+			// See which genotypes are surrounding the female. Which one does she choose?
+			neighbor_genotypes = rep("na", num_neighbors);
+			selected_mate_genotype = "na";
+			for (i in seqLen(num_neighbors)){
+				potential_mate = neighbors[i];
+				wildtype = potential_mate.countOfMutationsOfType(m1) == 2*CHROM_LENGTH;
+				drive_hom = potential_mate.countOfMutationsOfType(m2) == 2*CHROM_LENGTH;
+				drive_het = (potential_mate.countOfMutationsOfType(m1) == CHROM_LENGTH) & (potential_mate.countOfMutationsOfType(m2) == CHROM_LENGTH);
+				
+				if (wildtype){
+					this_genotype = "wild-type";
+				} else if (drive_hom){
+					this_genotype = "drive homozygote";
+				} else if (drive_het){
+					this_genotype = "drive heterozygote";
+				} else {
+					this_genotype = "unknown"; // shouldn't happen
+				}
+				
+				neighbor_genotypes[i] = this_genotype;
+				if (potential_mate == selected_mate){
+					selected_mate_genotype = this_genotype;
+				}
+				
+			}
+			
+			fem_wildtype = individual.countOfMutationsOfType(m1) == 2*CHROM_LENGTH;
+			fem_drive_hom = individual.countOfMutationsOfType(m2) == 2*CHROM_LENGTH;
+			fem_drive_het = (individual.countOfMutationsOfType(m1) == CHROM_LENGTH) & (selected_mate.countOfMutationsOfType(m2) == CHROM_LENGTH);
+			
+			if (fem_wildtype){
+				female_genotype = "wild-type";
+			} else if (fem_drive_hom){
+				female_genotype = "drive homozygote";
+			} else if (fem_drive_het){
+				female_genotype = "drive heterozygote";
+			} else {
+				female_genotype = "unknown"; // shouldn't happen
+			}
+			
+			
+			catn("female = " + female_genotype + " at position " + individual.x + " selects a male " + selected_mate_genotype + "     female's fitness = " + female_fitness + " num inds surrounding female = " + adult_density_force + " competition factor = " + actual_competition_factor_exponentiated + " p = " + p + " num offspring = " + num_offspring);
+			//catn("options: ");
+			//print(neighbor_genotypes);
+			
+			//catn("female's fitness = " + female_fitness + " num inds surrounding female = " + adult_density_force + " competition factor = " + actual_competition_factor_exponentiated + " p = " + p + " num offspring = " + num_offspring);
 		}
 	}
 
@@ -204,6 +300,7 @@ reproduction(NULL, "F") {
 
 // Kill off adults
 // why was this in a late() event in our gene drive models?
+// check this
 early() {
 	all = p1.individuals;
 	all[all.age > 0].fitnessScaling = 0.0;
@@ -229,6 +326,8 @@ late() {
 	het_freq = length(drive_heterogzygotes)/N; // freq(Dd)
 	
 	catn("Generation: " + gen + " N: " + N + " rate_dr: " + rate_dr + " freq(DD) = "+homoz_freq+" freq(Dd) = "+het_freq);
+	
+	//catn("Generation: " + gen + " N: " + N + " rate_dr: " + rate_dr);
 	
 	
 	if (rate_dr == 0){
