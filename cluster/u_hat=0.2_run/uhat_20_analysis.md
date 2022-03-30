@@ -40,10 +40,19 @@ whereas the grey line shows the a_obs value that led to a P(increase)
 closest to 50%
 
 ``` r
-knitr::include_graphics("../../cluster/u_hat=0.1_run/figures/more_replicates_uhat_10_sigma0.01_k_0.2.png")
+knitr::include_graphics("../../cluster/u_hat=0.2_run/figures/zoomed_in_uhat_0.2_more_replicates.png")
 ```
 
-![](../../cluster/u_hat=0.1_run/figures/more_replicates_uhat_10_sigma0.01_k_0.2.png)<!-- -->
+![](../../cluster/u_hat=0.2_run/figures/zoomed_in_uhat_0.2_more_replicates.png)<!-- -->
+The a_pred value that minimizes delta is 0.01464646, which is an
+under-estimate – the a_obs value that led to a P(increase) of 48% is
+0.02252525.
+
+The transition range looks like it’s between a = 0.02 and a = 0.027
+(quite short).
+
+Even with many values of a (190), N=30000, sigma = 0.01, and up to 100,
+there’s a lot of stochasiticity.
 
 ## How does delta change with a?
 
@@ -72,6 +81,8 @@ plot_a_vs_delta
 ```
 
 ![](uhat_20_analysis_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
+There is a clear minimum value of delta that the black line seems to
+capture. The delta_obs value is slightly above the minimum.
 
 ## How does P(increase) change with delta?
 
@@ -108,3 +119,6 @@ plot_delta_vs_freq
 ```
 
 ![](uhat_20_analysis_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
+
+P(increase) increases mostly linearly with delta until P(increase)=1.
+But there is a lot of stochasticity/outliers.
