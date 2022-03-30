@@ -64,7 +64,7 @@ plot_delta_vs_freq = ggplot(data, aes(x = delta, y = p_increase)) +
   geom_line(color = "grey") +
   geom_vline(xintercept = obs_v_pred$delta_pred, color = "black") + 
   xlab("delta = AUC1 - AUC0") + 
-  ylab("P(increase") +
+  ylab("P(increase)") +
   labs(title = paste0("sigma =",data$sigma[1], 
                       "  k=",data$k[1],"  u_hat=", data$u_hat[1],
                       "  nreps = ", nreps), 
