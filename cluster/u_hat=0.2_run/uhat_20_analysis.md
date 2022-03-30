@@ -73,7 +73,7 @@ plot_a_vs_delta
 
 ![](uhat_20_analysis_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
 
-## How does delta change with the P(increase)?
+## How does P(increase) change with delta?
 
 Would initially expect that at higher delta, P(increase) is higher –
 there is a positive correlation

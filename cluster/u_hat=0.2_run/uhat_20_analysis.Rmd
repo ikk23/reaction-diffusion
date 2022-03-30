@@ -47,7 +47,7 @@ plot_a_vs_delta = ggplot(data, aes(x = a, y = delta)) +
 plot_a_vs_delta
 ```
 
-## How does delta change with the P(increase)?
+## How does P(increase) change with delta?
 
 Would initially expect that at higher delta, P(increase) is higher -- there is a positive correlation
 ```{r}
