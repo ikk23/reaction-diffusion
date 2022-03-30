@@ -62,7 +62,7 @@ compiled_plot = ggplot(data = compiled, aes(x = a, y = p_increase, color = u_hat
   xlim(0, 0.05) +
   geom_vline(xintercept = obs_vs_pred_u10$a_pred, color = "coral1") +
   geom_vline(xintercept = obs_vs_pred_u20$a_pred, color = "mediumturquoise") +
-  labs(title = paste0("for u_hat = 10, a_pred is ", round(obs_vs_pred_u10$a_pred,4), " and a_obs is = ", round(obs_vs_pred_u10$a_obs, 4), "\nfor u_hat = 20, a_pred is ", round(obs_vs_pred_u20$a_pred,4), " and a_obs is ", round(obs_vs_pred_u20$a_obs,4)))
+  labs(title = paste0("for u_hat = 10, a_pred is ", round(obs_vs_pred_u10$a_pred,4), " and a_obs is ", round(obs_vs_pred_u10$a_obs, 4), "\nfor u_hat = 20, a_pred is ", round(obs_vs_pred_u20$a_pred,4), " and a_obs is ", round(obs_vs_pred_u20$a_obs,4)))
 
 #ggsave(filename = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/uhat20_vs_uhat10.png", plot = compiled_plot)
 
@@ -72,3 +72,28 @@ compiled_plot
     ## Warning: Removed 29 row(s) containing missing values (geom_path).
 
 ![](uhat_comparison_files/figure-gfm/unnamed-chunk-1-1.png)<!-- -->
+
+It makes sense that when the invasion frequency is lower, a smaller
+release area is required in order for the drive to spread – this is why
+the coral line (uhat=10) is behind the blue line (uhat=20). The observed
+values of a that cause P(increase)=50% are about 0.01 apart. However,
+the predicted values of a are way too close. delta should be more
+sensitive to changes in u_hat.
+
+## a vs delta for different u_hat
+
+``` r
+compiled_delta_plot = ggplot(data = compiled, aes(x = a, y = delta, color = u_hat)) +
+  geom_line() +
+  xlab("a") +
+  ylab("P(increase)") +
+  labs(title = paste0("for u_hat = 10, a_pred is ", round(obs_vs_pred_u10$a_pred,4), " and a_obs is ", round(obs_vs_pred_u10$a_obs, 4), "\nfor u_hat = 20, a_pred is ", round(obs_vs_pred_u20$a_pred,4), " and a_obs is ", round(obs_vs_pred_u20$a_obs,4)))
+
+compiled_delta_plot
+```
+
+![](uhat_comparison_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
+
+Where they overlap, these curves have very similar shapes, but the
+P(increase) is always higher when u_hat=10% (makes sense with a lower
+invasion frequency).
