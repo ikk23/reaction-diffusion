@@ -15,3 +15,4 @@
 
 * [R markdown keeping track of jobs](cluster/slurm_management.md)
 * [uhat = 20 output](cluster/u_hat=0.2_run/uhat_20_analysis.md)
+* [uhat = 10 output](cluster/u_hat=0.1_run/uhat_10_analysis.md)
