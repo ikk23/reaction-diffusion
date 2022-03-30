@@ -149,10 +149,10 @@ print(paste("predicted lowest delta=",min_delta,"at a=",min_a))
     `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/figures/`
 
 ``` r
-knitr::include_graphics("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/figures/zoomed_in_uhat_20_sigma0.01_uhat_0.2_k_0.2.png")
+knitr::include_graphics("../cluster/u_hat=0.2_run/figures/zoomed_in_uhat_20_sigma0.01_uhat_0.2_k_0.2.png")
 ```
 
-![](/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/figures/zoomed_in_uhat_20_sigma0.01_uhat_0.2_k_0.2.png)<!-- -->
+![](../cluster/u_hat=0.2_run/figures/zoomed_in_uhat_20_sigma0.01_uhat_0.2_k_0.2.png)<!-- -->
 \* The value of a that minimized AUC1-AUC0 was **a = 0.0145 (delta =
 0.0003)**, but the value of a that produced a probability of drive
 increase closest to 50% was **a = 0.0226 (delta = 0.0005)** \* Still a
@@ -237,10 +237,10 @@ grid = seq(0.005, 0.02, length.out = 100)
 -   Original plot:
 
 ``` r
-knitr::include_graphics("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.1_run/figures/original_uhat_10_sigma0.01_k_0.2.png")
+knitr::include_graphics("../cluster/u_hat=0.1_run/figures/original_uhat_10_sigma0.01_k_0.2.png")
 ```
 
-![](/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.1_run/figures/original_uhat_10_sigma0.01_k_0.2.png)<!-- -->
+![](../cluster/u_hat=0.1_run/figures/original_uhat_10_sigma0.01_k_0.2.png)<!-- -->
 The predicted a\* (based on the a value that minimizes delta) seems to
 predict the point at which p_increase = 1. It is slightly (not too much)
 higher than the a_obs value that produced a p(increase) closest to 50%.
@@ -306,10 +306,10 @@ merge script:
 -   Original plot:
 
 ``` r
-knitr::include_graphics("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.05_run/figures/original_uhat_5_sigma0.01_k_0.2.png")
+knitr::include_graphics("../cluster/u_hat=0.05_run/figures/original_uhat_5_sigma0.01_k_0.2.png")
 ```
 
-![](/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.05_run/figures/original_uhat_5_sigma0.01_k_0.2.png)<!-- -->
+![](../cluster/u_hat=0.05_run/figures/original_uhat_5_sigma0.01_k_0.2.png)<!-- -->
 
 In this case, a\* appears *way* off. It dramatically over-estimates the
 transition range.
@@ -325,10 +325,10 @@ transition range.
 ### Designing more replicates for u_hat=20%
 
 ``` r
-knitr::include_graphics("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/figures/zoomed_in_uhat_20_sigma0.01_uhat_0.2_k_0.2.png")
+knitr::include_graphics("../cluster/u_hat=0.2_run/figures/zoomed_in_uhat_20_sigma0.01_uhat_0.2_k_0.2.png")
 ```
 
-![](/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/figures/zoomed_in_uhat_20_sigma0.01_uhat_0.2_k_0.2.png)<!-- -->
+![](../cluster/u_hat=0.2_run/figures/zoomed_in_uhat_20_sigma0.01_uhat_0.2_k_0.2.png)<!-- -->
 
 Look at a between 0.01 and 0.03 \* Text file:
 `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/slurm_text/u20_a_0.01_to_0.03_50_replicates.txt`
