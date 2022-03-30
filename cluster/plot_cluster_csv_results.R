@@ -2,16 +2,12 @@ library(tidyverse)
 source("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/scripts/functions-main-model.R")
 
 # PATH TO THE CLUSTER OUTPUT
-file = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/scripts/vary_a_in_range_u20.csv"
+file = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.05_run/csv_raw/u5_a_0.005_to_0.02.csv"
 
 nreps = 50
-
-
-dir = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/csv_raw/"
-data1 = read_csv(paste0(dir,"vary_a_low_u20.csv"))
-data2 = read_csv(paste0(dir, "vary_a_in_range_u20.csv"))
-data3 = read_csv(paste0(dir, "vary_a_u20.csv"))
-data = rbind(data1,data2,data3) %>% arrange(a)
+data = read_csv(file)
+nparams = 100
+nparams_observed = nrow(data)/50 # 97, so 3 are missing
 
 
 # For each row, get the beta and delta value
@@ -67,7 +63,7 @@ summarize_data = tibble(a = a_vector, sigma = sigma_vector, beta = beta_vector,
                         p_increase = p_increase_vector)
 
 # Write out
-output_path = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/csvs/uhat_0.2_summary.csv"
+output_path = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.05_run/csvs/uhat_0.05_summary_missing_3.csv"
 write_csv(x = summarize_data, file = output_path)
 
 # Get the parameter set that had the closest AUC1-AUC0 to 0
@@ -94,8 +90,46 @@ plot_freqs_and_a = ggplot(summarize_data, aes(x = a, y = p_increase)) +
                       "  k=",summarize_data$k[1],"  u_hat=", summarize_data$u_hat[1],
                       "  nreps = ", nreps), 
        subtitle = paste0("a* = ", round(a_prop,4), " (delta* = ", round(delta_min,4),") but a_obs =",round(a_obs,4)," (delta_obs =", round(delta_obs,4),")")) 
-
-# Output final graph
-plot_path = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/figures/final_uhat_20_sigma0.01_uhat_0.2_k_0.2.png"
-
+dir = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.05_run/figures/"
+plot_path = paste0(dir,"original_uhat_5_sigma0.01_k_0.2.png")
 ggsave(filename = plot_path, plot = plot_freqs_and_a)
+
+# Zoom in
+plot_zoom = plot_freqs_and_a + xlim(0.005, a_prop)
+plot_path = paste0(dir, "zoomed_in_uhat_5_sigma0.01_k_0.2.png")
+ggsave(filename = plot_path, plot = plot_zoom)
+
+# Add to the range by assuming all a > max(a here) produces p(increase) of 1
+more_a = seq(0.025, 1.0, by = 0.025)
+n = length(more_a)
+sigma_vec = rep(0.01,n)
+k_vec = rep(0.2, n)
+u_hat_vec = rep(0.05, n)
+p_increase = rep(1,n)
+delta_vec = rep(-1,n)
+beta_vec = rep(-1,n)
+k = 0.2
+sigma = 0.01
+u_hat = 0.05
+for (i in 1:n){
+  a = more_a[i]
+  beta = a/0.01
+  delta = check_for_delta_0_when_b_is_1(u_hat, beta, sigma, k)
+  beta_vec[i] = beta
+  delta_vec[i] = delta
+}
+more_tibble = tibble(a = more_a, sigma = sigma_vec, beta = beta_vec, k = k_vec, u_hat = u_hat_vec, delta = delta_vec, p_increase = p_increase)
+expanded_tibble = rbind(summarize_data, more_tibble)
+
+exp_plot = ggplot(expanded_tibble, aes(x = a, y = p_increase)) + 
+  geom_point(color = "red") + 
+  geom_line(color = "grey") +
+  geom_vline(xintercept = a_prop) + 
+  ylab("P(increase)") + 
+  labs(title = paste0("sigma =",summarize_data$sigma[1], 
+                      "  k=",summarize_data$k[1],"  u_hat=", summarize_data$u_hat[1],
+                      "  nreps = ", nreps), 
+       subtitle = paste0("a* = ", round(a_prop,4), " (delta* = ", round(delta_min,4),") but a_obs =",round(a_obs,4)," (delta_obs =", round(delta_obs,4),")")) +
+  xlim(0, 0.1)
+plot_path = paste0(dir, "zoomed_out_uhat_5_sigma0.01_k_0.2.png")
+ggsave(filename = plot_path, plot = exp_plot)

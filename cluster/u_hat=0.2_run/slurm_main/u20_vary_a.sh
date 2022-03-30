@@ -2,8 +2,8 @@
 #SBATCH --ntasks=1
 #SBATCH --mem=1000
 #SBATCH --partition=regular
-#SBATCH --job-name=u5_a_0.005_to_0.02
-#SBATCH --output=u5_a_0.005_to_0.02.txt
+#SBATCH --job-name=u20_a_0.01_to_0.03
+#SBATCH --output=u20_a_0.01_to_0.03.txt
 #SBATCH --array=1-100
 
 # Run 100 array jobs, each with 10 replicates
@@ -19,7 +19,7 @@ BASE_DIR=/home/ikk23
 cp $BASE_DIR/underdom/main_scripts/python_driver.py .
 cp $BASE_DIR/underdom/main_scripts/nonWF-model.slim .
 cp $BASE_DIR/underdom/main_scripts/slimutil.py .
-cp $BASE_DIR/underdom/text_files/u005_a_0.005_to_0.02.txt .
+cp $BASE_DIR/underdom/text_files/u20_a_0.01_to_0.03_50_replicates.txt .
 
 # Include SLiM in the path
 PATH=$PATH:/home/ikk23/SLiM/SLiM_build
@@ -27,9 +27,9 @@ export PATH
 
 # Only the first .part file has the header
 # Output all files into an output-specific folder
-prog=`sed -n "${SLURM_ARRAY_TASK_ID}p" u005_a_0.005_to_0.02.txt`
+prog=`sed -n "${SLURM_ARRAY_TASK_ID}p" u20_a_0.01_to_0.03_50_replicates.txt`
 $prog > ${SLURM_ARRAY_TASK_ID}.part
-cp ${SLURM_ARRAY_TASK_ID}.part $BASE_DIR/underdom/out_u5
+cp ${SLURM_ARRAY_TASK_ID}.part $BASE_DIR/underdom/out_u20
 
 # Will need to merge later
 

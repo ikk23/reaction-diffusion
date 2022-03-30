@@ -163,8 +163,17 @@ grid = seq(0.005, 0.02, length.out = 100)
 * SLURM merge script: `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.1_run/slurm_merge/merge_a_0.005_to_0.02.sh`
   + On the cluster: `/home/ikk23/underdom/merge_scripts/merge_a_0.005_to_0.02.sh`
 
-Submitted
+### Final output
 
+* 4 jobs crashed
+* Raw file: `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.1_run/csv_raw/u10_a_0.005_to_0.02.csv`
+* Summary file: `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.1_run/csvs/uhat_0.1_summary_missing_4.csv`
+* Plots are in: `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.1_run/figures/`
+* Original plot:
+```{r}
+knitr::include_graphics("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.1_run/figures/original_uhat_10_sigma0.01_k_0.2.png")
+```
+The predicted a* (based on the a value that minimizes delta) seems to predict the point at which p_increase = 1. It is slightly (not too much) higher than the a_obs value that produced a p(increase) closest to 50%.
 
 ## Job3: `u_hat = 0.05, k = 0.2 (d/d fitness = 1.36, d/wt fitness = 0.98, wt/wt fitness = 1), sigma = 0.01, N = 30,000`
 
@@ -202,4 +211,39 @@ Let's look at a between 0.005 to 0.02, as before (100 jobs)
 * SLURM merge script: `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.05_run/slurm_merge/merge_u5_a_0.005_to_0.02.sh`
   + On the cluster: `/home/ikk23/underdom/merge_scripts/merge_u5_a_0.005_to_0.02.sh`
 
-Submitted
+### Final output
+
+* 3 jobs crashed
+* Raw csv: `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.05_run/csv_raw/u5_a_0.005_to_0.02.csv`
+* Summary csv: `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.05_run/csvs/uhat_0.05_summary_missing_3.csv`
+* Figures are in: `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.05_run/figures/`
+* Original plot:
+```{r}
+knitr::include_graphics("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.05_run/figures/original_uhat_5_sigma0.01_k_0.2.png")
+```
+
+In this case, a* appears *way* off. It dramatically over-estimates the transition range.
+
+## Re-run both u10 and u5 to see if more replicates (50 --> 100) help with stochasticity
+
+* Change from "short" to "regular" partition and changing `/SSD/` to `/workdir/`
+* Running the u_hat = 10% job: `vary_a_0.005_to_0.02.sh` (job number 4168726)
+* Running the u_hat = 5% job: (job number 4168826)
+
+### Designing more replicates for u_hat=20%
+
+```{r}
+knitr::include_graphics("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/figures/zoomed_in_uhat_20_sigma0.01_uhat_0.2_k_0.2.png")
+```
+
+Look at a between 0.01 and 0.03
+* Text file: `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/slurm_text/u20_a_0.01_to_0.03_50_replicates.txt`
+  + On the cluster: `/home/ikk23/underdom/text_files/u20_a_0.01_to_0.03_50_replicates.txt`
+* SLURM main script: `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/slurm_main/u20_vary_a.sh`
+  + On the cluster: `/home/ikk23/underdom/vary_a_scripts/u20_vary_a.sh`
+* SLURM merge script: `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/slurm_merge/merge_u20_a_0.01_to_0.03.sh`
+  + On the cluster: `/home/ikk23/underdom/merge_scripts/merge_u20_a_0.01_to_0.03.sh`
+  
+  
+* Submitted the main script (job number 4168926)
+

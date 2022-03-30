@@ -1,7 +1,7 @@
 #!/bin/bash -l
 #SBATCH --ntasks=1
 #SBATCH --mem=1000
-#SBATCH --partition=short
+#SBATCH --partition=regular
 #SBATCH --job-name=u10_a_0.005_to_0.02
 #SBATCH --output=u10_a_0.005_to_0.02.txt
 #SBATCH --array=1-100
@@ -9,7 +9,7 @@
 # Run 100 array jobs, each with 10 replicates
 
 # Create and move to working directory for job:
-WORKDIR=/SSD/$USER/$SLURM_JOB_ID-$SLURM_ARRAY_TASK_ID
+WORKDIR=/workdir/$USER/$SLURM_JOB_ID-$SLURM_ARRAY_TASK_ID
 mkdir -p $WORKDIR
 cd $WORKDIR
 

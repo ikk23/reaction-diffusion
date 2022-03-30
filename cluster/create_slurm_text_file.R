@@ -1,14 +1,14 @@
-a_seq = seq(0.005, 0.02, length.out = 100)
+a_seq = seq(0.01, 0.03, length.out = 100)
 
 # Start writing to a new output file
-sink('/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.05_run/slurm_text/u005_a_0.005_to_0.02.txt')
+sink('/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/slurm_text/u20_a_0.01_to_0.03_50_replicates.txt')
 
 for (i in 1:length(a_seq)){
   a = a_seq[i]
   if (i == 1){
-    line = paste0("python python_driver.py -a ",a," -u_hat 0.05 -header","\n")
+    line = paste0("python python_driver.py -a ",a," -u_hat 0.2 -header","\n")
   } else {
-    line = paste0("python python_driver.py -a ",a, " -u_hat 0.05", "\n")
+    line = paste0("python python_driver.py -a ",a, " -u_hat 0.2", "\n")
   }
   cat(line)
 }
