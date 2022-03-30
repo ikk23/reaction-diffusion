@@ -1,0 +1,20 @@
+python python_driver.py -a 0.001 -u_hat 0.05 -header
+python python_driver.py -a 0.00120526315789474 -u_hat 0.05
+python python_driver.py -a 0.00141052631578947 -u_hat 0.05
+python python_driver.py -a 0.00161578947368421 -u_hat 0.05
+python python_driver.py -a 0.00182105263157895 -u_hat 0.05
+python python_driver.py -a 0.00202631578947368 -u_hat 0.05
+python python_driver.py -a 0.00223157894736842 -u_hat 0.05
+python python_driver.py -a 0.00243684210526316 -u_hat 0.05
+python python_driver.py -a 0.00264210526315789 -u_hat 0.05
+python python_driver.py -a 0.00284736842105263 -u_hat 0.05
+python python_driver.py -a 0.00305263157894737 -u_hat 0.05
+python python_driver.py -a 0.00325789473684211 -u_hat 0.05
+python python_driver.py -a 0.00346315789473684 -u_hat 0.05
+python python_driver.py -a 0.00366842105263158 -u_hat 0.05
+python python_driver.py -a 0.00387368421052632 -u_hat 0.05
+python python_driver.py -a 0.00407894736842105 -u_hat 0.05
+python python_driver.py -a 0.00428421052631579 -u_hat 0.05
+python python_driver.py -a 0.00448947368421053 -u_hat 0.05
+python python_driver.py -a 0.00469473684210526 -u_hat 0.05
+python python_driver.py -a 0.0049 -u_hat 0.05

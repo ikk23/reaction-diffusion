@@ -265,4 +265,44 @@ a_obs and a_predicted has barely changed; once again, we see that a_predicted < 
 
 ### u_hat = 10%
 
-* Full summary 
+* Old raw csv file (need to average with *this* one instead): `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.1_run/csv_raw/u10_a_0.005_to_0.02.csv`
+* New compiled summary file: `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.1_run/csvs/uhat_10_more_replicate_summary.csv`
+* New figure (with grey line at a_obs):
+`/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.1_run/figures/more_replicates_uhat_10_sigma0.01_k_0.2.png`
+```{r}
+knitr::include_graphics("../cluster/u_hat=0.1_run/figures/more_replicates_uhat_10_sigma0.01_k_0.2.png")
+```
+Graph looks even more rough. But a_obs and a_pred haven't changed. Unlike u_hat=20, here, a_pred > a_obs (a_pred is about where p(increase) becomes 1).
+
+### u_hat = 5%
+
+* Old raw csv file: `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.05_run/csv_raw/u5_a_0.005_to_0.02.csv`
+* More replicate summary: `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.05_run/csvs/uhat_5_more_replicate_summary_from_a_0.005_to_0.02.csv`
+* New figure: `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.05_run/figures/more_replicates_uhat_0.05_a_0.005_to_0.02.png`
+```{r}
+knitr::include_graphics("../cluster/u_hat=0.05_run/figures/more_replicates_uhat_0.05_a_0.005_to_0.02.png")
+```
+Since the invasion frequency is so low (5%), the lowest value of a still leads to spread 50% of the time. a_pred is much greater than this a_obs. But it would be useful to do more cluster runs with u_hat = 0.05 but at an even lower range of a.
+
+```{r}
+sigma = 0.01
+k = 0.2
+u_hat = 0.05
+a = 0.005
+check_for_delta_0_when_b_is_1(u_hat, 0.002/sigma, sigma, k)
+```
+
+Let's run 20 jobs from a = 0.001 to a = 0.0049
+
+New job:
+
+* Text file: `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.05_run/slurm_text/u5_lower_a.txt`
+  + On the cluster: `/home/ikk23/underdom/text_files/u5_lower_a.txt`
+* SLURM main script: `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.05_run/slurm_main/u5_a_lower.sh` (using the short partition)
+  + On the cluster: `/home/ikk23/underdom/vary_a_scripts/u5_a_lower.sh
+  + Submitted around 12pm: `Submitted batch job 4175390`
+* Merge script: `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.05_run/slurm_merge/merge_a_lower.sh`
+  + On the cluster: `/home/ikk23/underdom/merge_scripts/merge_a_lower.sh`
+
+
+
