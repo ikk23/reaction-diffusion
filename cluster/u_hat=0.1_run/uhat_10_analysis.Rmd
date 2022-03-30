@@ -76,3 +76,4 @@ plot_delta_vs_freq = ggplot(data, aes(x = delta, y = p_increase)) +
 plot_delta_vs_freq
 ```
 I think this is because with the range of a I used, we're mainly on the side of the a-vs-delta curve where delta is decreasing as a is increasing (LHS).
+

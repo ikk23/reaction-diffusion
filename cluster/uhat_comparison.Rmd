@@ -1,0 +1,39 @@
+---
+title: "uhat_comparison"
+author: "Isabel Kim"
+date: "3/30/2022"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## u_hat = 10 vs u_hat = 20 - a vs P(increase) on the same axes
+
+```{r}
+library(tidyverse)
+source("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/plotting_functions.R")
+
+summary_u10 = read_csv("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.1_run/csvs/uhat_10_more_replicate_summary.csv")
+obs_vs_pred_u10 = get_a_pred_and_a_obs(summary_u10)
+
+summary_u20 = read_csv("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/csvs/uhat_0.2_more_replicate_summary.csv")
+obs_vs_pred_u20 = get_a_pred_and_a_obs(summary_u20)
+
+compiled = rbind(summary_u10, summary_u20)
+compiled$u_hat = as.character(compiled$u_hat)
+
+compiled_plot = ggplot(data = compiled, aes(x = a, y = p_increase, color = u_hat)) +
+  geom_line() +
+  xlab("a") +
+  ylab("P(increase)") +
+  xlim(0, 0.05) +
+  geom_vline(xintercept = obs_vs_pred_u10$a_pred, color = "coral1") +
+  geom_vline(xintercept = obs_vs_pred_u20$a_pred, color = "mediumturquoise") +
+  labs(title = paste0("for u_hat = 10, a_pred is ", round(obs_vs_pred_u10$a_pred,4), " and a_obs is = ", round(obs_vs_pred_u10$a_obs, 4), "\nfor u_hat = 20, a_pred is ", round(obs_vs_pred_u20$a_pred,4), " and a_obs is ", round(obs_vs_pred_u20$a_obs,4)))
+
+#ggsave(filename = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/uhat20_vs_uhat10.png", plot = compiled_plot)
+
+compiled_plot
+```
