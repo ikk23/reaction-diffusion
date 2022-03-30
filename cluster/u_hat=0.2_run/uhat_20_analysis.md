@@ -49,7 +49,7 @@ under-estimate – the a_obs value that led to a P(increase) of 48% is
 0.02252525.
 
 The transition range looks like it’s between a = 0.02 and a = 0.027
-(quite short).
+(quite short; 0.007 wide).
 
 Even with many values of a (190), N=30000, sigma = 0.01, and up to 100,
 there’s a lot of stochasiticity.
