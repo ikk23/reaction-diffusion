@@ -247,3 +247,8 @@ Look at a between 0.01 and 0.03
   
 * Submitted the main script (job number 4168926)
 
+## Re-runs to add more replicates
+
+* u_hat=20% raw csv file: `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/csv_raw/u20_a_0.01_to_0.03.csv`
+* u_hat=10% raw csv file: `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.1_run/csv_raw/second_run_u10_a_0.005_to_0.02.csv`
+* u_hat=5% raw csv file: `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.05_run/csv_raw/second_run_u5_a_0.005_to_0.02.csv`
