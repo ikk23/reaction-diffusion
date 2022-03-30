@@ -9,3 +9,8 @@
 ## SLiM models:
 * [WF model (note - problem with clustering)](slim/WF-model.slim)
 * [nonWF model](slim/nonWF-model.slim)
+
+
+## CLUSTER output:
+
+* [R markdown keeping track of jobs](cluster/slurm_management.md)
