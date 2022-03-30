@@ -2,12 +2,12 @@ library(tidyverse)
 source("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/scripts/functions-main-model.R")
 
 # PATH TO THE CLUSTER OUTPUT
-file = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.05_run/csv_raw/u5_a_0.005_to_0.02.csv"
+file = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/csv_raw/u20_a_0.01_to_0.03.csv"
 
 nreps = 50
 data = read_csv(file)
 nparams = 100
-nparams_observed = nrow(data)/50 # 97, so 3 are missing
+nparams_observed = nrow(data)/50 # none missing
 
 
 # For each row, get the beta and delta value
@@ -25,9 +25,6 @@ for (i in 1:n){
   delta_vector[i] = delta
 }
 data = data %>% add_column(beta = beta_vector, .after = 2) %>% add_column(delta = delta_vector)
-# write out the raw data
-output_path = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/csvs/uhat_0.2_full.csv"
-write_csv(x = data, file = output_path)
 
 # Group by common values of a
 starts = seq(1, n, by = nreps)
@@ -61,11 +58,14 @@ for (i in 1:nparams){
 summarize_data = tibble(a = a_vector, sigma = sigma_vector, beta = beta_vector,
                         k = k_vector, u_hat = u_hat_vector, delta = delta_vector,
                         p_increase = p_increase_vector)
+# Combine with the previous summary data
+past = read_csv("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/csvs/uhat_0.2_summary.csv")
+compiled = rbind(past, summarize_data) %>% arrange(a)
+path = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/csvs/uhat_0.2_more_replicate_summary.csv"
 
-# Write out
-output_path = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.05_run/csvs/uhat_0.05_summary_missing_3.csv"
-write_csv(x = summarize_data, file = output_path)
+write_csv(x = compiled, file = path)
 
+summarize_data = compiled
 # Get the parameter set that had the closest AUC1-AUC0 to 0
 # this would be the predicted value of a that'd lead to the critical propagule -- expect to see p(increase) = 0.5
 ind = which.min(summarize_data$delta)
@@ -90,9 +90,17 @@ plot_freqs_and_a = ggplot(summarize_data, aes(x = a, y = p_increase)) +
                       "  k=",summarize_data$k[1],"  u_hat=", summarize_data$u_hat[1],
                       "  nreps = ", nreps), 
        subtitle = paste0("a* = ", round(a_prop,4), " (delta* = ", round(delta_min,4),") but a_obs =",round(a_obs,4)," (delta_obs =", round(delta_obs,4),")")) 
-dir = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.05_run/figures/"
-plot_path = paste0(dir,"original_uhat_5_sigma0.01_k_0.2.png")
-ggsave(filename = plot_path, plot = plot_freqs_and_a)
+
+# Zoom in to last scale -- max(a) of 0.05
+p = plot_freqs_and_a + xlim(min(compiled$a),0.05)
+
+# Add line at a of pincrease of 0.5
+p = p + geom_vline(xintercept = a_obs, color = "cornsilk3")
+
+dir = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/figures/"
+
+plot_path = paste0(dir,"zoomed_in_uhat_0.2_more_replicates.png")
+ggsave(filename = plot_path, plot = p)
 
 # Zoom in
 plot_zoom = plot_freqs_and_a + xlim(0.005, a_prop)

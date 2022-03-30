@@ -143,7 +143,7 @@ print(paste("predicted lowest delta=",min_delta,"at a=",min_a))
 ### Final output
 
 -   See
-    `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/csvs/uhat_20_a_full_summary.csv`
+    `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/csvs/uhat_0.2_summary.csv`
     for summary of all of the a-values
 -   Figures are in
     `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/figures/`
@@ -352,3 +352,26 @@ SLURM merge script:
     `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.1_run/csv_raw/second_run_u10_a_0.005_to_0.02.csv`
 -   u_hat=5% raw csv file:
     `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.05_run/csv_raw/second_run_u5_a_0.005_to_0.02.csv`
+
+### u_hat = 20%
+
+-   Full summary before this was at:
+    `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/csvs/uhat_0.2_summary.csv`,
+    so prepare the raw csv file to the summary stage, then rbind this
+    all together and replot
+-   New compiled summary file:
+    `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/csvs/uhat_0.2_more_replicate_summary.csv`
+-   New figure (with grey line at a_obs):
+    `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/figures/zoomed_in_uhat_0.2_more_replicates.png`
+
+``` r
+knitr::include_graphics("../cluster/u_hat=0.2_run/figures/zoomed_in_uhat_0.2_more_replicates.png")
+```
+
+![](../cluster/u_hat=0.2_run/figures/zoomed_in_uhat_0.2_more_replicates.png)<!-- -->
+a_obs and a_predicted has barely changed; once again, we see that
+a_predicted \< a_obs. The new replicates *added* some stochasticity.
+
+### u_hat = 10%
+
+-   Full summary
