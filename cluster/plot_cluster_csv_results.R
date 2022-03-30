@@ -2,17 +2,11 @@ library(tidyverse)
 source("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/scripts/functions-main-model.R")
 
 # PATH TO THE RAW CLUSTER OUTPUT
-file = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.05_run/csv_raw/second_run_u5_a_0.005_to_0.02.csv"
+file = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.05_run/csv_raw/u5_a_0.001_to_a_0.0049.csv"
 nreps = 50
 data = read_csv(file)
-nparams = 100
-nparams_observed = nrow(data)/50 # none missing
-
-# for uhat=10 and uhat=5, compiled with old raw csv file here
-old_raw = read_csv("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.05_run/csv_raw/u5_a_0.005_to_0.02.csv")
-compiled_data = rbind(old_raw, data) %>% arrange(a)
-
-data = compiled_data
+nparams = 20
+nparams_observed = nrow(data)/50 # 19 - 1 missing
 
 # For each row, get the beta and delta value
 n = nrow(data)
@@ -29,9 +23,6 @@ for (i in 1:n){
   delta_vector[i] = delta
 }
 data = data %>% add_column(beta = beta_vector, .after = 2) %>% add_column(delta = delta_vector)
-
-
-
 
 # Group by common values of a
 starts = seq(1, n, by = nreps)
@@ -66,23 +57,25 @@ summarize_data = tibble(a = a_vector, sigma = sigma_vector, beta = beta_vector,
                         k = k_vector, u_hat = u_hat_vector, delta = delta_vector,
                         p_increase = p_increase_vector)
 
+old_summary = read_csv("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.05_run/csvs/uhat_5_more_replicate_summary_from_a_0.005_to_0.02.csv")
+
+compiled_summary = rbind(summarize_data, old_summary) %>% arrange(a)
+
+
 # Write out more-replicate-summary-data
-write_csv(x = summarize_data, file = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.05_run/csvs/uhat_5_more_replicate_summary_from_a_0.005_to_0.02.csv")
+write_csv(x = compiled_summary, file = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.05_run/csvs/uhat_5_u0.001_to_0.02_summary.csv")
 
-# Get the parameter set that had the closest AUC1-AUC0 to 0
-# this would be the predicted value of a that'd lead to the critical propagule -- expect to see p(increase) = 0.5
-ind = which.min(summarize_data$delta)
-min_row = summarize_data[ind,] 
-a_prop = min_row$a
-delta_min = min_row$delta
 
-# Get the observed a that had p(increase) closest to 50%
-diff = abs(summarize_data$p_increase - 0.5)
-ind = which.min(diff)
-a_obs = summarize_data$a[ind]
-delta_obs = summarize_data$delta[ind]
-p_increase_obs = summarize_data$p_increase[ind]
+source("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/plotting_functions.R")
+data = compiled_summary
+obs_vs_pred = get_a_pred_and_a_obs(data)
+a_prop = obs_vs_pred$a_pred
+delta_min = obs_vs_pred$delta_pred
+a_obs = obs_vs_pred$a_obs
+delta_obs = obs_vs_pred$delta_obs
+p_increase_obs = obs_vs_pred$p_increase_obs
 
+summarize_data = data
 # Plot p(increase) as a function of a
 plot_freqs_and_a = ggplot(summarize_data, aes(x = a, y = p_increase)) + 
   geom_point(color = "red") + 
@@ -92,14 +85,15 @@ plot_freqs_and_a = ggplot(summarize_data, aes(x = a, y = p_increase)) +
   labs(title = paste0("sigma =",summarize_data$sigma[1], 
                       "  k=",summarize_data$k[1],"  u_hat=", summarize_data$u_hat[1],
                       "  nreps = ", nreps), 
-       subtitle = paste0("a* = ", round(a_prop,4), " (delta* = ", round(delta_min,4),") but a_obs =",round(a_obs,4)," (delta_obs =", round(delta_obs,4),")")) 
+       subtitle = paste0("a* = ", round(a_prop,4), " (delta* = ", round(delta_min,4),") but a_obs =",round(a_obs,4)," (delta_obs =", round(delta_obs,4),")")) +
+  ylim(0,1)
 
 # Add line at a of pincrease of 0.5
 p = plot_freqs_and_a + geom_vline(xintercept = a_obs, color = "cornsilk3")
 
 dir = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.05_run/figures/"
 
-plot_path = paste0(dir,"more_replicates_uhat_0.05_a_0.005_to_0.02.png")
+plot_path = paste0(dir,"uhat_5_u0.001_to_0.02.png")
 ggsave(filename = plot_path, plot = p)
 
 # Zoom in
