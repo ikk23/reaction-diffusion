@@ -64,6 +64,31 @@ there’s a lot of stochasiticity.
 ``` r
 source("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/plotting_functions.R")
 obs_v_pred = get_a_pred_and_a_obs(data)
+obs_v_pred
+```
+
+    ## $index_of_pred
+    ## [1] 29
+    ## 
+    ## $a_pred
+    ## [1] 0.01464646
+    ## 
+    ## $delta_pred
+    ## [1] 0.0002546032
+    ## 
+    ## $index_of_obs
+    ## [1] 92
+    ## 
+    ## $a_obs
+    ## [1] 0.02252525
+    ## 
+    ## $p_increase_obs
+    ## [1] 0.48
+    ## 
+    ## $delta_obs
+    ## [1] 0.0004718396
+
+``` r
 nreps = 50
 
 plot_a_vs_delta = ggplot(data, aes(x = a, y = delta)) + 

@@ -36,6 +36,7 @@ Even with many values of a (190), N=30000, sigma = 0.01, and up to 100, there's 
 ```{r}
 source("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/plotting_functions.R")
 obs_v_pred = get_a_pred_and_a_obs(data)
+obs_v_pred
 nreps = 50
 
 plot_a_vs_delta = ggplot(data, aes(x = a, y = delta)) + 
