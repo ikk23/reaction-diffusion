@@ -1,4 +1,4 @@
-uhat_10_analysis
+uhat_5\_analysis
 ================
 Isabel Kim
 3/30/2022
@@ -21,10 +21,10 @@ library(tidyverse)
     ## x dplyr::lag()    masks stats::lag()
 
 ``` r
-data = read_csv("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.1_run/csvs/uhat_10_more_replicate_summary.csv")
+data = read_csv("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.05_run/csvs/uhat_5_u0.001_to_0.02_summary.csv")
 ```
 
-    ## Rows: 196 Columns: 7
+    ## Rows: 216 Columns: 7
 
     ## ── Column specification ────────────────────────────────────────────────────────
     ## Delimiter: ","
@@ -37,50 +37,49 @@ data = read_csv("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusio
 # a_obs vs a_pred values
 source("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/plotting_functions.R")
 obs_v_pred = get_a_pred_and_a_obs(data)
+
+nreps = 50
 obs_v_pred
 ```
 
     ## $index_of_pred
-    ## [1] 110
+    ## [1] 121
     ## 
     ## $a_pred
-    ## [1] 0.01348485
+    ## [1] 0.01287879
     ## 
     ## $delta_pred
-    ## [1] 0.0006380466
+    ## [1] 0.0008226724
     ## 
     ## $index_of_obs
-    ## [1] 76
+    ## [1] 20
     ## 
     ## $a_obs
-    ## [1] 0.01075758
+    ## [1] 0.005
     ## 
     ## $p_increase_obs
     ## [1] 0.5
     ## 
     ## $delta_obs
-    ## [1] 0.0007126801
+    ## [1] 0.001979917
+
+## a vs p(increase) - 100 replicates when a \> 0.005 and 50 replicates for a \< 0.005
 
 ``` r
-nreps = 100
+knitr::include_graphics("../../cluster/u_hat=0.05_run/figures/uhat_5_u0.001_to_0.02.png")
 ```
 
-## a vs p(increase) - 100 total replicates
+![](../../cluster/u_hat=0.05_run/figures/uhat_5_u0.001_to_0.02.png)<!-- -->
 
-``` r
-knitr::include_graphics("../../cluster/u_hat=0.1_run/figures/more_replicates_uhat_10_sigma0.01_k_0.2.png")
-```
+Like with uhat=10, the predicted value of a\* (0.01287879)
+over-estimates the observed a-value that leads to a P(increase) of 50%
+(a_obs = 0.005). This is far off.
 
-![](../../cluster/u_hat=0.1_run/figures/more_replicates_uhat_10_sigma0.01_k_0.2.png)<!-- -->
-The a_pred value that minimizes delta is 0.01348485 (only slightly less
-than the a_pred for u_hat=20). Now, a_pred is an *over-estimate* – the
-a_obs value that led to a P(increase) of 50% was 0.01075758. However,
-this prediction is not as far off as it was for u_hat=20.
+Even with a=0.001, P(increase) is still greater than 0 at this low
+threshold of 5%. The transition range looks like it’s between 0.001 and
+0.01 (about 0.009 wide - wider than it was for uhat=20 and uhat=10).
 
-The transition range looks like it’s between a=0.0075 and a=0.014 (about
-the same width as for u_hat; around 0.0065).
-
-Lots of stochasticity even with 100 replicates.
+Some stochasticity in the transition range.
 
 ## How does delta change with a?
 
@@ -104,10 +103,9 @@ plot_a_vs_delta = ggplot(data, aes(x = a, y = delta)) +
 plot_a_vs_delta
 ```
 
-![](uhat_10_analysis_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
-Again, the a_pred value seems to find the minimum. Again, the grey a_obs
-line finds a higher delta value, but now it’s on the left-hand side of
-the minimum (a\* is an over-estimate).
+![](uhat_5_analysis_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
+Similar to the other uhat results, a_pred captures the minimum, and
+a_obs is to the left of it.
 
 ## How does P(increase) change with delta?
 
@@ -117,10 +115,10 @@ What is the correlation between delta and P(increase)?
 cor(data$delta, data$p_increase)
 ```
 
-    ## [1] -0.7499646
+    ## [1] -0.9440732
 
-Negative correlation this time? That doesn’t make sense. If the AUC
-increases more, we’d expect the drive to be more likely to succeed.
+Negative correlation because we’re on the left hand side of the minimum
+of delta?
 
 ``` r
 plot_delta_vs_freq = ggplot(data, aes(x = delta, y = p_increase)) + 
@@ -138,7 +136,4 @@ plot_delta_vs_freq = ggplot(data, aes(x = delta, y = p_increase)) +
 plot_delta_vs_freq
 ```
 
-![](uhat_10_analysis_files/figure-gfm/unnamed-chunk-5-1.png)<!-- --> I
-think this is because with the range of a I used, we’re mainly on the
-side of the a-vs-delta curve where delta is decreasing as a is
-increasing (LHS).
+![](uhat_5_analysis_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
