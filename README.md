@@ -18,3 +18,7 @@
 * [uhat = 10 output](cluster/u_hat=0.1_run/uhat_10_analysis.md)
 * [uhat = 5 output](cluster/u_hat=0.05_run/uhat_5_analysis.md)
 * [Comparing uhat=5, uhat=10, and uhat=20](cluster/uhat_comparison.md)
+
+## Mathematica:
+
+* [Tutorial](
