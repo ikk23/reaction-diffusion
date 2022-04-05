@@ -26,3 +26,7 @@
 
 * [Tutorial](mathematica_tutorial.md)
 * [AUC (theta) and delta equations](AUC_only.nb)
+
+## Still need to:
+
+* Re-run the cluster jobs with a lower range of *a* values (first minimize |delta - 0| based on the corrected delta equation)
