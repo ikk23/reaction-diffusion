@@ -14,14 +14,13 @@
 ## CLUSTER output:
 
 * [R markdown keeping track of jobs](cluster/slurm_management.md)
-* [uhat = 20 output](cluster/u_hat=0.2_run/uhat_20_analysis.md)
 * [uhat = 10 output](cluster/u_hat=0.1_run/uhat_10_analysis.md)
 * [uhat = 5 output](cluster/u_hat=0.05_run/uhat_5_analysis.md)
 * [Comparing uhat=5, uhat=10, and uhat=20](cluster/uhat_comparison.md)
 
 ### Edited delta
 
-* [Plots](cluster/redo_delta.md)
+* [uhat = 20 output](cluster/uhat20_redo_delta.md)
 
 ## Mathematica:
 
