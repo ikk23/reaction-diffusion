@@ -25,3 +25,4 @@
 ## Mathematica:
 
 * [Tutorial](mathematica_tutorial.md)
+* [AUC (theta) and delta equations](AUC_only.nb)
