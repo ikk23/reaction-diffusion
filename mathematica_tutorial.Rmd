@@ -126,3 +126,16 @@ Out[1]= 4
 * For a *definite* integral with bounds, supply a vector argument -- 1st variable is the variable to integrate over (`x`), next variable is the lower bound, third variable is the upper bound
   + ex: `Integrate[1/(x^3 + 1), {x,0,1}]` outputs `1/18 (2sqrt(3) + Log[64])`
   
+## Conditionals
+
+### [If](https://reference.wolfram.com/language/ref/If.html)
+
+* Use the function `If[condition, t, f]`. the "t" will occur if the condition is true, and "f" will occur if the condition is false
+  + ex: `abs[x_] := If[x < 0, -x, x]`
+  + ex: `x = 0`
+      * `a = 0.5`
+      * `If[x < (-a/2), Print["true"], Print["false"]]` outputs `false`
+
+### [And](https://reference.wolfram.com/language/ref/And.html)
+
+* Use `&&`
