@@ -46,3 +46,82 @@ delta = function(a,b,sigma,k,uhat){
 }
 
 
+factored_auc = function(a, b, sigma, k, uhat){
+  orange = (((3*sigma*(b^2)*k)/2)*((3*b) - (2*uhat) - 2)) - (2*a*b*k*(b-1)*(b-uhat)) + (a*b)
+  pink_inner = (sigma*b*((3*uhat) - (4*b) + 3)) - (a*((3*b) - uhat - 1))
+  pink = (b*k*pink_inner)*exp(-a/sigma)
+  blue = (-sigma*(b^3)*k/2)*exp(-2*a/sigma)
+  
+  auc_factored = orange + pink + blue
+  return(auc_factored)
+}
+
+factored_delta = function(a,b,sigma,k,uhat){
+  orange = (((3*sigma*(b^2)*k)/2)*((3*b) - (2*uhat) - 2)) - (2*a*b*k*(b-1)*(b-uhat))
+  pink_inner = (sigma*b*((3*uhat) - (4*b) + 3)) - (a*((3*b) - uhat - 1))
+  pink = (b*k*pink_inner)*exp(-a/sigma)
+  blue = (-sigma*(b^3)*k/2)*exp(-2*a/sigma)
+
+  delta_factored = orange+pink+blue
+  return(delta_factored)
+}
+
+
+# Checking when factoring
+a = 0.1
+b = 1
+sigma = 0.001
+uhat = 0.4
+
+unfactored = auc_mathematica(a,b,sigma,k,uhat)
+factored = factored_auc(a,b,sigma,k,uhat)
+print("THETA")
+print(paste("Initial:",unfactored,"--> factored:",factored))
+
+print("DELTA")
+delta_un = delta(a,b,sigma,k,uhat)
+delta_factored = factored_delta(a,b,sigma,k,uhat)
+print(paste("Initial:",delta_un,"--> factored:",delta_factored))
+
+factored_auc_b_is_1 = function(a, b, sigma, k, uhat){
+  orange = ((3*sigma*k/2)*(1 - (2*uhat))) + a
+  
+  pink = k*((sigma*((3*uhat) - 1)) - (a*(2-uhat)))*exp(-a/sigma)
+  
+  blue = (-sigma*k/2)*exp(-2*a/sigma)
+  
+  auc_b_1 = orange + pink + blue
+  return(auc_b_1)
+}
+
+factored_delta_b_is_1 = function(a,b,sigma,k,uhat){
+  orange = (3*sigma*k/2)*(1-(2*uhat))
+  
+  pink = k*((sigma*((3*uhat)-1)) - (a*(2-uhat)))*exp(-a/sigma)
+  
+  blue = (-sigma*k/2)*exp(-2*a/sigma)
+  
+  delta = orange+pink+blue
+  return(delta)
+}
+
+
+a = 0.5
+b = 1
+sigma = 0.1
+uhat = 0.3
+
+auc_orig = auc_mathematica(a,b,sigma,k,uhat)
+auc_factored = factored_auc(a,b,sigma,k,uhat)
+auc_factored_b_is_1 = factored_auc_b_is_1(a,b,sigma,k,uhat)
+print(paste("Orig:",auc_orig,"factored:",auc_factored,"factored and b=1:",auc_factored_b_is_1))
+
+delta_orig = delta(a,b,sigma,k,uhat)
+delta_factored = factored_delta(a,b,sigma,k,uhat)
+delta_factored_b_is_1 = factored_delta_b_is_1(a,b,sigma,k,uhat)
+print(paste("Orig:",delta_orig,"factored:",delta_factored,"factored and b=1:",delta_factored_b_is_1))
+
+
+
+
+
