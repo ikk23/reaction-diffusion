@@ -1,31 +1,32 @@
-Redoing the plots with the correct delta value
-================
-Isabel Kim
-4/5/2022
+---
+title: "Redoing the uhat=20% plots with the correct delta value"
+author: "Isabel Kim"
+date: "4/5/2022"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
 
 ## Load in packages and functions
-
-``` r
+```{r message=F}
 library(tidyverse)
 source("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/scripts/functions-main-model.R")
 ```
 
-## uhat=20%
+## uhat=20% files
 
--   Summary csv file from before:
-    `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/csvs/uhat_0.2_more_replicate_summary.csv`
+* Summary csv file from before: `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/csvs/uhat_0.2_more_replicate_summary.csv`
 
 Read in the replicate summary file from before
-
-``` r
+```{r eval=F}
 csv = read_csv("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/csvs/uhat_0.2_more_replicate_summary.csv")
 dim(csv)
 head(csv)
 ```
-
 Go through and add the correct delta
-
-``` r
+```{r eval=F}
 n = 190
 corr_delta = rep(-1,n)
 for (i in 1:n){
@@ -48,12 +49,11 @@ csv_edit = csv %>% add_column(delta_correct = corr_delta)
 #write_csv(file="/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/csvs/EDITED_DELTA_uhat_0.2_more_replicate_summary.csv",x=csv_edit)
 ```
 
-Edited csv file is at:
-`Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/csvs/EDITED_DELTA_uhat_0.2_more_replicate_summary.csv`
+Edited csv file is at: `Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/csvs/EDITED_DELTA_uhat_0.2_more_replicate_summary.csv`
+
 
 ### Replot the a vs P(increase) graph
-
-``` r
+```{r eval=F}
 data = csv_edit
 
 # Manually add a a=0, p_increase = 0 row for a this graph only
@@ -84,15 +84,12 @@ plot_freqs_and_a = ggplot(data_a_graph, aes(x = a, y = p_increase)) +
 #ggsave(plot = plot_freqs_and_a, filename = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/figures/EDITED_DELTA_a_vs_p_increase.png")
 ```
 
-``` r
+```{r}
 knitr::include_graphics("../cluster/u_hat=0.2_run/figures/EDITED_DELTA_a_vs_p_increase.png")
 ```
 
-![](../cluster/u_hat=0.2_run/figures/EDITED_DELTA_a_vs_p_increase.png)<!-- -->
-
 Zoom in
-
-``` r
+```{r eval=F}
 freq_vs_a_zoomed_in = ggplot(data_a_graph, aes(x = a, y = p_increase)) + 
   geom_point(color = "red") + 
   geom_line(color = "grey") +
@@ -107,15 +104,13 @@ freq_vs_a_zoomed_in = ggplot(data_a_graph, aes(x = a, y = p_increase)) +
 #ggsave(plot = freq_vs_a_zoomed_in, filename = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/figures/EDITED_DELTA_zoomed_in_a_vs_p_increase.png")
 ```
 
-``` r
+```{r}
 knitr::include_graphics("../cluster/u_hat=0.2_run/figures/EDITED_DELTA_zoomed_in_a_vs_p_increase.png")
 ```
 
-![](../cluster/u_hat=0.2_run/figures/EDITED_DELTA_zoomed_in_a_vs_p_increase.png)<!-- -->
 
 ### Replot the a vs delta graph
-
-``` r
+```{r eval=F}
 plot_a_vs_delta = ggplot(csv_edit, aes(x = a, y = delta_correct)) + 
   geom_point(color = "purple") + 
   geom_line(color = "grey") +
@@ -129,15 +124,60 @@ plot_a_vs_delta = ggplot(csv_edit, aes(x = a, y = delta_correct)) +
 #ggsave(plot = plot_a_vs_delta, "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/figures/EDITED_DELTA_a_vs_delta.png") 
 ```
 
-``` r
+```{r}
 knitr::include_graphics("../cluster/u_hat=0.2_run/figures/EDITED_DELTA_a_vs_delta.png")
 ```
 
-![](../cluster/u_hat=0.2_run/figures/EDITED_DELTA_a_vs_delta.png)<!-- -->
+#### Extend a to lower values (below the minimum a used in the cluster runs)
+```{r eval=F}
+a_lowers = seq(0, 0.008, length.out = 20)
+sigma = 0.01
+b=1
+uhat=0.2
+k=0.2
+delta_lowers = rep(-1,20)
+for (i in 1:20){
+  a = a_lowers[i]
+  delta_lowers[i] = delta(a,b,sigma,k,uhat)
+}
+
+a_extend = c(a_lowers, csv_edit$a)
+delta_extend = c(delta_lowers, csv_edit$delta_correct)
+n = length(delta_extend)
+a_vs_delta_tibble = tibble(a = a_extend, sigma = rep(0.01, n), beta = a_extend/0.01, k = rep(0.2,n), u_hat = rep(0.2,n), delta_correct = delta_extend)
+
+# output
+#write_csv(file = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/csvs/EDITED_DELTA_a_vs_delta_theoretical.csv", x = a_vs_delta_tibble)
+```
+
+csv file of delta values predicted for various a values: `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/csvs/EDITED_DELTA_a_vs_delta_theoretical.csv`
+
+Plot a vs delta extended
+```{r eval=F}
+
+# Which delta is closest to 0 (besides when a = 0)?
+
+plot_ext_a_v_delta = ggplot(a_vs_delta_tibble, aes(x = a, y = delta_correct)) + 
+  geom_point(color = "purple") + 
+  geom_line(color = "grey") +
+  geom_vline(xintercept = a_prop) + 
+  ylab("delta") + 
+  labs(title = paste0("sigma =",data$sigma[1], 
+                      "  k=",data$k[1],"  u_hat=", data$u_hat[1]),
+       subtitle = paste0("a* = ", round(a_prop,4), " (delta* = ", round(delta_min,4),") but a_obs =",round(a_obs,4)," (delta_obs =", round(delta_obs,4),")"))+
+  geom_vline(xintercept = a_obs, color = "cornsilk3") +
+  geom_hline(yintercept = 0, color = "black")
+
+#ggsave(plot = plot_ext_a_v_delta, "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/figures/EDITED_DELTA_extended_scale_a_vs_delta.png") 
+```
+
+```{r}
+knitr::include_graphics("../cluster/u_hat=0.2_run/figures/EDITED_DELTA_extended_scale_a_vs_delta.png")
+```
+
 
 ### Replot the delta vs P(increase) graph
-
-``` r
+```{r eval=F}
 plot_delta_vs_p_increase = ggplot(csv_edit, aes(x = delta_correct, y = p_increase)) +
   geom_point(color = "blue") + 
   geom_line(color = "grey") +
@@ -152,8 +192,23 @@ plot_delta_vs_p_increase = ggplot(csv_edit, aes(x = delta_correct, y = p_increas
 #ggsave(plot = plot_delta_vs_p_increase, "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/figures/EDITED_DELTA_delta_vs_p_increase.png") 
 ```
 
-``` r
+```{r}
 knitr::include_graphics("../cluster/u_hat=0.2_run/figures/EDITED_DELTA_delta_vs_p_increase.png")
 ```
 
-![](../cluster/u_hat=0.2_run/figures/EDITED_DELTA_delta_vs_p_increase.png)<!-- -->
+### Analytical AUC predictions for some a
+
+#### a = 0.009, the minimizing value for delta
+```{r}
+a_pred_res = u_t0_to_t1(x_grid=seq(-0.5,0.5,by=0.0001),a=0.009,b=1,sigma=0.01,k=0.2,u_hat=0.2)
+
+# auc PREDICTIONS
+print(paste("Trapezoidal AUC: ", a_pred_res$theta1_trapz, "Mathematica AUC: ", auc_mathematica(a=0.009,b=1,sigma=0.01,k=0.2,uhat=0.2) , "my equation AUC (wrong): ", a_pred_res$theta1_factored))
+```
+
+### a = 0.02252525, the value of a that caused P(increase) closest to 50%
+```{r}
+a_obs_res = u_t0_to_t1(x_grid=seq(-0.5,0.5,by=0.0001),a=0.02252525,b=1,sigma=0.01,k=0.2,u_hat=0.2)
+
+print(paste("Trapezoidal AUC: ", a_obs_res$theta1_trapz, "Mathematica AUC: ", auc_mathematica(a=0.02252525,b=1,sigma=0.01,k=0.2,uhat=0.2) , "my equation AUC (wrong): ", a_obs_res$theta1_factored))
+```
