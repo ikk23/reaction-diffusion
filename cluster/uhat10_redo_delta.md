@@ -8,11 +8,12 @@ Isabel Kim
 ``` r
 library(tidyverse)
 source("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/scripts/functions-main-model.R")
+source("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/plotting_functions.R")
 ```
 
 ## uhat=10% files
 
--   Summary csv files from before:
+-   Summary csv file from before:
     `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.1_run/csvs/uhat_10_more_replicate_summary.csv`
 
 Read in the replicate summary file from before
@@ -49,7 +50,7 @@ write_csv(file="/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion
 ```
 
 Edited csv file is at:
-`Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.1_run/csvs/EDITED_DELTA_uhat_0.2_more_replicate_summary.csv`
+`/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.1_run/csvs/EDITED_DELTA_uhat_0.2_more_replicate_summary.csv`
 
 ## Replot the a vs P(increase) graph
 
@@ -214,7 +215,7 @@ knitr::include_graphics("../cluster/u_hat=0.1_run/figures/EDITED_DELTA_delta_vs_
 ![](../cluster/u_hat=0.1_run/figures/EDITED_DELTA_delta_vs_p_increase.png)<!-- -->
 ## Analytical AUC predictions for some a
 
-### a = 0.004126316, the minimizing value for delta (but not included in the cluster runs)
+### a = 0.004126316 - the value of a that causes AUC1 to be closest to a\*b (not in the cluster runs)
 
 ``` r
 a_pred_res = u_t0_to_t1(x_grid=seq(-0.5,0.5,by=0.0001),a=0.004126316,b=1,sigma=0.01,k=0.2,u_hat=0.1)

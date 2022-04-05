@@ -8,6 +8,7 @@ Isabel Kim
 ``` r
 library(tidyverse)
 source("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/scripts/functions-main-model.R")
+source("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/plotting_functions.R")
 ```
 
 ## uhat=20% files
@@ -49,7 +50,7 @@ csv_edit = csv %>% add_column(delta_correct = corr_delta)
 ```
 
 Edited csv file is at:
-`Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/csvs/EDITED_DELTA_uhat_0.2_more_replicate_summary.csv`
+`/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/csvs/EDITED_DELTA_uhat_0.2_more_replicate_summary.csv`
 
 ## Replot the a vs P(increase) graph
 
