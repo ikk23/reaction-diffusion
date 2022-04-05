@@ -26,7 +26,11 @@
 
 * [Tutorial](mathematica_tutorial.md)
 * [AUC (theta) and delta equations](AUC_only.nb)
-* [R scripts to check the factored equation]
+* [R scripts to check the factored equation](scripts/auc-equations.R)
+
+## Model equations
+
+* [See Latex document](correct_model_equations.pdf)
 
 ## Still need to:
 
