@@ -26,6 +26,9 @@
 
 * [Tutorial](mathematica_tutorial.md)
 * [AUC (theta) and delta equations](AUC_only.nb)
+* [Mathematica AUC output (not factored)]
+* [Mathematica delta output (not factored)]
+* [R scripts to check the factored equation]
 
 ## Still need to:
 
