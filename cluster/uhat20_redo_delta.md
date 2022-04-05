@@ -51,7 +51,7 @@ csv_edit = csv %>% add_column(delta_correct = corr_delta)
 Edited csv file is at:
 `Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/csvs/EDITED_DELTA_uhat_0.2_more_replicate_summary.csv`
 
-### Replot the a vs P(increase) graph
+## Replot the a vs P(increase) graph
 
 ``` r
 data = csv_edit
@@ -113,7 +113,7 @@ knitr::include_graphics("../cluster/u_hat=0.2_run/figures/EDITED_DELTA_zoomed_in
 
 ![](../cluster/u_hat=0.2_run/figures/EDITED_DELTA_zoomed_in_a_vs_p_increase.png)<!-- -->
 
-### Replot the a vs delta graph
+## Replot the a vs delta graph
 
 ``` r
 plot_a_vs_delta = ggplot(csv_edit, aes(x = a, y = delta_correct)) + 
@@ -135,7 +135,7 @@ knitr::include_graphics("../cluster/u_hat=0.2_run/figures/EDITED_DELTA_a_vs_delt
 
 ![](../cluster/u_hat=0.2_run/figures/EDITED_DELTA_a_vs_delta.png)<!-- -->
 
-#### Extend a to lower values (below the minimum a used in the cluster runs)
+### Extend a to lower values (below the minimum a used in the cluster runs)
 
 ``` r
 a_lowers = seq(0, 0.008, length.out = 20)
@@ -185,6 +185,9 @@ knitr::include_graphics("../cluster/u_hat=0.2_run/figures/EDITED_DELTA_extended_
 ```
 
 ![](../cluster/u_hat=0.2_run/figures/EDITED_DELTA_extended_scale_a_vs_delta.png)<!-- -->
+The predicted value of a that would cause AUC1 to be closest to a\*b is
+a=0.009, which was included in the cluster run (the minimum a;
+P(increase) was still close to 0).
 
 ### Replot the delta vs P(increase) graph
 
@@ -209,9 +212,9 @@ knitr::include_graphics("../cluster/u_hat=0.2_run/figures/EDITED_DELTA_delta_vs_
 
 ![](../cluster/u_hat=0.2_run/figures/EDITED_DELTA_delta_vs_p_increase.png)<!-- -->
 
-### Analytical AUC predictions for some a
+## Analytical AUC predictions for some a
 
-#### a = 0.009, the minimizing value for delta
+### a = 0.009, the minimizing value for delta
 
 ``` r
 a_pred_res = u_t0_to_t1(x_grid=seq(-0.5,0.5,by=0.0001),a=0.009,b=1,sigma=0.01,k=0.2,u_hat=0.2)
