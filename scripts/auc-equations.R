@@ -83,7 +83,7 @@ delta_un = delta(a,b,sigma,k,uhat)
 delta_factored = factored_delta(a,b,sigma,k,uhat)
 print(paste("Initial:",delta_un,"--> factored:",delta_factored))
 
-factored_auc_b_is_1 = function(a, b, sigma, k, uhat){
+factored_auc_b_is_1 = function(a, sigma, k, uhat){
   orange = ((3*sigma*k/2)*(1 - (2*uhat))) + a
   
   pink = k*((sigma*((3*uhat) - 1)) - (a*(2-uhat)))*exp(-a/sigma)
@@ -94,7 +94,7 @@ factored_auc_b_is_1 = function(a, b, sigma, k, uhat){
   return(auc_b_1)
 }
 
-factored_delta_b_is_1 = function(a,b,sigma,k,uhat){
+factored_delta_b_is_1 = function(a,sigma,k,uhat){
   orange = (3*sigma*k/2)*(1-(2*uhat))
   
   pink = k*((sigma*((3*uhat)-1)) - (a*(2-uhat)))*exp(-a/sigma)
