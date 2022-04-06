@@ -16,6 +16,10 @@
 * [R markdown keeping track of jobs (with the delta bug)](cluster/slurm_management.md)
 * [Comparing uhat=5, uhat=10, and uhat=20](cluster/redo_delta_uhat_comparison.md)
 
+
+* [New cluster plan](cluster_runs_2.md)
+
+
 ### Specific runs
 
 * [uhat = 20 output](cluster/uhat20_redo_delta.md)
