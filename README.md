@@ -19,7 +19,7 @@
 * [Comparing uhat=5, uhat=10, and uhat=20](cluster/redo_delta_uhat_comparison.md)
 
 
-* [New cluster plan](cluster_runs_2.md)
+* [Second cluster runs (4/7 onwards)](cluster_runs_2.md)
 
 
 ### Output from specific runs
