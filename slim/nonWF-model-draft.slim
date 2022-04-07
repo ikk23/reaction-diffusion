@@ -5,23 +5,18 @@ initialize() {
 	initializeSex("A");
 	
 	// Parameters that can be changed at the command line
-	defineCfgParam("a", 0.3);
-	defineCfgParam("sigma",0.01);
+	defineCfgParam("a", 0.01075758);
+	defineCfgParam("sigma",0.01); // average dispersal distance	
 	defineCfgParam("k", 0.2);
-	defineCfgParam("u_hat", 0.2);
-	// save the boundaries for the drive release
-	defineConstant("drive_x_min", 0.5 - (a/2));
-	defineConstant("drive_x_max", 0.5 + (a/2));
-	
-	defineConstant("DRIVE_RELEASE_GENERATION",10); // when to release the drive
-	defineConstant("NO_DRIVE", F); // don't release drive at all -- for wt N testing
+	defineCfgParam("u_hat", 0.1);
 	
 	defineConstant("alpha", 1 - 2*u_hat);
 	defineConstant("beta", a/sigma);
 	catn("-----------------------------------");
 	catn("a = " + a + " sigma = " + sigma + " so beta = " + beta);
-	defineConstant("m", sigma); // mating radius
-	
+	defineConstant("m", 0.005); // mating radius
+	defineConstant("X_MAX", 1); // x ranges from 0 to X_MAX, default 1.0
+
 	catn("-----------------------------------");
 	print(paste("Frequency threshold of:", u_hat, " and alpha of: " + alpha));
 	
@@ -29,7 +24,7 @@ initialize() {
 	defineConstant("CHROM_LENGTH", 1);
 	defineConstant("GROWTH_AT_ZERO_DENSITY", 2); // in empty areas, the expected # of offspring is 2*fitness*this value 
 	defineConstant("EXPONENT_OF_COMPETITION_FACTOR", 2); // increase from 1 to make the penalty for crowded individuals more severe
-	defineConstant("EXPECTED_ADULT_COMPETITION", POPSIZE*(2*m)); 
+	defineConstant("EXPECTED_ADULT_COMPETITION", POPSIZE*((2*m)/X_MAX)); // if X_MAX=1, this is POPSIZE*2*m
 	
 	catn("-----------------------------------");
 	catn("EXPECTED_ADULT_COMPETITION when m is " + m + " = " + EXPECTED_ADULT_COMPETITION);
@@ -76,19 +71,92 @@ initialize() {
 
 //// HELPER FUNC FOR CONSTANTS THAT MAY ASLO BE CONFIGURED VIA COMMAND LINE.
 function (void) defineCfgParam(string$ name, lifs value) {
-	if (!exists(name))
-		defineConstant(name, value);
+    if (!exists(name))
+        defineConstant(name, value);
 }
+
+
+
+
 
 
 1 {
 	sim.addSubpop("p1", POPSIZE);
 	
 	all = p1.individuals;
-	all.x = runif(POPSIZE, min = 0, max = 1);
+	all.x = runif(POPSIZE, min = 0, max = X_MAX);
 	
-	all.genomes.addNewDrawnMutation(m1, seqLen(CHROM_LENGTH));
-	all.tagF = wt_homozygote_fitness;
+	// Release drive in the middle of the grid between -a/2 and a/2
+	if (!RELEASE_DRIVE_EVERYWHERE){
+		
+		midpoint = X_MAX/2;
+		range_left = midpoint - (a/2);
+		range_right = midpoint + (a/2);
+		catn("-----------------------------------");
+		catn("drive is between " + range_left + " and " + range_right);
+
+		
+		in_range = (all.x >= range_left & all.x <= range_right);
+		drive = all[in_range];
+		
+		if (DRIVE_DISPERSAL){
+			for (i in seqLen(length(POPSIZE))){
+				ind = all[i];
+				distance = rexp(1,mu = sigma);
+				
+				// if this draw is 1, go right. If it's 0, go left.
+				right = rbinom(1, 1, 0.5);
+				if (right){
+					ind.x = ind.x + distance;
+				} else {
+					ind.x = ind.x - distance;
+				}
+			}
+		}
+		catn("with dispersal, drive goes from "+ min(drive.x) + " to " + max(drive.x));
+		catn("-----------------------------------");
+		
+		catn("OUTPUT"); // everything else printed to the SLiM consule is generation-by-generation output
+
+		
+		wildtype = all[!in_range];
+		
+		wildtype.genomes.addNewDrawnMutation(m1, seqLen(CHROM_LENGTH));
+		drive.genomes.addNewDrawnMutation(m2, seqLen(CHROM_LENGTH));
+		
+		wildtype.color = "blue";
+		drive.color = "red";
+		
+		// tag individuals based on their fitness
+		wildtype.tagF = wt_homozygote_fitness;
+		drive.tagF = drive_homozygote_fitness;
+	
+	} else {
+		// (2*number of homozygous drive carriers)/(2*POPSIZE) = initial frequency of the drive = b
+		// 2(POPSIZE)b = 2*number of homozygous drive carriers
+		// number of homozygous drive carriers = (POPSIZE)*b
+		
+		// release drive homozygous such that they represent proportion b of the population everywhere
+		num_initial_homozygous_drive_carriers  = asInteger(round(POPSIZE*b));
+		num_initial_wt = POPSIZE - num_initial_homozygous_drive_carriers;
+		
+		// sample num_initial_homozygous_drive_carriers random ids to convert to drive
+		drive_ids = sample(x = seqLen(POPSIZE), size = num_initial_homozygous_drive_carriers, replace = F);
+		
+		for (i in seqLen(POPSIZE)){
+			ind = all[i];
+			if (any(drive_ids == ind.index)){
+				ind.genomes.addNewDrawnMutation(m2, seqLen(CHROM_LENGTH));
+				ind.color = "red";
+				ind.tagF = drive_homozygote_fitness;
+			} else {
+				ind.genomes.addNewDrawnMutation(m1, seqLen(CHROM_LENGTH));
+				ind.color = "blue";
+				ind.tagF = wt_homozygote_fitness;
+			}
+		}
+	}
+
 
 }
 
@@ -165,7 +233,7 @@ reproduction(NULL, "F") {
 				if (potential_mate == selected_mate){
 					selected_mate_genotype = this_genotype;
 				}
-			
+				
 			}
 			
 			fem_wildtype = individual.countOfMutationsOfType(m1) == 2*CHROM_LENGTH;
@@ -194,32 +262,25 @@ reproduction(NULL, "F") {
 }
 
 1: modifyChild() {
-
-	// at the drive release generation, convert all offspring whose parents were within the release square to d/d
-	gen = sim.generation;
-	if (gen == DRIVE_RELEASE_GENERATION){
-		if (parent1.x >= drive_x_min & parent1.x <= drive_x_max){
-			child.genomes.addNewDrawnMutation(m2, seqLen(CHROM_LENGTH));
-		}
-	}
-
+	
 	wildtype = child.countOfMutationsOfType(m1) == 2*CHROM_LENGTH;
 	drive_hom = child.countOfMutationsOfType(m2) == 2*CHROM_LENGTH;
 	drive_het = (child.countOfMutationsOfType(m1) == CHROM_LENGTH) & (child.countOfMutationsOfType(m2) == CHROM_LENGTH);
 	
-	
 	// genotype determines fitness and color
 	if (wildtype){
 		child.tagF = wt_homozygote_fitness;
+		child.color = "blue";
 	} else if (drive_hom) {
 		child.tagF = drive_homozygote_fitness;
+		child.color = "red";
 	} else if (drive_het) {
 		child.tagF = drive_heterozygote_fitness;
+		child.color = "red";
 	} else {
 		// shouldn't ever occur
-		print("Unknown genotype -- there are " + child.countOfMutationsOfType(m1) + " wt mutations and " + child.countOfMutationsOfType(m2) + " drives");
+		print("Unknown genotype -- there are ",child.countOfMutationsOfType(m1), " wt mutations and " + child.countOfMutationsOfType(m2) + " drives");
 	}
-
 	
 	// draw a displacement distance from the exponential distribution with an average dispersal distance of sigma
 	distance = rexp(1,mu = sigma);
@@ -252,46 +313,28 @@ early() {
 // end the simulation if the drive is lost or fixed
 late() {
 	
+	N = p1.individualCount;
+	all = p1.individuals;
+	num_drive_alleles = sum(all.genomes.countOfMutationsOfType(m2)==CHROM_LENGTH);
+	rate_dr = num_drive_alleles/(2*N);
 	gen = sim.generation;
 	
-	if (!NO_DRIVE & gen >= DRIVE_RELEASE_GENERATION){
-		N = p1.individualCount;
-		all = p1.individuals;
-		num_drive_alleles = sum(all.genomes.countOfMutationsOfType(m2)==CHROM_LENGTH);
-		rate_dr = num_drive_alleles/(2*N);
-		
-		
-		
-		// Separate inds by genotype
-		drive_homozygotes = all[all.countOfMutationsOfType(m2) == 2*CHROM_LENGTH];
-		drive_heterozygotes = all[all.countOfMutationsOfType(m2)==CHROM_LENGTH];
-		wild_types = all[all.countOfMutationsOfType(m1)==2*CHROM_LENGTH];
-		homoz_freq = length(drive_homozygotes)/N; // freq(DD)
-		het_freq = length(drive_heterozygotes)/N; // freq(Dd)
-		
-		// Color
-		all.color = "blue";
-		drive_homozygotes.color = "red";
-		drive_heterozygotes.color = "red";
-		
-		
-		catn("Generation: " + gen + " N: " + N + " rate_dr: " + rate_dr + " freq(DD) = "+homoz_freq+" freq(Dd) = "+het_freq);
-		
-		//catn("Generation: " + gen + " N: " + N + " rate_dr: " + rate_dr);
-		
-		
-		if (rate_dr == 0){
-			sim.simulationFinished();
-		} // else if (rate_dr == 1){
-		//sim.simulationFinished();
-		//}
+	// Separate drive homozygotes and drive heterozygotes
+	drive_homozygotes = all[all.countOfMutationsOfType(m2) == 2*CHROM_LENGTH];
+	drive_heterogzygotes = all[all.countOfMutationsOfType(m2)==CHROM_LENGTH];
+	homoz_freq = length(drive_homozygotes)/N; // freq(DD)
+	het_freq = length(drive_heterogzygotes)/N; // freq(Dd)
 	
-	} else {
-		N = p1.individualCount;
-		gen = sim.generation;
-		p1.individuals.color = "blue";
-		catn("Generation: " + gen + " N: " + N);
-	}
+	catn("Generation: " + gen + " N: " + N + " rate_dr: " + rate_dr + " freq(DD) = "+homoz_freq+" freq(Dd) = "+het_freq);
+	
+	//catn("Generation: " + gen + " N: " + N + " rate_dr: " + rate_dr);
+	
+	
+	if (rate_dr == 0){
+		sim.simulationFinished();
+	} // else if (rate_dr == 1){
+	//sim.simulationFinished();
+	//}
 	
 	i1.evaluate();
 }
