@@ -9,6 +9,7 @@
 ## SLiM models:
 * [WF model (note - problem with clustering)](slim/WF-model.slim)
 * [nonWF model](slim/nonWF-model.slim)
+  + [Figuring out how / how long to let the wild-type population stabilize](wt-stabilize/wild-type-stabilization.md)
 
 
 ## CLUSTER:
