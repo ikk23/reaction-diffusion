@@ -252,3 +252,7 @@ knitr::include_graphics("../wt-stabilize/capacity50k.png")
 ```
 * min = 49,297 and max=50,748 (range of 1451)
 * Not significant improvement from 30,000
+
+## Conclusion
+
+* Since there isn't a clear generation where N "levels off" (it's always varying but stays around the carrying capacity), let's release the drive at generation 10, as we did in the chasing paper.
