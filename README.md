@@ -11,7 +11,7 @@
 * [nonWF model](slim/nonWF-model.slim)
 
 
-## CLUSTER output:
+## CLUSTER:
 
 * [R markdown keeping track of jobs (with the delta bug)](cluster/slurm_management.md)
 * [Comparing uhat=5, uhat=10, and uhat=20](cluster/redo_delta_uhat_comparison.md)
@@ -20,7 +20,7 @@
 * [New cluster plan](cluster_runs_2.md)
 
 
-### Specific runs
+### Output from specific runs
 
 * [uhat = 20 output](cluster/uhat20_redo_delta.md)
 * [uhat = 10 output](cluster/uhat10_redo_delta.md)
@@ -39,4 +39,4 @@
 ## Still need to:
 
 * Re-run the cluster jobs with a lower range of *a* values (first minimize |delta - 0| based on the corrected delta equation)
-  + We *don't* want the value of a that *minimizes* delta, we want the value of *a* that minimizes |delta|. Doing the former could cause you to select the most negative delta.
+  + We don't want the value of a that *minimizes* delta, we want the value of *a* that minimizes |delta| (doing the former could cause you to select the most negative delta).
