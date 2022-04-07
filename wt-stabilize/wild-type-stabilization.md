@@ -271,3 +271,52 @@ knitr::include_graphics("../wt-stabilize/exp2_combined_replicates_first_3.png")
 ![](../wt-stabilize/exp2_combined_replicates_first_3.png)<!-- -->
 
 No clear generation where anything becomes less stochastic.
+
+## What occurred in our gene drive models (in the ten gens before drive drop)?
+
+-   Run this with BETA=2, EXPONENT=1 (as in the normal models)
+-   We had a capacity of 50,000
+-   And a speed (sigma) of 0.04 (4% of the total area), as opposed to
+    our 0.01
+    -   Density interaction distance is 0.01
+
+``` bash
+TXT="/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/wt-stabilize/output.txt"
+CSV="/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/wt-stabilize/gene_drive_replicate1.csv"
+
+python check_N.py $TXT > $CSV
+```
+
+-   Figure:
+    `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/wt-stabilize/gene_drive_replicate1.png`
+
+``` r
+knitr::include_graphics("../wt-stabilize/gene_drive_replicate1.png")
+```
+
+![](../wt-stabilize/gene_drive_replicate1.png)<!-- -->
+
+Much greater increase than in the 1D models – less stochastic; seems to
+stabilize a bit around 52,000. But here, there is some variability (+ or
+- 10,000)
+
+## Back to `nonWF-model.slim` with exponent of 2 but try raising the population size to 50,000
+
+-   run for 54 generations
+
+``` bash
+TXT="/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/wt-stabilize/output.txt"
+CSV="/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/wt-stabilize/capacity50k.csv"
+
+python check_N.py $TXT > $CSV
+```
+
+Figure:
+`/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/wt-stabilize/capacity50k.png`
+
+``` r
+knitr::include_graphics("../wt-stabilize/capacity50k.png")
+```
+
+![](../wt-stabilize/capacity50k.png)<!-- --> \* min = 49,297 and
+max=50,748 (range of 1451) \* Not significant improvement from 30,000
