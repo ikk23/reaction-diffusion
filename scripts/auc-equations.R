@@ -106,22 +106,4 @@ factored_delta_b_is_1 = function(a,sigma,k,uhat){
 }
 
 
-a = 0.5
-b = 1
-sigma = 0.1
-uhat = 0.3
-
-auc_orig = auc_mathematica(a,b,sigma,k,uhat)
-auc_factored = factored_auc(a,b,sigma,k,uhat)
-auc_factored_b_is_1 = factored_auc_b_is_1(a,b,sigma,k,uhat)
-print(paste("Orig:",auc_orig,"factored:",auc_factored,"factored and b=1:",auc_factored_b_is_1))
-
-delta_orig = delta(a,b,sigma,k,uhat)
-delta_factored = factored_delta(a,b,sigma,k,uhat)
-delta_factored_b_is_1 = factored_delta_b_is_1(a,b,sigma,k,uhat)
-print(paste("Orig:",delta_orig,"factored:",delta_factored,"factored and b=1:",delta_factored_b_is_1))
-
-
-
-
 
