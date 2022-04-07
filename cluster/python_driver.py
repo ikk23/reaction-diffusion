@@ -20,7 +20,7 @@ def parse_slim(slim_string):
     drive_rates = []
 
     for line in line_split:
-        if line.startswith("Generation:"):
+        if line.startswith("GEN::"):
           spaced_line = line.split()
           drive_freq = float(spaced_line[5])
           drive_rates.append(drive_freq)

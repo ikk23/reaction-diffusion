@@ -24,3 +24,58 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ### Example
 
+
+#### 1. Determine a good range of *a* values for uhat=20% 2nd runs
+```{r}
+source("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/scripts/auc-equations.R")
+
+sigma = 0.01
+k = 0.2
+uhat = 0.2
+
+n = 101
+a_vector = seq(0, 0.03, length.out=n)
+delta_vector = rep(-1,n)
+
+for (i in 1:n){
+  delta_vector[i] = factored_delta(a_vector[i],1,sigma,k,uhat)
+}
+
+library(tidyverse)
+
+results = tibble(a=a_vector, delta = delta_vector)
+p = ggplot(results, aes(x=a,y=delta)) + geom_point(color = "red") + geom_line() + geom_hline(yintercept = 0)
+
+print(p)
+
+# exclude the a=0 case
+a_not_zero = a_vector[2:n]
+delta_not_zero = delta_vector[2:n]
+ind = which.min(abs(delta_not_zero))
+a_star = a_not_zero[ind]
+delta_star = delta_not_zero[ind]
+print(paste("Delta is",delta_star,"at a=",a_star))
+```
+
+Predict that a* is around 0.009 for uhat=20% 
+
+But for the uhat=20% runs, a_obs that caused P(increase)=50% was at 0.0225, so extend the grid for a to at least 0.03
+
+#### 4. Use `create_slurm_text_file.R` to create the text file for the SLURM job
+
+* ex: for `uhat=20`, use `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/slurm_text/second_run.txt`
+  + 100 jobs
+  + 50 replicates each
+
+#### 5. Create a new shell script to run this
+
+* ex: `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/slurm_main/second_run_vary_a_uhat20.sh`
+* Submit to cluster
+  + `Submitted batch job 4257186` at 4:21pm April 7th
+
+#### 6. Create a script to merge the output .part files once the job is finished
+
+* ex: `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/slurm_merge/second_run_uhat20_merge.sh`
+  + Creates `second_run_uhat20.csv` in my `/home/ikk23/underdom/csvs/` folder on the cluster
+
+  

@@ -40,7 +40,7 @@ knitr::include_graphics("./slim/num-offspring-code.png")
 * Only the new children are still present
 * Color all individuals based on whether they have drive (drive = red, wt = blue)
 * If gen < drive release generation, print out just the generation and the population size
-* If gen >= drive release generation, print out the generation, population size, frequency of the drive allele, genotype frequency of d/d homozygotes, and genotype frequency of d/wt heterozygotes
+* If gen >= drive release generation ("GEN::"), print out the generation, population size, frequency of the drive allele, genotype frequency of d/d homozygotes, and genotype frequency of d/wt heterozygotes
   + if the drive allele has already been lost, end the simulation
 * Evaluate the i1 interaction (which calculates distances used for local mating / density regulation)
 * If gen==100, end the simulation
