@@ -2,33 +2,17 @@ library(tidyverse)
 source("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/scripts/functions-main-model.R")
 
 # PATH TO THE RAW CLUSTER OUTPUT
-file = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.05_run/csv_raw/u5_a_0.001_to_a_0.0049.csv"
+file = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/csv_raw/second_run_uhat20.csv"
 nreps = 50
-data = read_csv(file)
-nparams = 20
-nparams_observed = nrow(data)/50 # 19 - 1 missing
+data = read_csv(file) %>% arrange(a)
+nparams = 100
+nparams_observed = nrow(data)/nreps # 100 
 
-# For each row, get the beta and delta value
-n = nrow(data)
-beta_vector = rep(-1,n)
-delta_vector = rep(-1,n)
-for (i in 1:n){
-  a = data$a[i]
-  sigma = data$sigma[i]
-  u_hat = data$u_hat[i]
-  k = data$k[i]
-  beta = a/sigma
-  beta_vector[i] = beta
-  delta = check_for_delta_0_when_b_is_1(u_hat, beta, sigma, k)
-  delta_vector[i] = delta
-}
-data = data %>% add_column(beta = beta_vector, .after = 2) %>% add_column(delta = delta_vector)
 
 # Group by common values of a
-starts = seq(1, n, by = nreps)
+starts = seq(1, nrow(data), by = nreps)
 nparams = length(starts)
 a_vector = rep(-1,nparams)
-beta_vector = rep(-1,nparams)
 sigma_vector = rep(-1,nparams)
 k_vector = rep(-1,nparams)
 u_hat_vector = rep(-1,nparams)
@@ -42,7 +26,6 @@ for (i in 1:nparams){
   # these will be the same for all replicates
   a_vector[i] = rows$a[1]
   sigma_vector[i] = rows$sigma[1]
-  beta_vector[i] = rows$beta[1]
   k_vector[i] = rows$k[1]
   u_hat_vector[i] = rows$u_hat[1]
   delta_vector[i] = rows$delta[1]
@@ -53,21 +36,16 @@ for (i in 1:nparams){
 }
 
 # Compile summary tibble
-summarize_data = tibble(a = a_vector, sigma = sigma_vector, beta = beta_vector,
+summarize_data = tibble(a = a_vector, sigma = sigma_vector, 
                         k = k_vector, u_hat = u_hat_vector, delta = delta_vector,
                         p_increase = p_increase_vector)
 
-old_summary = read_csv("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.05_run/csvs/uhat_5_more_replicate_summary_from_a_0.005_to_0.02.csv")
-
-compiled_summary = rbind(summarize_data, old_summary) %>% arrange(a)
-
-
-# Write out more-replicate-summary-data
-write_csv(x = compiled_summary, file = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.05_run/csvs/uhat_5_u0.001_to_0.02_summary.csv")
+# Write out 
+write_csv(x = summarize_data, file = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/csvs/summary_second_run_uhat20.csv")
 
 
 source("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/plotting_functions.R")
-data = compiled_summary
+data = summarize_data
 obs_vs_pred = get_a_pred_and_a_obs(data)
 a_prop = obs_vs_pred$a_pred
 delta_min = obs_vs_pred$delta_pred
@@ -91,9 +69,9 @@ plot_freqs_and_a = ggplot(summarize_data, aes(x = a, y = p_increase)) +
 # Add line at a of pincrease of 0.5
 p = plot_freqs_and_a + geom_vline(xintercept = a_obs, color = "cornsilk3")
 
-dir = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.05_run/figures/"
+dir = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/figures/"
 
-plot_path = paste0(dir,"uhat_5_u0.001_to_0.02.png")
+plot_path = paste0(dir,"second_run_a_0.0003_to_0.03.png")
 ggsave(filename = plot_path, plot = p)
 
 # Zoom in

@@ -2,8 +2,8 @@
 #SBATCH --ntasks=1
 #SBATCH --mem=1000
 #SBATCH --partition=short
-#SBATCH --job-name=second_run_uhat20_merge
-#SBATCH --output=second_run_uhat20_merge.txt
+#SBATCH --job-name=second_run_full_range_uhat20_merge
+#SBATCH --output=second_run_full_range_uhat20_merge.txt
 
 # make temporary working directory
 USER=ikk23
@@ -21,11 +21,11 @@ cp * $WORKDIR/
 cd $WORKDIR
 
 # merge all .part files into overall csv
-cat *.part > second_run_uhat20.csv
+cat *.part > second_run_full_range_uhat20.csv
 
 # copy csv to my folder
 OUTPUT_DIR=/home/ikk23/underdom/csvs
-cp second_run_uhat20.csv $OUTPUT_DIR
+cp second_run_full_range_uhat20.csv $OUTPUT_DIR
 
 # Removing the scratch directory
 rm -rf $WORKDIR

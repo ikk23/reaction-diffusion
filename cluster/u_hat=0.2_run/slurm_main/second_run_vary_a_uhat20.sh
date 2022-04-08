@@ -2,11 +2,11 @@
 #SBATCH --ntasks=1
 #SBATCH --mem=1000
 #SBATCH --partition=regular
-#SBATCH --job-name=second_uhat20
-#SBATCH --output=second_uhat20.txt
-#SBATCH --array=1-100
+#SBATCH --job-name=second_uhat20_full_range
+#SBATCH --output=second_uhat20_full_range.txt
+#SBATCH --array=1-150
 
-# Run 100 array jobs, each with 50 replicates
+# Run 150 array jobs, each with 50 replicates
 
 # Create and move to working directory for job:
 WORKDIR=/workdir/$USER/$SLURM_JOB_ID-$SLURM_ARRAY_TASK_ID

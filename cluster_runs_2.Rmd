@@ -77,5 +77,23 @@ But for the uhat=20% runs, a_obs that caused P(increase)=50% was at 0.0225, so e
 
 * ex: `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/slurm_merge/second_run_uhat20_merge.sh`
   + Creates `second_run_uhat20.csv` in my `/home/ikk23/underdom/csvs/` folder on the cluster
-
+  + `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/csv_raw/second_run_uhat20.csv`
   
+#### 7. Analyze output
+
+* Raw csv: `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/csv_raw/second_run_uhat20.csv`
+* Summary csv: `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/csvs/summary_second_run_uhat20.csv`
+
+This figure looks a lot different than last time -- out predicted a is so close to the observed a. Is this real?
+```{r}
+knitr::include_graphics("./cluster/u_hat=0.2_run/figures/second_run_a_0.0003_to_0.03.png")
+```
+Do more runs at the lower and upper range + 2x as many replicates in this range.
+
+##### Next run
+
+* Slurm text: `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/slurm_text/second_run.txt` again
+  + 150 jobs
+* Slurm main job: `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/slurm_main/second_run_vary_a_uhat20.sh` like before but modified job name and array length
+  + `Submitted batch job 4263810`
+* Slurm merge job: `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/slurm_merge/second_run_uhat20_merge.sh` like before but now outputs csv file called `second_run_full_range_uhat20.csv`
