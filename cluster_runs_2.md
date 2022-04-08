@@ -117,6 +117,35 @@ knitr::include_graphics("./cluster/u_hat=0.2_run/figures/second_run_a_0.0003_to_
 Do more runs at the lower and upper range + 2x as many replicates in
 this range.
 
+#### Validate in SLiM
+
+-   At a=0.009, do we see success 50% of the time?
+
+-   100 generations:
+
+    -   Replicate 1: decrease
+    -   Replicate 2: increase
+    -   Replicate 3: increase
+    -   Replicate 4: increase
+    -   Replicate 5: decrease
+    -   Replicate 6: increase
+    -   Replicate 7: decrease
+
+-   Yes, this seems plausible.
+
+-   When a is super low (0.0003), do we still get success 18% of the
+    time (20% / 1 out of 5)?
+
+-   100 generations:
+
+    -   Replicate 1: decrease (loss)
+    -   Replicate 2: increase (but probably wouldn’t ultimately fix)
+    -   Replicate 3: increase
+    -   Replicate 4: decrease
+    -   Replicate 5: decrease
+
+-   Could be plausible
+
 ##### Next run
 
 -   Slurm text:

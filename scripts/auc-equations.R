@@ -66,23 +66,6 @@ factored_delta = function(a,b,sigma,k,uhat){
   return(delta_factored)
 }
 
-
-# Checking when factoring
-a = 0.1
-b = 1
-sigma = 0.001
-uhat = 0.4
-
-unfactored = auc_mathematica(a,b,sigma,k,uhat)
-factored = factored_auc(a,b,sigma,k,uhat)
-print("THETA")
-print(paste("Initial:",unfactored,"--> factored:",factored))
-
-print("DELTA")
-delta_un = delta(a,b,sigma,k,uhat)
-delta_factored = factored_delta(a,b,sigma,k,uhat)
-print(paste("Initial:",delta_un,"--> factored:",delta_factored))
-
 factored_auc_b_is_1 = function(a, sigma, k, uhat){
   orange = ((3*sigma*k/2)*(1 - (2*uhat))) + a
   
