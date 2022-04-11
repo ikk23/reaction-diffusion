@@ -36,7 +36,3 @@
 
 * [See Latex document](correct_model_equations.pdf)
 
-## Still need to:
-
-* Re-run the cluster jobs with a lower range of *a* values (first minimize |delta - 0| based on the corrected delta equation)
-  + We don't want the value of a that *minimizes* delta, we want the value of *a* that minimizes |delta| (doing the former could cause you to select the most negative delta).
