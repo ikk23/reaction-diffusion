@@ -1,0 +1,11 @@
+---
+title: "uhat=20% debugged cluster runs with wt gens"
+author: "Isabel Kim"
+date: "4/11/2022"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+

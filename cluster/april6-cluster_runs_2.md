@@ -1,4 +1,4 @@
-Second batch of cluster runs (with the right delta equation)
+debugging / running uhat=20% jobs only
 ================
 Isabel Kim
 4/6/2022
@@ -58,7 +58,7 @@ p = ggplot(results, aes(x=a,y=delta)) + geom_point(color = "red") + geom_line() 
 print(p)
 ```
 
-![](cluster_runs_2_files/figure-gfm/unnamed-chunk-1-1.png)<!-- -->
+![](april6-cluster_runs_2_files/figure-gfm/unnamed-chunk-1-1.png)<!-- -->
 
 ``` r
 # exclude the a=0 case
@@ -110,10 +110,10 @@ This figure looks a lot different than last time – out predicted a is so
 close to the observed a. Is this real?
 
 ``` r
-knitr::include_graphics("./cluster/u_hat=0.2_run/figures/second_run_a_0.0003_to_0.03.png")
+knitr::include_graphics("../cluster/u_hat=0.2_run/figures/second_run_a_0.0003_to_0.03.png")
 ```
 
-![](./cluster/u_hat=0.2_run/figures/second_run_a_0.0003_to_0.03.png)<!-- -->
+![](../cluster/u_hat=0.2_run/figures/second_run_a_0.0003_to_0.03.png)<!-- -->
 Do more runs at the lower and upper range + 2x as many replicates in
 this range.
 
@@ -169,10 +169,10 @@ this range.
     `second_run_full_range_uhat20_3pm.csv`
 
 ``` r
-knitr::include_graphics("./cluster/u_hat=0.2_run/figures/second_run_a_0.0001_to_0.999_3pm.png")
+knitr::include_graphics("../cluster/u_hat=0.2_run/figures/second_run_a_0.0001_to_0.999_3pm.png")
 ```
 
-![](./cluster/u_hat=0.2_run/figures/second_run_a_0.0001_to_0.999_3pm.png)<!-- -->
+![](../cluster/u_hat=0.2_run/figures/second_run_a_0.0001_to_0.999_3pm.png)<!-- -->
 Something is definitely off. Even when a –> 1.0, there’s still less than
 a 75% chance of the drive even spreading.
 
@@ -185,11 +185,37 @@ a 75% chance of the drive even spreading.
 #### Cancelled the rest of these Slurm jobs, transferred the fixed SLiM model, and re-run
 
 -   `Submitted batch job 4267884`
+-   Output:
+    `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/csv_raw/bug_fixed_second_run_full_range_uhat20.csv`
 
-##### Even when a = 0.0001, increase occurs 26% of the time?
+#### Something is very off:
 
--   Replicate 1: decrease
--   Replicate 2: decrease
--   Replicate 3: decrease
--   Replicate 4: starts at 0, so not an increase or a decrease
--   Replicate 5: decrease / loss
+``` r
+library(tidyverse)
+data = read_csv("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/csvs/bug_fixed_second_run_full_range_uhat20_WEIRD_SUMMARY.csv")
+```
+
+    ## Rows: 146 Columns: 6
+    ## ── Column specification ────────────────────────────────────────────────────────
+    ## Delimiter: ","
+    ## dbl (6): a, sigma, k, u_hat, delta, p_increase
+    ## 
+    ## ℹ Use `spec()` to retrieve the full column specification for this data.
+    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+
+``` r
+knitr::include_graphics("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/figures/second_run_WEIRD_OFF.png")
+```
+
+![](/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/figures/second_run_WEIRD_OFF.png)<!-- -->
+
+Why is P(increase)=32% when a is as low as possible, a=0.0001?
+
+Visually:
+
+1.  Decrease (loss)
+2.  Starts and ends at zero – python would count this as an “increase”
+
+-   Fixed `python_driver.py` and retransferred to cluster –> re-running
+
+#### For results, see `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/april11-uhat20_wt_gens_results.Rmd`
