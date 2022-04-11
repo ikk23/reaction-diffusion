@@ -22,9 +22,9 @@
 
 ### Output from specific runs
 
-* [uhat = 20 output](cluster/uhat20_redo_delta.md)
-* [uhat = 10 output](cluster/uhat10_redo_delta.md)
-* [uhat = 5 output](cluster/uhat5_redo_delta.md)
+* [uhat = 20 output from 4/5](cluster/uhat20_redo_delta.md)
+* [uhat = 10 output from 4/5](cluster/uhat10_redo_delta.md)
+* [uhat = 5 output from 4/5](cluster/uhat5_redo_delta.md)
 
 ## Mathematica:
 
