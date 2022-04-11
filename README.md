@@ -3,7 +3,7 @@
 ## R scripts:
 * [Simulating reaction-diffusion waves](scripts/numerical-reaction-diffusion-functions.R)
 * [3-compartment model waves](scripts/compartment-model.R)
-* [Simulating u(x,t=0) and u(x,t=1) with new migration - reaction model](scripts/functions-main-model.R)
+* [Simulating u(x,t=0) and u(x,t=1) with new migration - reaction model: main functions](scripts/functions-main-model.R)
   + [Examples](scripts/examples-main-model.R)
 
 ## SLiM models:
