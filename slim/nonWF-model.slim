@@ -5,7 +5,7 @@ initialize() {
 	initializeSex("A");
 	
 	// Parameters that can be changed at the command line
-	defineCfgParam("a", 0.0003);
+	defineCfgParam("a", 0.0001);
 	defineCfgParam("sigma",0.01);
 	defineCfgParam("k", 0.2);
 	defineCfgParam("u_hat", 0.2);
@@ -66,6 +66,11 @@ initialize() {
 	wt = initializeMutationType("m1", 0.5, "f", 0.0);
 	dr = initializeMutationType("m2", 0.5, "f", 0.0);
 	variations = c(wt, dr);
+	
+	// NEW - these mutations overwrite one another.
+	variations.mutationStackPolicy = "l";
+	variations.mutationStackGroup = 1;	
+	
 	initializeGenomicElementType("g1", variations, c(1, 1));
 	initializeGenomicElement(g1, 0, CHROM_LENGTH-1);
 	

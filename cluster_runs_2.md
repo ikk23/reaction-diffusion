@@ -146,17 +146,34 @@ this range.
 
 -   Could be plausible
 
-##### Next run
+#### Next run
 
 -   Slurm text:
     `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/slurm_text/second_run.txt`
     again
+
     -   150 jobs
+
 -   Slurm main job:
     `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/slurm_main/second_run_vary_a_uhat20.sh`
     like before but modified job name and array length
+
     -   `Submitted batch job 4263810`
+
 -   Slurm merge job:
     `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/slurm_merge/second_run_uhat20_merge.sh`
     like before but now outputs csv file called
     `second_run_full_range_uhat20.csv`
+
+-   Merging with some jobs missing as of 3pm:
+    `second_run_full_range_uhat20_3pm.csv`
+
+``` r
+knitr::include_graphics("./cluster/u_hat=0.2_run/figures/second_run_a_0.0001_to_0.999_3pm.png")
+```
+
+![](./cluster/u_hat=0.2_run/figures/second_run_a_0.0001_to_0.999_3pm.png)<!-- -->
+Something is definitely off. Even when a –> 1.0, there’s still less than
+a 75% chance of the drive even spreading.
+
+#### Checking a near 1.0 visually

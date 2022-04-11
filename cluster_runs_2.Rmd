@@ -113,11 +113,36 @@ Do more runs at the lower and upper range + 2x as many replicates in this range.
 * Could be plausible
   
 
-##### Next run
+#### Next run
 
 * Slurm text: `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/slurm_text/second_run.txt` again
   + 150 jobs
 * Slurm main job: `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/slurm_main/second_run_vary_a_uhat20.sh` like before but modified job name and array length
   + `Submitted batch job 4263810`
 * Slurm merge job: `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/slurm_merge/second_run_uhat20_merge.sh` like before but now outputs csv file called `second_run_full_range_uhat20.csv`
+
+* Merging with some jobs missing as of 3pm: `second_run_full_range_uhat20_3pm.csv`
+
+```{r}
+knitr::include_graphics("./cluster/u_hat=0.2_run/figures/second_run_a_0.0001_to_0.999_3pm.png")
+```
+Something is definitely off. Even when a --> 1.0, there's still less than a 75% chance of the drive even spreading.
+
+#### Checking a near 1.0 visually
+
+* a = 0.999 --> shows P(increase) = 0.72 (3 out of 4)
+
+#### Found bug: mutationStackPolicy wasn't specified, so individuals were allowed to have both drive and wild-type. This caused the drive to never be able to fix.
+
+#### Cancelled the rest of these Slurm jobs, transferred the fixed SLiM model, and re-run
+
+* `Submitted batch job 4267884`
+
+##### Even when a = 0.0001, increase occurs 26% of the time?
+
+* Replicate 1: decrease
+* Replicate 2: decrease
+* Replicate 3: decrease
+* Replicate 4: starts at 0, so not an increase or a decrease
+* Replicate 5: decrease / loss
 
