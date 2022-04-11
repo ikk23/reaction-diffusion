@@ -2,12 +2,13 @@ library(tidyverse)
 source("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/scripts/functions-main-model.R")
 
 # PATH TO THE RAW CLUSTER OUTPUT
-file = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/csv_raw/second_run_full_range_uhat20_3pm.csv"
+file = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/csv_raw/bug_fixed_second_run_full_range_uhat20.csv"
 data = read_csv(file) %>% arrange(a)
-nparams = length(unique(data$a)) # 103; 47 missing right now
+nparams = length(unique(data$a)) # 146; 4 missing
 
 
 # Group by common values of a
+nreps = 50
 starts = seq(1, nrow(data), by = nreps)
 nparams = length(starts)
 a_vector = rep(-1,nparams)
@@ -39,7 +40,7 @@ summarize_data = tibble(a = a_vector, sigma = sigma_vector,
                         p_increase = p_increase_vector)
 
 # Write out 
-write_csv(x = summarize_data, file = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/csvs/summary_second_run_0.0001_to_0.999_3pm_uhat20.csv")
+write_csv(x = summarize_data, file = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/csvs/bug_fixed_second_run_full_range_uhat20_WEIRD_SUMMARY.csv")
 
 
 source("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/plotting_functions.R")
@@ -69,7 +70,7 @@ p = plot_freqs_and_a + geom_vline(xintercept = a_obs, color = "cornsilk3")
 
 dir = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/figures/"
 
-plot_path = paste0(dir,"second_run_a_0.0001_to_0.999_3pm.png")
+plot_path = paste0(dir,"second_run_WEIRD_OFF.png")
 ggsave(filename = plot_path, plot = p)
 
 # Zoom in

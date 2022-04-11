@@ -28,7 +28,8 @@ def parse_slim(slim_string):
     initial_drive_rate = drive_rates[0]
     last_drive_rate = drive_rates[-1]
     
-    if initial_drive_rate > last_drive_rate:
+    # This can also occur when both are 0.0 (when a is very low)
+    if initial_drive_rate >= last_drive_rate:
       outcome = "decrease"
     else:
       outcome = "increase"

@@ -29,19 +29,15 @@ initialize() {
 	defineConstant("CHROM_LENGTH", 1);
 	defineConstant("GROWTH_AT_ZERO_DENSITY", 2); // in empty areas, the expected # of offspring is 2*fitness*this value 
 	defineConstant("EXPONENT_OF_COMPETITION_FACTOR", 2); // increase from 1 to make the penalty for crowded individuals more severe
-	defineConstant("EXPECTED_ADULT_COMPETITION", POPSIZE*(2*m)); 
+	defineConstant("EXPECTED_ADULT_COMPETITION", POPSIZE*(2*m));
 	
 	catn("-----------------------------------");
 	catn("EXPECTED_ADULT_COMPETITION when m is " + m + " = " + EXPECTED_ADULT_COMPETITION);
 	
 	// checks
-	defineConstant("CHECK_MATING_CODE", F); // whether to check the competition factor code
 	defineConstant("RELEASE_DRIVE_EVERYWHERE", F); // if F, only release between -a/2 and a/2
 	defineConstant("b", 0.18); // if releasing the drive uniformly, make b < 1. Drive released at this introduction frequency everywhere
 	
-	// Only 1 can be true
-	// DRIVE_DISPERSAL=T is default
-	defineConstant("DRIVE_DISPERSAL", T);
 	defineConstant("MATING_DEACTIVATION", F);
 	
 	// Fitness values are based on alpha (1 - 2u_hat) and k
@@ -69,7 +65,7 @@ initialize() {
 	
 	// NEW - these mutations overwrite one another.
 	variations.mutationStackPolicy = "l";
-	variations.mutationStackGroup = 1;	
+	variations.mutationStackGroup = 1;
 	
 	initializeGenomicElementType("g1", variations, c(1, 1));
 	initializeGenomicElement(g1, 0, CHROM_LENGTH-1);
@@ -111,24 +107,10 @@ reproduction(NULL, "F") {
 	
 	// get the fitness values of each male in this circle and sample based on these mating weights
 	// determine the female's fecundity based on her fitness and the number of individuals surrounding her
-	
-	
-	if (MATING_DEACTIVATION){
-		if (sim.generation > 2){
-			mating_weights = neighbors.tagF;
-			mate_id = sample(x = seqLen(num_neighbors), size = 1, weights = mating_weights);
-			selected_mate = neighbors[mate_id];
-			female_fitness = individual.tagF;
-		} else {
-			female_fitness = 1.0;
-			selected_mate = sample(neighbors,size=1);
-		}
-	}  else {
-		mating_weights = neighbors.tagF;
-		mate_id = sample(x = seqLen(num_neighbors), size = 1, weights = mating_weights);
-		selected_mate = neighbors[mate_id];
-		female_fitness = individual.tagF;
-	}
+	mating_weights = neighbors.tagF;
+	mate_id = sample(x = seqLen(num_neighbors), size = 1, weights = mating_weights);
+	selected_mate = neighbors[mate_id];
+	female_fitness = individual.tagF;
 	
 	adult_density_force = i1.totalOfNeighborStrengths(individual);
 	competition_ratio = adult_density_force / EXPECTED_ADULT_COMPETITION;
@@ -141,65 +123,11 @@ reproduction(NULL, "F") {
 	for (i in seqLen(num_offspring)) {
 		offspring = subpop.addCrossed(individual, selected_mate);
 	}
-	
-	if (CHECK_MATING_CODE){
-		//random_indices = c(9742,194,3606,3348,8057,8125,1215,5109,189,9570,9988,1221, 7720,3688,8129,7110,1190,2817,465,3018);
-		random_indices = seqLen(p1.individualCount);
-		if (any(random_indices == individual.index)){
-			
-			// See which genotypes are surrounding the female. Which one does she choose?
-			neighbor_genotypes = rep("na", num_neighbors);
-			selected_mate_genotype = "na";
-			for (i in seqLen(num_neighbors)){
-				potential_mate = neighbors[i];
-				wildtype = potential_mate.countOfMutationsOfType(m1) == 2*CHROM_LENGTH;
-				drive_hom = potential_mate.countOfMutationsOfType(m2) == 2*CHROM_LENGTH;
-				drive_het = (potential_mate.countOfMutationsOfType(m1) == CHROM_LENGTH) & (potential_mate.countOfMutationsOfType(m2) == CHROM_LENGTH);
-				
-				if (wildtype){
-					this_genotype = "wild-type";
-				} else if (drive_hom){
-					this_genotype = "drive homozygote";
-				} else if (drive_het){
-					this_genotype = "drive heterozygote";
-				} else {
-					this_genotype = "unknown"; // shouldn't happen
-				}
-				
-				neighbor_genotypes[i] = this_genotype;
-				if (potential_mate == selected_mate){
-					selected_mate_genotype = this_genotype;
-				}
-			
-			}
-			
-			fem_wildtype = individual.countOfMutationsOfType(m1) == 2*CHROM_LENGTH;
-			fem_drive_hom = individual.countOfMutationsOfType(m2) == 2*CHROM_LENGTH;
-			fem_drive_het = (individual.countOfMutationsOfType(m1) == CHROM_LENGTH) & (selected_mate.countOfMutationsOfType(m2) == CHROM_LENGTH);
-			
-			if (fem_wildtype){
-				female_genotype = "wild-type";
-			} else if (fem_drive_hom){
-				female_genotype = "drive homozygote";
-			} else if (fem_drive_het){
-				female_genotype = "drive heterozygote";
-			} else {
-				female_genotype = "unknown"; // shouldn't happen
-			}
-			
-			
-			catn("female = " + female_genotype + " at position " + individual.x + " selects a male " + selected_mate_genotype + "     female's fitness = " + female_fitness + " num inds surrounding female = " + adult_density_force + " competition factor = " + actual_competition_factor_exponentiated + " p = " + p + " num offspring = " + num_offspring);
-			//catn("options: ");
-			//print(neighbor_genotypes);
-			
-			//catn("female's fitness = " + female_fitness + " num inds surrounding female = " + adult_density_force + " competition factor = " + actual_competition_factor_exponentiated + " p = " + p + " num offspring = " + num_offspring);
-		}
-	}
 
 }
 
 1: modifyChild() {
-
+	
 	// at the drive release generation, convert all offspring whose parents were within the release square to d/d
 	gen = sim.generation;
 	if (gen == DRIVE_RELEASE_GENERATION){
@@ -207,7 +135,7 @@ reproduction(NULL, "F") {
 			child.genomes.addNewDrawnMutation(m2, seqLen(CHROM_LENGTH));
 		}
 	}
-
+	
 	wildtype = child.countOfMutationsOfType(m1) == 2*CHROM_LENGTH;
 	drive_hom = child.countOfMutationsOfType(m2) == 2*CHROM_LENGTH;
 	drive_het = (child.countOfMutationsOfType(m1) == CHROM_LENGTH) & (child.countOfMutationsOfType(m2) == CHROM_LENGTH);
@@ -224,7 +152,6 @@ reproduction(NULL, "F") {
 		// shouldn't ever occur
 		print("Unknown genotype -- there are " + child.countOfMutationsOfType(m1) + " wt mutations and " + child.countOfMutationsOfType(m2) + " drives");
 	}
-
 	
 	// draw a displacement distance from the exponential distribution with an average dispersal distance of sigma
 	distance = rexp(1,mu = sigma);

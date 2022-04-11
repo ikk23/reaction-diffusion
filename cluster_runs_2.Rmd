@@ -137,12 +137,21 @@ Something is definitely off. Even when a --> 1.0, there's still less than a 75% 
 #### Cancelled the rest of these Slurm jobs, transferred the fixed SLiM model, and re-run
 
 * `Submitted batch job 4267884`
+* Output: `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/csv_raw/bug_fixed_second_run_full_range_uhat20.csv`
 
-##### Even when a = 0.0001, increase occurs 26% of the time?
+#### Something is very off:
 
-* Replicate 1: decrease
-* Replicate 2: decrease
-* Replicate 3: decrease
-* Replicate 4: starts at 0, so not an increase or a decrease
-* Replicate 5: decrease / loss
+```{r}
+library(tidyverse)
+data = read_csv("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/csvs/bug_fixed_second_run_full_range_uhat20_WEIRD_SUMMARY.csv")
 
+knitr::include_graphics("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/figures/second_run_WEIRD_OFF.png")
+```
+
+Why is P(increase)=32% when a is as low as possible, a=0.0001?
+
+Visually:
+
+1. Decrease (loss)
+2. Starts and ends at zero -- python would count this as an "increase"
+  + Fixed `python_driver.py` and retransferred to cluster --> re-running
