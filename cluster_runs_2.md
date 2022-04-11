@@ -177,3 +177,19 @@ Something is definitely off. Even when a –> 1.0, there’s still less than
 a 75% chance of the drive even spreading.
 
 #### Checking a near 1.0 visually
+
+-   a = 0.999 –> shows P(increase) = 0.72 (3 out of 4)
+
+#### Found bug: mutationStackPolicy wasn’t specified, so individuals were allowed to have both drive and wild-type. This caused the drive to never be able to fix.
+
+#### Cancelled the rest of these Slurm jobs, transferred the fixed SLiM model, and re-run
+
+-   `Submitted batch job 4267884`
+
+##### Even when a = 0.0001, increase occurs 26% of the time?
+
+-   Replicate 1: decrease
+-   Replicate 2: decrease
+-   Replicate 3: decrease
+-   Replicate 4: starts at 0, so not an increase or a decrease
+-   Replicate 5: decrease / loss
