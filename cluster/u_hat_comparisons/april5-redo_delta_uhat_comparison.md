@@ -40,10 +40,10 @@ compiled_plot = ggplot(data = compiled, aes(x = a, y = p_increase, color = u_hat
 ```
 
 ``` r
-knitr::include_graphics("../cluster/EDITED_DELTA_uhat20_vs_uhat10_vs_uhat5.png")
+knitr::include_graphics("EDITED_DELTA_uhat20_vs_uhat10_vs_uhat5.png")
 ```
 
-![](../cluster/EDITED_DELTA_uhat20_vs_uhat10_vs_uhat5.png)<!-- -->
+![](EDITED_DELTA_uhat20_vs_uhat10_vs_uhat5.png)<!-- -->
 
 The prediction is always \~(1/2) of the observed a value
 
@@ -92,7 +92,7 @@ compiled_delta_plot = ggplot(data = compiled_delta, aes(x = a, y = delta_correct
 ```
 
 ``` r
-knitr::include_graphics("../cluster/EDITED_DELTA_delta_vs_a_uhat20_vs_uhat10_vs_uhat5.png")
+knitr::include_graphics("EDITED_DELTA_delta_vs_a_uhat20_vs_uhat10_vs_uhat5.png")
 ```
 
-![](../cluster/EDITED_DELTA_delta_vs_a_uhat20_vs_uhat10_vs_uhat5.png)<!-- -->
+![](EDITED_DELTA_delta_vs_a_uhat20_vs_uhat10_vs_uhat5.png)<!-- -->

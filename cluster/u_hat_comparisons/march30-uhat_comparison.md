@@ -91,7 +91,7 @@ compiled_plot
 
     ## Warning: Removed 29 row(s) containing missing values (geom_path).
 
-![](uhat_comparison_files/figure-gfm/unnamed-chunk-1-1.png)<!-- -->
+![](march30-uhat_comparison_files/figure-gfm/unnamed-chunk-1-1.png)<!-- -->
 
 It makes sense that when the invasion frequency is lower, a smaller
 release area is required in order for the drive to spread – this is why
@@ -118,7 +118,7 @@ compiled_delta_plot = ggplot(data = compiled, aes(x = a, y = delta, color = u_ha
 compiled_delta_plot
 ```
 
-![](uhat_comparison_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
+![](march30-uhat_comparison_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
 
 Where they overlap, these curves have very similar shapes, but the
 P(increase) is always higher when u_hat is lower (makes sense that with
