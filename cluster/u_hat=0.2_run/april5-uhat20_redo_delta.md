@@ -86,10 +86,10 @@ plot_freqs_and_a = ggplot(data_a_graph, aes(x = a, y = p_increase)) +
 ```
 
 ``` r
-knitr::include_graphics("../cluster/u_hat=0.2_run/figures/EDITED_DELTA_a_vs_p_increase.png")
+knitr::include_graphics("../../cluster/u_hat=0.2_run/figures/EDITED_DELTA_a_vs_p_increase.png")
 ```
 
-![](../cluster/u_hat=0.2_run/figures/EDITED_DELTA_a_vs_p_increase.png)<!-- -->
+![](../../cluster/u_hat=0.2_run/figures/EDITED_DELTA_a_vs_p_increase.png)<!-- -->
 
 Zoom in
 
@@ -109,10 +109,10 @@ freq_vs_a_zoomed_in = ggplot(data_a_graph, aes(x = a, y = p_increase)) +
 ```
 
 ``` r
-knitr::include_graphics("../cluster/u_hat=0.2_run/figures/EDITED_DELTA_zoomed_in_a_vs_p_increase.png")
+knitr::include_graphics("../../cluster/u_hat=0.2_run/figures/EDITED_DELTA_zoomed_in_a_vs_p_increase.png")
 ```
 
-![](../cluster/u_hat=0.2_run/figures/EDITED_DELTA_zoomed_in_a_vs_p_increase.png)<!-- -->
+![](../../cluster/u_hat=0.2_run/figures/EDITED_DELTA_zoomed_in_a_vs_p_increase.png)<!-- -->
 
 ## Replot the a vs delta graph
 
@@ -131,10 +131,10 @@ plot_a_vs_delta = ggplot(csv_edit, aes(x = a, y = delta_correct)) +
 ```
 
 ``` r
-knitr::include_graphics("../cluster/u_hat=0.2_run/figures/EDITED_DELTA_a_vs_delta.png")
+knitr::include_graphics("../../cluster/u_hat=0.2_run/figures/EDITED_DELTA_a_vs_delta.png")
 ```
 
-![](../cluster/u_hat=0.2_run/figures/EDITED_DELTA_a_vs_delta.png)<!-- -->
+![](../../cluster/u_hat=0.2_run/figures/EDITED_DELTA_a_vs_delta.png)<!-- -->
 
 ### Extend a to lower values (below the minimum a used in the cluster runs)
 
@@ -182,10 +182,10 @@ plot_ext_a_v_delta = ggplot(a_vs_delta_tibble, aes(x = a, y = delta_correct)) +
 ```
 
 ``` r
-knitr::include_graphics("../cluster/u_hat=0.2_run/figures/EDITED_DELTA_extended_scale_a_vs_delta.png")
+knitr::include_graphics("../../cluster/u_hat=0.2_run/figures/EDITED_DELTA_extended_scale_a_vs_delta.png")
 ```
 
-![](../cluster/u_hat=0.2_run/figures/EDITED_DELTA_extended_scale_a_vs_delta.png)<!-- -->
+![](../../cluster/u_hat=0.2_run/figures/EDITED_DELTA_extended_scale_a_vs_delta.png)<!-- -->
 The predicted value of a that would cause AUC1 to be closest to a\*b is
 a=0.009, which was included in the cluster run (the minimum a;
 P(increase) was still close to 0).
@@ -208,10 +208,10 @@ plot_delta_vs_p_increase = ggplot(csv_edit, aes(x = delta_correct, y = p_increas
 ```
 
 ``` r
-knitr::include_graphics("../cluster/u_hat=0.2_run/figures/EDITED_DELTA_delta_vs_p_increase.png")
+knitr::include_graphics("../../cluster/u_hat=0.2_run/figures/EDITED_DELTA_delta_vs_p_increase.png")
 ```
 
-![](../cluster/u_hat=0.2_run/figures/EDITED_DELTA_delta_vs_p_increase.png)<!-- -->
+![](../../cluster/u_hat=0.2_run/figures/EDITED_DELTA_delta_vs_p_increase.png)<!-- -->
 
 ## Analytical AUC predictions for some a
 
@@ -221,7 +221,7 @@ knitr::include_graphics("../cluster/u_hat=0.2_run/figures/EDITED_DELTA_delta_vs_
 a_pred_res = u_t0_to_t1(x_grid=seq(-0.5,0.5,by=0.0001),a=0.009,b=1,sigma=0.01,k=0.2,u_hat=0.2)
 ```
 
-![](uhat20_redo_delta_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
+![](april5-uhat20_redo_delta_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
 
 ``` r
 # auc PREDICTIONS
@@ -236,7 +236,7 @@ print(paste("Trapezoidal AUC: ", a_pred_res$theta1_trapz, "Mathematica AUC: ", a
 a_obs_res = u_t0_to_t1(x_grid=seq(-0.5,0.5,by=0.0001),a=0.02252525,b=1,sigma=0.01,k=0.2,u_hat=0.2)
 ```
 
-![](uhat20_redo_delta_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
+![](april5-uhat20_redo_delta_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
 
 ``` r
 print(paste("Trapezoidal AUC: ", a_obs_res$theta1_trapz, "Mathematica AUC: ", auc_mathematica(a=0.02252525,b=1,sigma=0.01,k=0.2,uhat=0.2) , "my equation AUC (wrong): ", a_obs_res$theta1_factored))

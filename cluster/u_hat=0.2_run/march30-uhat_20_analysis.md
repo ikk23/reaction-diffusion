@@ -1,4 +1,4 @@
-uhat_5\_analysis
+uhat = 20 analysis
 ================
 Isabel Kim
 3/30/2022
@@ -21,10 +21,10 @@ library(tidyverse)
     ## x dplyr::lag()    masks stats::lag()
 
 ``` r
-data = read_csv("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.05_run/csvs/uhat_5_u0.001_to_0.02_summary.csv")
+data = read_csv("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/csvs/uhat_0.2_more_replicate_summary.csv")
 ```
 
-    ## Rows: 216 Columns: 7
+    ## Rows: 190 Columns: 7
 
     ## ── Column specification ────────────────────────────────────────────────────────
     ## Delimiter: ","
@@ -33,53 +33,26 @@ data = read_csv("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusio
     ## ℹ Use `spec()` to retrieve the full column specification for this data.
     ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
 
-``` r
-# a_obs vs a_pred values
-source("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/plotting_functions.R")
-obs_v_pred = get_a_pred_and_a_obs(data)
+## a vs p(increase)
 
-nreps = 50
-obs_v_pred
-```
-
-    ## $index_of_pred
-    ## [1] 121
-    ## 
-    ## $a_pred
-    ## [1] 0.01287879
-    ## 
-    ## $delta_pred
-    ## [1] 0.0008226724
-    ## 
-    ## $index_of_obs
-    ## [1] 20
-    ## 
-    ## $a_obs
-    ## [1] 0.005
-    ## 
-    ## $p_increase_obs
-    ## [1] 0.5
-    ## 
-    ## $delta_obs
-    ## [1] 0.001979917
-
-## a vs p(increase) - 100 replicates when a \> 0.005 and 50 replicates for a \< 0.005
+Black line represents the a_pred that minimizes delta in this range,
+whereas the grey line shows the a_obs value that led to a P(increase)
+closest to 50%
 
 ``` r
-knitr::include_graphics("../../cluster/u_hat=0.05_run/figures/uhat_5_u0.001_to_0.02.png")
+knitr::include_graphics("../../cluster/u_hat=0.2_run/figures/zoomed_in_uhat_0.2_more_replicates.png")
 ```
 
-![](../../cluster/u_hat=0.05_run/figures/uhat_5_u0.001_to_0.02.png)<!-- -->
+![](../../cluster/u_hat=0.2_run/figures/zoomed_in_uhat_0.2_more_replicates.png)<!-- -->
+The a_pred value that minimizes delta is 0.01464646, which is an
+under-estimate – the a_obs value that led to a P(increase) of 48% is
+0.02252525.
 
-Like with uhat=10, the predicted value of a\* (0.01287879)
-over-estimates the observed a-value that leads to a P(increase) of 50%
-(a_obs = 0.005). This is far off.
+The transition range looks like it’s between a = 0.02 and a = 0.027
+(quite short; 0.007 wide).
 
-Even with a=0.001, P(increase) is still greater than 0 at this low
-threshold of 5%. The transition range looks like it’s between 0.001 and
-0.01 (about 0.009 wide - wider than it was for uhat=20 and uhat=10).
-
-Some stochasticity in the transition range.
+Even with many values of a (190), N=30000, sigma = 0.01, and up to 100,
+there’s a lot of stochasiticity.
 
 ## How does delta change with a?
 
@@ -89,6 +62,35 @@ Some stochasticity in the transition range.
     to 50%
 
 ``` r
+source("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/plotting_functions.R")
+obs_v_pred = get_a_pred_and_a_obs(data)
+obs_v_pred
+```
+
+    ## $index_of_pred
+    ## [1] 29
+    ## 
+    ## $a_pred
+    ## [1] 0.01464646
+    ## 
+    ## $delta_pred
+    ## [1] 0.0002546032
+    ## 
+    ## $index_of_obs
+    ## [1] 92
+    ## 
+    ## $a_obs
+    ## [1] 0.02252525
+    ## 
+    ## $p_increase_obs
+    ## [1] 0.48
+    ## 
+    ## $delta_obs
+    ## [1] 0.0004718396
+
+``` r
+nreps = 50
+
 plot_a_vs_delta = ggplot(data, aes(x = a, y = delta)) + 
   geom_point(color = "purple") + 
   geom_line(color = "grey") +
@@ -103,22 +105,27 @@ plot_a_vs_delta = ggplot(data, aes(x = a, y = delta)) +
 plot_a_vs_delta
 ```
 
-![](uhat_5_analysis_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
-Similar to the other uhat results, a_pred captures the minimum, and
-a_obs is to the left of it.
+![](march30-uhat_20_analysis_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
+There is a clear minimum value of delta that the black line seems to
+capture. The delta_obs value is slightly above the minimum.
 
 ## How does P(increase) change with delta?
 
-What is the correlation between delta and P(increase)?
+Would initially expect that at higher delta, P(increase) is higher –
+there is a positive correlation
 
 ``` r
 cor(data$delta, data$p_increase)
 ```
 
-    ## [1] -0.9440732
+    ## [1] 0.8460563
 
-Negative correlation because we’re on the left hand side of the minimum
-of delta?
+Graph:
+
+-   Black line shows the minimum delta value, at which we expect the
+    critical propagule to occur.
+-   Grey line shows the delta value at which P(increase) is closest to
+    50%
 
 ``` r
 plot_delta_vs_freq = ggplot(data, aes(x = delta, y = p_increase)) + 
@@ -136,4 +143,7 @@ plot_delta_vs_freq = ggplot(data, aes(x = delta, y = p_increase)) +
 plot_delta_vs_freq
 ```
 
-![](uhat_5_analysis_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
+![](march30-uhat_20_analysis_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
+
+P(increase) increases mostly linearly with delta until P(increase)=1.
+But there is a lot of stochasticity/outliers.

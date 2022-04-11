@@ -85,10 +85,10 @@ plot_freqs_and_a = ggplot(data_a_graph, aes(x = a, y = p_increase)) +
 ```
 
 ``` r
-knitr::include_graphics("../cluster/u_hat=0.1_run/figures/EDITED_DELTA_a_vs_p_increase.png")
+knitr::include_graphics("../../cluster/u_hat=0.1_run/figures/EDITED_DELTA_a_vs_p_increase.png")
 ```
 
-![](../cluster/u_hat=0.1_run/figures/EDITED_DELTA_a_vs_p_increase.png)<!-- -->
+![](../../cluster/u_hat=0.1_run/figures/EDITED_DELTA_a_vs_p_increase.png)<!-- -->
 Adding the a=0,P(increase)=0 point adds some weirdness.
 
 ## Replot the a vs delta graph
@@ -108,10 +108,10 @@ plot_a_vs_delta = ggplot(csv_edit, aes(x = a, y = delta_correct)) +
 ```
 
 ``` r
-knitr::include_graphics("../cluster/u_hat=0.1_run/figures/EDITED_DELTA_a_vs_delta.png")
+knitr::include_graphics("../../cluster/u_hat=0.1_run/figures/EDITED_DELTA_a_vs_delta.png")
 ```
 
-![](../cluster/u_hat=0.1_run/figures/EDITED_DELTA_a_vs_delta.png)<!-- -->
+![](../../cluster/u_hat=0.1_run/figures/EDITED_DELTA_a_vs_delta.png)<!-- -->
 ### Extend a to lower values (below the minimum a used in the cluster
 runs)
 
@@ -182,10 +182,10 @@ p = ggplot(a_vs_delta_tibble, aes(x = a, y = delta_correct)) +
 ```
 
 ``` r
-knitr::include_graphics("../cluster/u_hat=0.1_run/figures/EDITED_DELTA_extended_scale_a_vs_delta.png")
+knitr::include_graphics("../../cluster/u_hat=0.1_run/figures/EDITED_DELTA_extended_scale_a_vs_delta.png")
 ```
 
-![](../cluster/u_hat=0.1_run/figures/EDITED_DELTA_extended_scale_a_vs_delta.png)<!-- -->
+![](../../cluster/u_hat=0.1_run/figures/EDITED_DELTA_extended_scale_a_vs_delta.png)<!-- -->
 
 The predicted value of a that would get AUC1 closest to (a\*b) is
 `a_star = 0.004126316`, which wasn’t included in the cluster runs (but
@@ -209,10 +209,10 @@ plot_delta_vs_p_increase = ggplot(csv_edit, aes(x = delta_correct, y = p_increas
 ```
 
 ``` r
-knitr::include_graphics("../cluster/u_hat=0.1_run/figures/EDITED_DELTA_delta_vs_p_increase.png")
+knitr::include_graphics("../../cluster/u_hat=0.1_run/figures/EDITED_DELTA_delta_vs_p_increase.png")
 ```
 
-![](../cluster/u_hat=0.1_run/figures/EDITED_DELTA_delta_vs_p_increase.png)<!-- -->
+![](../../cluster/u_hat=0.1_run/figures/EDITED_DELTA_delta_vs_p_increase.png)<!-- -->
 ## Analytical AUC predictions for some a
 
 ### a = 0.004126316 - the value of a that causes AUC1 to be closest to a\*b (not in the cluster runs)
@@ -221,7 +221,7 @@ knitr::include_graphics("../cluster/u_hat=0.1_run/figures/EDITED_DELTA_delta_vs_
 a_pred_res = u_t0_to_t1(x_grid=seq(-0.5,0.5,by=0.0001),a=0.004126316,b=1,sigma=0.01,k=0.2,u_hat=0.1)
 ```
 
-![](uhat10_redo_delta_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
+![](april5-uhat10_redo_delta_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
 
 ``` r
 print(paste("Trapezoidal AUC: ", a_pred_res$theta1_trapz, "Mathematica AUC: ", auc_mathematica(a=0.004126316,b=1,sigma=0.01,k=0.2,uhat=0.1) , "my equation AUC (wrong): ", a_pred_res$theta1_factored))
@@ -237,7 +237,7 @@ The Mathematica prediction is much closer
 a_pred_res = u_t0_to_t1(x_grid=seq(-0.5,0.5,by=0.0001),a=0.005,b=1,sigma=0.01,k=0.2,u_hat=0.1)
 ```
 
-![](uhat10_redo_delta_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
+![](april5-uhat10_redo_delta_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
 
 ``` r
 print(paste("Trapezoidal AUC: ", a_pred_res$theta1_trapz, "Mathematica AUC: ", auc_mathematica(a=0.005,b=1,sigma=0.01,k=0.2,uhat=0.1) , "my equation AUC (wrong): ", a_pred_res$theta1_factored))
@@ -251,7 +251,7 @@ print(paste("Trapezoidal AUC: ", a_pred_res$theta1_trapz, "Mathematica AUC: ", a
 a_pred_res = u_t0_to_t1(x_grid=seq(-0.5,0.5,by=0.0001),a=0.01075758,b=1,sigma=0.01,k=0.2,u_hat=0.1)
 ```
 
-![](uhat10_redo_delta_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
+![](april5-uhat10_redo_delta_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
 
 ``` r
 print(paste("Trapezoidal AUC: ", a_pred_res$theta1_trapz, "Mathematica AUC: ", auc_mathematica(a=0.01075758,b=1,sigma=0.01,k=0.2,uhat=0.1) , "my equation AUC (wrong): ", a_pred_res$theta1_factored))
