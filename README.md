@@ -28,6 +28,10 @@
   + [uhat = 5% output from 4/5](cluster/u_hat=0.05_run/april5-uhat5_redo_delta.md)
   + [Comparing the 3 above](cluster/u_hat_comparisons/april5-redo_delta_uhat_comparison.md)
 
+
+* Week of April 11th runs (10 generations for wild-types to stabilize + fixed bugs in the python + SLiM scripts):
+  + [uhat=20% from 4/11](cluster/u_hat=0.2_run/april11-uhat20_wt_gens_results.md)
+
 ## Mathematica:
 
 * [Tutorial](mathematica/mathematica_tutorial.md)
