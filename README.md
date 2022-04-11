@@ -10,7 +10,7 @@
 * [WF model (note - problem with clustering)](slim/WF-model.slim)
 * [nonWF model](slim/nonWF-model.slim)
   + [Order of operations in the model](slim/slim_order_of_operations.md)
-  + [Figuring out how / how long to let the wild-type population stabilize](wt-stabilize/wild-type-stabilization.md)
+  + [Figuring out how / how long to let the wild-type population stabilize](slim/wt-stabilize/wild-type-stabilization.md)
 
 
 ## CLUSTER:
