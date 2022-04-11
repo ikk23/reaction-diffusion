@@ -1,16 +1,11 @@
-n = 101
-a_vector = seq(0, 0.03, length.out=n)
-a_seq_middle = a_vector[2:n]
-a_seq_lower = seq(0.0001,0.00029,length.out=10)
-a_seq_upper = seq(0.0303, 0.999, length.out = 40)
-a_seq = c(a_seq_lower, a_seq_middle, a_seq_upper) # 150 total jobs
-# a_seq_lower and a_seq_upper will have 50 replicates each
-# but a_seq_middle will have 100
-u_hat = 0.2
+
+u_hat = 0.05
+
+a_seq = c(seq(0.001,0.015,length.out=100), seq(0.02,1.0,length.out=50))
 
 
 # Start writing to a new output file
-sink('/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/slurm_text/second_run.txt')
+sink('/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.05_run/slurm_text/uhat5_april11_full_a_run.txt')
 
 for (i in 1:length(a_seq)){
   a = a_seq[i]
