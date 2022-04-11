@@ -18,7 +18,7 @@
 ### Management 
 
 * [First runs (with the delta bug)](cluster/slurm_management.md)
-* [Second cluster run of uhat=20% only (adding the drive in gen 10)](cluster_runs_2.md)
+* [Second cluster run of uhat=20% only (adding the drive in gen 10)](cluster/april6-cluster_runs_2.md)
 
 ### Output from specific runs
 
