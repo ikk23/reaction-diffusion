@@ -15,17 +15,18 @@
 
 ## CLUSTER:
 
-* [R markdown keeping track of jobs (with the delta bug)](cluster/slurm_management.md)
-* [Comparing uhat=5, uhat=10, and uhat=20](cluster/redo_delta_uhat_comparison.md)
-* [Second cluster runs (4/7 onwards)](cluster_runs_2.md)
+### Management 
 
+* [First runs (with the delta bug)](cluster/slurm_management.md)
+* [Second cluster runs (4/7 onwards) - adding the drive in gen 10](cluster_runs_2.md)
 
 ### Output from specific runs
 
-* April 5th runs (bug in Python script / before adding the wild-type equilibriation generations):
+* April 5th runs (bug in Python script / before letting the wild-type population stabilize):
   + [uhat = 20% output from 4/5](cluster/u_hat=0.2_run/april5-uhat20_redo_delta.md)
   + [uhat = 10% output from 4/5](cluster/u_hat=0.1_run/april5-uhat10_redo_delta.md)
   + [uhat = 5% output from 4/5](cluster/u_hat=0.05_run/april5-uhat5_redo_delta.md)
+  + [Comparing the 3 above](cluster/u_hat_comparisons/april5-redo_delta_uhat_comparison.md)
 
 ## Mathematica:
 
