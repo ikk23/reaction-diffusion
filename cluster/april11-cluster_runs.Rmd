@@ -1,5 +1,5 @@
 ---
-title: "uhat=10% and uhat=5% cluster runs with debugged scripts and 10 gens until drive"
+title: "uhat=10% and uhat=5% cluster runs with debugged scripts and 10 gens until drive + new run --> uhat=40%"
 author: "Isabel Kim"
 date: "4/11/2022"
 output: github_document
@@ -113,3 +113,49 @@ a_seq = c(seq(0.001,0.015,length.out=100), seq(0.02,1.0,length.out=50))
 * Raw csv is now at: `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.05_run/csv_raw/uhat5_april11_full_a_run.csv`
 * Summary csv is at: `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.05_run/csvs/summary_april11_full_range_uhat5.csv`
 
+## uhat=40% jobs
+
+* Before, a_predicted was 0.002 and a_observed was 0.005
+```{r}
+sigma = 0.01
+k = 0.2
+uhat = 0.4
+
+n = 1000
+a_vector = seq(0, 1.0, length.out=n)
+delta_vector = rep(-1,n)
+
+for (i in 1:n){
+  delta_vector[i] = factored_delta(a_vector[i],1,sigma,k,uhat)
+}
+
+
+results = tibble(a=a_vector, delta = delta_vector)
+p = ggplot(results, aes(x=a,y=delta)) + geom_point(color = "red") + geom_line() + geom_hline(yintercept = 0)
+
+print(p)
+
+# Find x-intercept
+a_not_zero = a_vector[2:n]
+delta_not_zero = delta_vector[2:n]
+ind = which.min(abs(delta_not_zero))
+a_star = a_not_zero[ind]
+delta_star = delta_not_zero[ind]
+print(paste("Delta is",delta_star,"at a=",a_star))
+```
+* a_predicted is around 0.026
+* Since a_observed for uhat=20% was 0.0246, we could expect upwards of a=0.1 for a_observed here. Concentrate on a = 0.0001 to 0.15
+
+```{r}
+a_seq = c(seq(0.0001,0.15,length.out=100), seq(0.17,1.0,length.out=50))
+```
+
+### Files
+
+* text file: `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.4_run/slurm_text/uhat40_april12_full_a_run.txt`
+* SLURM script: `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.4_run/slurm_main/uhat40_april12_main.sh`
+  + **Submitted batch job 4279105**
+* Merge script: `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.4_run/slurm_merge/uhat40_april12_merge.sh`
+  + On the cluster: `/home/ikk23/underdom/merge_scripts/uhat40_april12_merge.sh`
+  + Will create `uhat40_april12_full_a_run.csv`
+  

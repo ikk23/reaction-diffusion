@@ -93,6 +93,9 @@ p = plot_a_vs_delta + xlim(0,0.1)
 ggsave(filename = paste0(dir,"april12_zoomed_in_a_vs_delta_uhat5.png"),plot=p)
 
 # Delta vs P(increase)
+summarize_data = read_csv("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.05_run/csvs/summary_april11_full_range_uhat5.csv")
+summarize_data$p_increase[150] = 1.0
+
 delta_vs_p_increase = ggplot(summarize_data, aes(x = delta, y = p_increase)) + 
   geom_point(color = "blue") + 
   geom_line(color = "grey") +

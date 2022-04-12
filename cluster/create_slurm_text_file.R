@@ -1,11 +1,11 @@
 
-u_hat = 0.05
+u_hat = 0.4
 
-a_seq = c(seq(0.001,0.015,length.out=100), seq(0.02,1.0,length.out=50))
+a_seq = c(seq(0.0001,0.15,length.out=100), seq(0.17,1.0,length.out=50))
 
 
 # Start writing to a new output file
-sink('/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.05_run/slurm_text/uhat5_april11_full_a_run.txt')
+sink('/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.4_run/slurm_text/uhat40_april12_full_a_run.txt')
 
 for (i in 1:length(a_seq)){
   a = a_seq[i]
