@@ -1,5 +1,5 @@
 uhat=10% and uhat=5% cluster runs with debugged scripts and 10 gens
-until drive + new run –> uhat=40%
+until drive + new run –> uhat=40%, uhat=15%
 ================
 Isabel Kim
 4/11/2022
@@ -214,3 +214,61 @@ a_seq = c(seq(0.0001,0.15,length.out=100), seq(0.17,1.0,length.out=50))
     -   On the cluster:
         `/home/ikk23/underdom/merge_scripts/uhat40_april12_merge.sh`
     -   Will create `uhat40_april12_full_a_run.csv`
+
+## uhat=15%
+
+Never run before
+
+``` r
+sigma = 0.01
+k = 0.2
+uhat = 0.15
+
+n = 1000
+a_vector = seq(0, 1.0, length.out=n)
+delta_vector = rep(-1,n)
+
+for (i in 1:n){
+  delta_vector[i] = factored_delta(a_vector[i],1,sigma,k,uhat)
+}
+
+
+results = tibble(a=a_vector, delta = delta_vector)
+p = ggplot(results, aes(x=a,y=delta)) + geom_point(color = "red") + geom_line() + geom_hline(yintercept = 0)
+
+print(p)
+```
+
+![](april11-cluster_runs_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+
+``` r
+# Find x-intercept
+a_not_zero = a_vector[2:n]
+delta_not_zero = delta_vector[2:n]
+ind = which.min(abs(delta_not_zero))
+a_star = a_not_zero[ind]
+delta_star = delta_not_zero[ind]
+print(paste("Delta is",delta_star,"at a=",a_star))
+```
+
+    ## [1] "Delta is 2.13455768506119e-05 at a= 0.00700700700700701"
+
+-   a_observed for uhat=10% was 0.0133 and a_observed for uhat=20% was
+    0.0246, so I’d expect a_observed here to be around 0.019
+
+``` r
+a_seq = c(seq(0.0001,0.1,length.out=100),seq(0.12,1.0,length.out=50))
+```
+
+### Files
+
+-   text file:
+    `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.15_run/slurm_text/uhat15_april12_full_a_run.txt`
+-   SLURM main:
+    `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.15_run/slurm_main/uhat15_april12_main.sh`
+    -   **Submitted batch job 4282838 – running 4/12 5:30pm**
+-   SLURM merge:
+    `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.15_run/slurm_merge/uhat15_april12_merge.sh`
+    -   On the cluster:
+        `/home/ikk23/underdom/merge_scripts/uhat15_april12_merge.sh`
+    -   Creates: `uhat15_april12_full_a_run.csv`
