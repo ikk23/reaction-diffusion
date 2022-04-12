@@ -34,7 +34,7 @@
   + [uhat=20% from 4/11](cluster/u_hat=0.2_run/april11-uhat20_wt_gens_results.md)
   + [uhat=10% from 4/12](cluster/u_hat=0.1_run/april12-uhat10_wt_gens_results.md)
   + [uhat=5% from 4/12](cluster/u_hat=0.05_run/april12-uhat5_wt_gens_results.md)
-  + [Comparing these](cluster/u_hat_comparisons/april5-redo_delta_uhat_comparison.md)
+  + [Comparing these](cluster/u_hat_comparisons/april12-u20,10,5_comparison.md)
  
 ## Mathematica:
 
