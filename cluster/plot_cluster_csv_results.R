@@ -2,7 +2,7 @@ library(tidyverse)
 source("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/scripts/functions-main-model.R")
 
 # PATH TO THE RAW CLUSTER OUTPUT
-file = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/csv_raw/full_range_uhat20.csv"
+file = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.1_run/csv_raw/uhat10_april11_full_a_run.csv"
 data = read_csv(file) %>% arrange(a)
 nparams = length(unique(data$a)) # 150
 
@@ -40,7 +40,7 @@ summarize_data = tibble(a = a_vector, sigma = sigma_vector,
                         p_increase = p_increase_vector)
 
 # Write out 
-write_csv(x = summarize_data, file = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/csvs/summary_april11_full_range_uhat20.csv")
+write_csv(x = summarize_data, file = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.1_run/csvs/summary_april11_full_range_uhat10.csv")
 
 
 source("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/plotting_functions.R")
@@ -65,16 +65,14 @@ plot_freqs_and_a = ggplot(summarize_data, aes(x = a, y = p_increase)) +
        subtitle = paste0("a* = ", round(a_prop,4), " (delta* = ", round(delta_min,4),") but a_obs =",round(a_obs,4)," (delta_obs =", round(delta_obs,4),")")) +
   ylim(0,1)
 
-dir = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/figures/"
+dir = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.1_run/figures/"
 
 # Add line at a of pincrease of 0.5
 p = plot_freqs_and_a + geom_vline(xintercept = a_obs, color = "cornsilk3") 
-
+ggsave(filename = paste0(dir,"april12_full_a_vs_p_increase_uhat10.png"),plot=p)
 
 p2 = p + xlim(0,0.1)
-
-plot_path = paste0(dir,"april11_zoomed_in.png")
-ggsave(filename = plot_path, plot = p2)
+ggsave(filename = paste0(dir,"april12_zoomed_in_a_vs_p_increase_uhat10.png"), plot = p2)
 
 # Delta plot
 plot_a_vs_delta = ggplot(summarize_data, aes(x = a, y = delta)) + 
@@ -86,11 +84,13 @@ plot_a_vs_delta = ggplot(summarize_data, aes(x = a, y = delta)) +
                       "  k=",summarize_data$k[1],"  u_hat=", summarize_data$u_hat[1]), 
        subtitle = paste0("a* = ", round(a_prop,4), " (delta* = ", round(delta_min,4),") but a_obs =",round(a_obs,4)," (delta_obs =", round(delta_obs,4),")")) +
   geom_vline(xintercept = a_obs, color = "cornsilk3") + geom_hline(yintercept = 0)
-ggsave(filename = paste0(dir,"april11_full_a_vs_delta.png"),plot=plot_a_vs_delta)
+
+
+ggsave(filename = paste0(dir,"april12_full_a_vs_delta_uhat10.png"),plot=plot_a_vs_delta)
 
 # zoom in
 p = plot_a_vs_delta + xlim(0,0.1)
-ggsave(filename = paste0(dir,"april11_zoomed_in_a_vs_delta.png"),plot=p)
+ggsave(filename = paste0(dir,"april12_zoomed_in_a_vs_delta_uhat10.png"),plot=p)
 
 # Delta vs P(increase)
 delta_vs_p_increase = ggplot(summarize_data, aes(x = delta, y = p_increase)) + 
@@ -103,5 +103,6 @@ delta_vs_p_increase = ggplot(summarize_data, aes(x = delta, y = p_increase)) +
                       "  k=",summarize_data$k[1],"  u_hat=", summarize_data$u_hat[1]), 
        subtitle = paste0("a* = ", round(a_prop,4), " (delta* = ", round(delta_min,4),") but a_obs =",round(a_obs,4)," (delta_obs =", round(delta_obs,4),")")) +
   geom_vline(xintercept = delta_obs, color = "cornsilk3")
-ggsave(filename=paste0(dir,"april11_delta_vs_p_increase.png"),plot = delta_vs_p_increase)
+
+ggsave(filename=paste0(dir,"april12_delta_vs_p_increase_uhat10.png"),plot = delta_vs_p_increase)
 
