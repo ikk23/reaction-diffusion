@@ -213,7 +213,8 @@ plot
 ```
 
 ![](april12-u20,10,5_comparison_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
-\* Wonder if we can use this equation.
+\* Wonder if we can use this equation. + No, it only involves SLiM
+results, not the equation at all.
 
 ### uhat vs the lower value for a (below which P(increase) is always 100%)
 

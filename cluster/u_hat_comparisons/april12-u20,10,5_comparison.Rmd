@@ -134,6 +134,7 @@ plot = ggplot(transitions_edit) + geom_point(aes(x=uhat,y=a_upper),color="black"
 plot
 ```
 * Wonder if we can use this equation.
+  + No, it only involves SLiM results, not the equation at all.
 
 ### uhat vs the lower value for a (below which P(increase) is always 100%)
 ```{r}
