@@ -31,6 +31,7 @@
 
 
 * Week of April 11th runs (10 generations for wild-types to stabilize + fixed bugs in the python + SLiM scripts):
+  + [uhat=40% from 4/12](cluster/u_hat=0.4_run/april12-uhat40_wt_gens_results.md)
   + [uhat=20% from 4/11](cluster/u_hat=0.2_run/april11-uhat20_wt_gens_results.md)
   + [uhat=10% from 4/12](cluster/u_hat=0.1_run/april12-uhat10_wt_gens_results.md)
   + [uhat=5% from 4/12](cluster/u_hat=0.05_run/april12-uhat5_wt_gens_results.md)
