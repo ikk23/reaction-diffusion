@@ -91,12 +91,14 @@ compiled_plot = ggplot(data = compiled, aes(x = a, y = p_increase, color = u_hat
                       "\nfor u_hat = 20, a_pred is ", round(obs_vs_pred_u20$a_pred,4), 
                       " and a_obs is ", round(obs_vs_pred_u20$a_obs,4)))
 
-compiled_plot
+#ggsave(filename = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat_comparisons/april12-a_vs_p.png",plot = compiled_plot)
 ```
 
-    ## Warning: Removed 135 row(s) containing missing values (geom_path).
+``` r
+knitr::include_graphics("../../cluster/u_hat_comparisons/april12-a_vs_p.png")
+```
 
-![](april12-u20,10,5_comparison_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
+![](../../cluster/u_hat_comparisons/april12-a_vs_p.png)<!-- -->
 
 ## Compare delta vs P(increase) graphs
 
@@ -109,12 +111,16 @@ compiled_delta_v_p_increase = ggplot(data = compiled, aes(x = delta, y = p_incre
                       "\nfor u_hat = 10, delta_obs is ", round(obs_vs_pred_u10$delta_obs,4), 
                       "\nfor u_hat = 20, delta_obs is ", round(obs_vs_pred_u20$delta_obs,4)))
 
-compiled_delta_v_p_increase
+#ggsave(filename = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat_comparisons/april12-delta_vs_p.png",plot = compiled_delta_v_p_increase)
 ```
 
-![](april12-u20,10,5_comparison_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
-## What are the delta transition range boundaries (delta_min – below
-which P(increase)=0 and delta_max – above which P(increase)=1.0)?
+``` r
+knitr::include_graphics("../../cluster/u_hat_comparisons/april12-delta_vs_p.png")
+```
+
+![](../../cluster/u_hat_comparisons/april12-delta_vs_p.png)<!-- -->
+
+## What are the delta transition range boundaries (delta_min – below which P(increase)=0 and delta_max – above which P(increase)=1.0)?
 
 ``` r
 uhat5 = compiled %>% filter(u_hat=="0.05")

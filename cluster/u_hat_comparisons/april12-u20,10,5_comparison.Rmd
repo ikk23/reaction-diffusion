@@ -31,7 +31,7 @@ compiled$p_increase[150] = 1.0 # fix
 ```
 
 ## Compare a vs P(increase) graphs
-```{r}
+```{r eval=F}
 compiled_plot = ggplot(data = compiled, aes(x = a, y = p_increase, color = u_hat)) +
   geom_line() +
   xlab("a") +
@@ -47,11 +47,15 @@ compiled_plot = ggplot(data = compiled, aes(x = a, y = p_increase, color = u_hat
                       "\nfor u_hat = 20, a_pred is ", round(obs_vs_pred_u20$a_pred,4), 
                       " and a_obs is ", round(obs_vs_pred_u20$a_obs,4)))
 
-compiled_plot
+#ggsave(filename = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat_comparisons/april12-a_vs_p.png",plot = compiled_plot)
+```
+
+```{r}
+knitr::include_graphics("../../cluster/u_hat_comparisons/april12-a_vs_p.png")
 ```
 
 ## Compare delta vs P(increase) graphs
-```{r}
+```{r eval=F}
 compiled_delta_v_p_increase = ggplot(data = compiled, aes(x = delta, y = p_increase, color = u_hat)) +
   geom_line() +
   xlab("delta") +
@@ -60,11 +64,15 @@ compiled_delta_v_p_increase = ggplot(data = compiled, aes(x = delta, y = p_incre
                       "\nfor u_hat = 10, delta_obs is ", round(obs_vs_pred_u10$delta_obs,4), 
                       "\nfor u_hat = 20, delta_obs is ", round(obs_vs_pred_u20$delta_obs,4)))
 
-compiled_delta_v_p_increase
+#ggsave(filename = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat_comparisons/april12-delta_vs_p.png",plot = compiled_delta_v_p_increase)
 ```
+```{r}
+knitr::include_graphics("../../cluster/u_hat_comparisons/april12-delta_vs_p.png")
+```
+
 ## What are the delta transition range boundaries (delta_min -- below which P(increase)=0 and delta_max -- above which P(increase)=1.0)?
 
-```{r}
+```{r eval=F}
 uhat5 = compiled %>% filter(u_hat=="0.05")
 uhat10 = compiled %>% filter(u_hat=="0.1")
 uhat20 = compiled %>% filter(u_hat=="0.2")
