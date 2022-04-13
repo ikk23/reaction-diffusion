@@ -120,6 +120,28 @@ knitr::include_graphics("../../cluster/u_hat_comparisons/april12-delta_vs_p.png"
 The transition range for uhat=40 seems very sharp – probably didn’t have
 enough data in this region.
 
+## Check a vs delta
+
+``` r
+compiled_delta_v_a = ggplot(data = compiled, aes(x = a, y = delta, color = u_hat)) +
+  geom_line() +
+  xlab("a") +
+  ylab("delta") +
+  labs(title = paste0("for u_hat = 5,   delta_obs is ", round(obs_vs_pred_u5$delta_obs, 4),
+                      "\nfor u_hat = 10, delta_obs is ", round(obs_vs_pred_u10$delta_obs,4),
+                      "\nfor u_hat = 15, delta_obs is ", round(obs_vs_pred_u15$delta_obs,4),
+                      "\nfor u_hat = 20, delta_obs is ", round(obs_vs_pred_u20$delta_obs,4),
+                      "\nfor u_hat = 40, delta_obs is ",round(obs_vs_pred_u40$delta_obs,4)))
+
+#ggsave(plot=compiled_delta_v_a, filename = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat_comparisons/april13_compiled_a_vs_delta.png")
+```
+
+``` r
+knitr::include_graphics("../../cluster/u_hat_comparisons/april13_compiled_a_vs_delta.png")
+```
+
+![](../../cluster/u_hat_comparisons/april13_compiled_a_vs_delta.png)<!-- -->
+
 ## What are the delta transition range boundaries (delta_min – below which P(increase)=0 and delta_max – above which P(increase)=1.0)?
 
 ``` r
@@ -191,7 +213,7 @@ u_vs_a_upper = ggplot(transitions, aes(x=uhat,y=a_upper)) + geom_point() + geom_
 u_vs_a_upper
 ```
 
-![](april12-uhat_comparison_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
+![](april12-uhat_comparison_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
 
 -   *linear* relationship between uhat and a_upper
     -   If uhat goes up by x, then the a_value should go up by mx
@@ -233,7 +255,7 @@ plot = ggplot(transitions_edit) + geom_point(aes(x=uhat,y=a_upper),color="black"
 plot
 ```
 
-![](april12-uhat_comparison_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
+![](april12-uhat_comparison_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
 \*But this equation only involves SLiM results, not the delta or AUC
 equation at all.
 
@@ -245,7 +267,7 @@ u_vs_a_lower = ggplot(transitions_edit, aes(x=uhat,y=a_lower)) + geom_point() + 
 u_vs_a_lower
 ```
 
-![](april12-uhat_comparison_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
+![](april12-uhat_comparison_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
 Not very linear
 
 ### uhat vs delta_upper
@@ -256,5 +278,86 @@ u_vs_delta_upper = ggplot(transitions_edit, aes(x=uhat,y=delta_upper)) + geom_po
 u_vs_delta_upper
 ```
 
-![](april12-uhat_comparison_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
+![](april12-uhat_comparison_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
 Weird that the slope becomes negative between uhat=20% and uhat=40%?
+
+## delta equation as a function of a and u_hat
+
+### Apply equation to a range of uhats
+
+``` r
+source("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/scripts/auc-equations.R")
+
+u_hat = seq(0.05,0.45,by=0.05)
+n = length(u_hat) # 9
+
+a_grid = seq(0.0, 1.0, length.out=1000)
+
+delta_u_5 = rep(-1, 1000)
+delta_u_10 = rep(-1,1000)
+delta_u_15 = rep(-1,1000)
+delta_u_20 = rep(-1,1000)
+delta_u_25 = rep(-1,1000)
+delta_u_30 = rep(-1,1000)
+delta_u_35 = rep(-1,1000)
+delta_u_40 = rep(-1,1000)
+delta_u_45 = rep(-1,1000)
+
+# for plotting
+a_grid_expanded = c(a_grid, a_grid, a_grid, a_grid, a_grid, a_grid, a_grid, a_grid, a_grid)
+u_hat_expanded = c(rep(0.05,1000), rep(0.1,1000), rep(0.15,1000),rep(0.2,1000),rep(0.25,1000),
+                   rep(0.3,1000),rep(0.35,1000),rep(0.4,1000),rep(0.45,1000))
+u_hat_expanded_string = as.character(u_hat_expanded)
+
+b=1
+sigma=0.01
+k = 0.2
+for (i in 1:1000){
+  a = a_grid[i]
+  delta_u_5[i] = factored_delta(a,b,sigma,k,0.05)
+  delta_u_10[i] = factored_delta(a,b,sigma,k,0.1)
+  delta_u_15[i] = factored_delta(a,b,sigma,k,0.15)
+  delta_u_20[i] = factored_delta(a,b,sigma,k,0.2)
+  delta_u_25[i] = factored_delta(a,b,sigma,k,0.25)
+  delta_u_30[i] = factored_delta(a,b,sigma,k,0.3)
+  delta_u_35[i] = factored_delta(a,b,sigma,k,0.35)
+  delta_u_40[i] = factored_delta(a,b,sigma,k,0.4)
+  delta_u_45[i] = factored_delta(a,b,sigma,k,0.45)
+}
+
+delta_expanded = c(delta_u_5, delta_u_10, delta_u_15, delta_u_20, delta_u_25, 
+                   delta_u_30, delta_u_35, delta_u_40, delta_u_45)
+
+delta_vs_a_and_u = tibble(a = a_grid_expanded, delta = delta_expanded, uhat = u_hat_expanded_string) 
+```
+
+### Plot a vs delta, colored by uhat
+
+``` r
+p = ggplot(delta_vs_a_and_u, aes(x = a, y = delta, color = uhat)) + geom_line() + geom_hline(yintercept = 0) + geom_vline(xintercept=0)
+
+#ggsave(plot= p, filename = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat_comparisons/april13_delta_vs_full_a_by_u.png")
+
+#### Zooming in on only the transition region
+p_zoom = p + xlim(0,0.1)
+
+#ggsave(plot= p_zoom, filename = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat_comparisons/april13_delta_vs_fzoomed_in_a_by_u.png")
+```
+
+``` r
+knitr::include_graphics("../../cluster/u_hat_comparisons/april13_delta_vs_full_a_by_u.png")
+```
+
+![](../../cluster/u_hat_comparisons/april13_delta_vs_full_a_by_u.png)<!-- -->
+
+#### Zoomed in - a from 0 to 0.1
+
+``` r
+knitr::include_graphics("../../cluster/u_hat_comparisons/april13_delta_vs_fzoomed_in_a_by_u.png")
+```
+
+![](../../cluster/u_hat_comparisons/april13_delta_vs_fzoomed_in_a_by_u.png)<!-- -->
+The increase in a_pred increases at a faster rate than the increase in
+uhat – note the difference in the x-intercept between uhat=5% and
+uhat=10% vs uhat=40% and uhat=45% – once uhat gets pretty high, a bigger
+increase in *a* is needed in order for the drive to spread..

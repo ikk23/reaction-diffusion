@@ -27,6 +27,9 @@ knitr::include_graphics("../../cluster/u_hat=0.4_run/figures/april12_full_a_vs_p
 knitr::include_graphics("../../cluster/u_hat=0.4_run/figures/april12_zoomed_in_a_vs_p_increase_uhat40.png")
 ```
 * a_observed = 0.0682
+  + SLiM visual validation that at a=0.0682, we see P(increase) about 50% of the time:
+    * Replicate 1: increases from 0.0 to 0.082, then stablizes (is the advantage of d/d fitness too small?)
+    
 
 ## a vs delta
 
