@@ -164,6 +164,8 @@ uhat40 = compiled %>% filter(u_hat == "0.4")
 library(tidyverse)
 uhats = c(0.05,0.1,0.15 ,0.2, 0.4)
 a_mins = c(0.0001,0.0094,0.01523,0.0216,0.0607)
+a_observed = c(0.00679798, 0.01328283, 0.01927273, 0.0246,0.06823636 )
+delta_observed = c(0.000238392, 0.00062167, 0.000880852, 0.000967741,0.000576682)
 a_maxs = c(0.01,0.0165,0.0223,0.03,0.07884)
 delta_mins = c(-(9.84e-06), 0.000308603,0.000584299,0.000797672,0.000555901)
 delta_maxs = c(0.000573111,0.000893806,0.00108,0.001219991,0.000590642)
@@ -171,8 +173,10 @@ delta_maxs = c(0.000573111,0.000893806,0.00108,0.001219991,0.000590642)
 transitions = tibble(uhat = uhats,
                      a_lower = a_mins,
                      a_upper = a_maxs,
+                     a_observed = a_observed,
                      delta_lower = delta_mins,
-                     delta_upper = delta_maxs)
+                     delta_upper = delta_maxs,
+                     delta_observed = delta_observed)
 ```
 
 ### uhat vs the upper value for a (above which P(increase) is always 100%)
@@ -201,6 +205,24 @@ plot = ggplot(transitions_edit) + geom_point(aes(x=uhat,y=a_upper),color="black"
 plot
 ```
 *But this equation only involves SLiM results, not the delta or AUC equation at all.
+
+### uhat vs a_observed? 
+
+```{r}
+u_vs_a_obs = ggplot(transitions_edit, aes(x = uhat, y = a_observed)) + geom_point() + geom_line()
+
+u_vs_a_obs
+```
+Similar results to uhat vs a_upper -- appears linear for uhat=5% to uhat=20%, then increases more from uhat=20% to uhat=40% (not sure if this is due to lack of data here though)
+
+### uhat vs delta_observed?
+```{r}
+u_vs_delta_obs = ggplot(transitions_edit, aes(x = uhat, y = delta_observed)) + geom_point() + geom_line()
+
+u_vs_delta_obs
+```
+
+
 
 ### uhat vs the lower value for a (below which P(increase) is always 100%)
 ```{r}
@@ -290,3 +312,11 @@ knitr::include_graphics("../../cluster/u_hat_comparisons/april13_delta_vs_full_a
 knitr::include_graphics("../../cluster/u_hat_comparisons/april13_delta_vs_fzoomed_in_a_by_u.png")
 ```
 The increase in a_pred increases at a faster rate than the increase in uhat -- note the difference in the x-intercept between uhat=5% and uhat=10% vs uhat=40% and uhat=45% -- once uhat gets pretty high, a bigger increase in *a* is needed in order for the drive to spread..
+
+## Conclusions
+
+* The a_predicted is always lower than the a_observed.
+* Predictions get worse as uhat increases (it's especially bad for uhat=40%)
+* The delta value at which P(increase)=100% increases with uhat (a greater increase in AUC is needed for the drive to spread as the frequency threshold gets higher). 
+  + But an exception is uhat=40% -- this transition is very sharp and occurs at a very low delta value compared to the other runs'. There could be an issue of not enough data in this region though.
+* The threshold for a (at which delta=0) is expected to increase non-linearly with uhat (as uhat increases, a larger increase in a is needed). But in the actual data, the a_observed 
