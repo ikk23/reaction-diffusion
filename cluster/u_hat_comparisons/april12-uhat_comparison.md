@@ -1,4 +1,4 @@
-uhat=40, 20, 10, and 5% comparison after debugging + wt gens
+uhat=40, 20, 15, 10, and 5% comparison after debugging + wt gens
 ================
 Isabel Kim
 4/12/2022
@@ -7,84 +7,30 @@ Isabel Kim
 
 ``` r
 library(tidyverse)
-```
-
-    ## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──
-
-    ## ✓ ggplot2 3.3.5     ✓ purrr   0.3.4
-    ## ✓ tibble  3.1.6     ✓ dplyr   1.0.8
-    ## ✓ tidyr   1.2.0     ✓ stringr 1.4.0
-    ## ✓ readr   2.1.2     ✓ forcats 0.5.1
-
-    ## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-    ## x dplyr::filter() masks stats::filter()
-    ## x dplyr::lag()    masks stats::lag()
-
-``` r
 source("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/plotting_functions.R")
 
 summary_u40 = read_csv("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.4_run/csvs/summary_april12_full_range_uhat40.csv")
-```
-
-    ## Rows: 150 Columns: 6
-
-    ## ── Column specification ────────────────────────────────────────────────────────
-    ## Delimiter: ","
-    ## dbl (6): a, sigma, k, u_hat, delta, p_increase
-    ## 
-    ## ℹ Use `spec()` to retrieve the full column specification for this data.
-    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-
-``` r
 obs_vs_pred_u40 = get_a_pred_and_a_obs(summary_u40)
 
 summary_u20 = read_csv("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/csvs/summary_april11_full_range_uhat20.csv")
-```
-
-    ## Rows: 150 Columns: 6
-    ## ── Column specification ────────────────────────────────────────────────────────
-    ## Delimiter: ","
-    ## dbl (6): a, sigma, k, u_hat, delta, p_increase
-    ## 
-    ## ℹ Use `spec()` to retrieve the full column specification for this data.
-    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-
-``` r
 obs_vs_pred_u20 = get_a_pred_and_a_obs(summary_u20)
 
+summary_u15 = read_csv("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.15_run/csvs/summary_april13_full_range_uhat15.csv")
+obs_vs_pred_u15 = get_a_pred_and_a_obs(summary_u15)
+# adjust
+obs_vs_pred_u15$a_pred = 0.006154545
+obs_vs_pred_u15$delta_pred = -0.000017000
+obs_vs_pred_u15$index_of_pred = 7
+
 summary_u10 = read_csv("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.1_run/csvs/summary_april11_full_range_uhat10.csv")
-```
-
-    ## Rows: 150 Columns: 6
-    ## ── Column specification ────────────────────────────────────────────────────────
-    ## Delimiter: ","
-    ## dbl (6): a, sigma, k, u_hat, delta, p_increase
-    ## 
-    ## ℹ Use `spec()` to retrieve the full column specification for this data.
-    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-
-``` r
 obs_vs_pred_u10 = get_a_pred_and_a_obs(summary_u10)
 
 summary_u5 = read_csv("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.05_run/csvs/summary_april11_full_range_uhat5.csv")
-```
-
-    ## Rows: 150 Columns: 6
-    ## ── Column specification ────────────────────────────────────────────────────────
-    ## Delimiter: ","
-    ## dbl (6): a, sigma, k, u_hat, delta, p_increase
-    ## 
-    ## ℹ Use `spec()` to retrieve the full column specification for this data.
-    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-
-``` r
-#summary_u5$p_increase[150] = 1.0
-#write_csv(x = summary_u5, file = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.05_run/csvs/summary_april11_full_range_uhat5.csv")
 obs_vs_pred_u5 = get_a_pred_and_a_obs(summary_u5)
 
-compiled = rbind(summary_u5,summary_u10, summary_u20,summary_u40)
+compiled = rbind(summary_u5,summary_u10,summary_u15,summary_u20,summary_u40)
 compiled$u_hat = as.character(compiled$u_hat)
-#View(compiled)
+View(compiled)
 ```
 
 ## Compare a vs P(increase) graphs
@@ -95,20 +41,27 @@ compiled_plot = ggplot(data = compiled, aes(x = a, y = p_increase, color = u_hat
   xlab("a") +
   ylab("P(increase)") +
   xlim(0, 0.1) +
-  geom_vline(xintercept = obs_vs_pred_u5$a_pred, color = "coral1") +
-  geom_vline(xintercept = obs_vs_pred_u10$a_pred, color = "green3") +
-  geom_vline(xintercept = obs_vs_pred_u20$a_pred, color = "turquoise") +
-  geom_vline(xintercept = obs_vs_pred_u40$a_pred, color = "purple") +
   labs(title = paste0("for u_hat = 5,   a_pred is ", round(obs_vs_pred_u5$a_pred, 4),
                       " and a_obs is ", round(obs_vs_pred_u5$a_obs, 4),
                       "\nfor u_hat = 10, a_pred is ", round(obs_vs_pred_u10$a_pred,4), 
-                      " and a_obs is ", round(obs_vs_pred_u10$a_obs, 4), 
+                      " and a_obs is ", round(obs_vs_pred_u10$a_obs, 4),
+                      "\nfor u_hat = 15, a_pred is ", round(obs_vs_pred_u15$a_pred,4),
+                      " and a_obs is ", round(obs_vs_pred_u15$a_obs, 4),
                       "\nfor u_hat = 20, a_pred is ", round(obs_vs_pred_u20$a_pred,4), 
                       " and a_obs is ", round(obs_vs_pred_u20$a_obs,4),
                       "\nfor u_hat = 40, a_pred is ",round(obs_vs_pred_u40$a_pred,4),
                       " and a_obs is ", round(obs_vs_pred_u40$a_obs,4)))
+#ggsave(filename = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat_comparisons/april12-a_vs_p_uhat_5_10_15_20_40_no_lines.png",plot = compiled_plot)
 
-#ggsave(filename = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat_comparisons/april12-a_vs_p_uhat_5_10_20_40.png",plot = compiled_plot)
+
+p = compiled_plot +
+  geom_vline(xintercept = obs_vs_pred_u5$a_pred, color = "coral1") +
+  geom_vline(xintercept = obs_vs_pred_u10$a_pred, color = "yellow4") +
+  geom_vline(xintercept = obs_vs_pred_u15$a_pred, color = "seagreen3") +
+  geom_vline(xintercept = obs_vs_pred_u20$a_pred, color = "deepskyblue2") +
+  geom_vline(xintercept = obs_vs_pred_u40$a_pred, color = "magenta2")
+
+#ggsave(filename = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat_comparisons/april12-a_vs_p_uhat_5_10_15_20_40_with_lines.png",plot = p)
 ```
 
 ### just uhat=5, 10, and 20:
@@ -127,7 +80,22 @@ knitr::include_graphics("../../cluster/u_hat_comparisons/april12-a_vs_p_uhat_5_1
 
 ![](../../cluster/u_hat_comparisons/april12-a_vs_p_uhat_5_10_20_40.png)<!-- -->
 
-## Compare delta vs P(increase) graphs
+### uhat = 5, 10, 15, 20, 40 without any prediction lines
+
+``` r
+knitr::include_graphics("../../cluster/u_hat_comparisons/april12-a_vs_p_uhat_5_10_15_20_40_no_lines.png")
+```
+
+![](../../cluster/u_hat_comparisons/april12-a_vs_p_uhat_5_10_15_20_40_no_lines.png)<!-- -->
+### uhat = 5, 10, 15, 20, 40 *with* a_pred prediction lines
+
+``` r
+knitr::include_graphics("../../cluster/u_hat_comparisons/april12-a_vs_p_uhat_5_10_15_20_40_with_lines.png")
+```
+
+![](../../cluster/u_hat_comparisons/april12-a_vs_p_uhat_5_10_15_20_40_with_lines.png)<!-- -->
+
+## Compare delta vs P(increase) graphs for uhat = 5, 10, 15, 20, 40
 
 ``` r
 compiled_delta_v_p_increase = ggplot(data = compiled, aes(x = delta, y = p_increase, color = u_hat)) +
@@ -135,7 +103,8 @@ compiled_delta_v_p_increase = ggplot(data = compiled, aes(x = delta, y = p_incre
   xlab("delta") +
   ylab("P(increase)") +
   labs(title = paste0("for u_hat = 5,   delta_obs is ", round(obs_vs_pred_u5$delta_obs, 4),
-                      "\nfor u_hat = 10, delta_obs is ", round(obs_vs_pred_u10$delta_obs,4), 
+                      "\nfor u_hat = 10, delta_obs is ", round(obs_vs_pred_u10$delta_obs,4),
+                      "\nfor u_hat = 15, delta_obs is ", round(obs_vs_pred_u15$delta_obs,4),
                       "\nfor u_hat = 20, delta_obs is ", round(obs_vs_pred_u20$delta_obs,4),
                       "\nfor u_hat = 40, delta_obs is ",round(obs_vs_pred_u40$delta_obs,4)))
 
@@ -148,12 +117,17 @@ knitr::include_graphics("../../cluster/u_hat_comparisons/april12-delta_vs_p.png"
 
 ![](../../cluster/u_hat_comparisons/april12-delta_vs_p.png)<!-- -->
 
+The transition range for uhat=40 seems very sharp – probably didn’t have
+enough data in this region.
+
 ## What are the delta transition range boundaries (delta_min – below which P(increase)=0 and delta_max – above which P(increase)=1.0)?
 
 ``` r
 uhat5 = compiled %>% filter(u_hat=="0.05")
 uhat10 = compiled %>% filter(u_hat=="0.1")
+uhat15 = compiled %>% filter(u_hat == "0.15")
 uhat20 = compiled %>% filter(u_hat=="0.2")
+uhat40 = compiled %>% filter(u_hat == "0.4")
 
 # View each file
 ```
@@ -163,26 +137,45 @@ uhat20 = compiled %>% filter(u_hat=="0.2")
     around 0.000573111
 -   For uhat=10%, delta_min = around 0.000308603 (except for some
     outliers) and delta_max = 0.000893806
+-   For uhat=15%, delta_min = around 0.000584299 and delta_max = 0.00108
 -   For uhat=20%, delta_min=0.000797672 (besides the outlier at
     delta=-1.91e-5) and delta_max=0.001219991
+-   For uhat=40%, delta_min=0.000555901 and delta_max=0.000590642
 
 ## What are the a value transition range boundaries?
 
 -   For uhat=5%, a_min again doesn’t really exist but the minimum ran
     here is a_min=0.0001 a_max is around 0.01
 -   For uhat=10%, a_min is around 0.0094 and a_max is around 0.0165
+-   For uhat=15%, a_min is around 0.01523 and a_max is around 0.0223
 -   For uhat=20%, a_min is around 0.0216 and a_max is around 0.03
+-   For uhat=40%, a_min=0.06067 and a_max=0.07884
 
 ## Plot these
 
 ### Create new data frame
 
 ``` r
-uhats = c(0.05,0.1,0.2)
-a_mins = c(0.0001,0.0094,0.0216)
-a_maxs = c(0.01,0.0165,0.03)
-delta_mins = c(-(9.84e-06), 0.000308603,0.000797672)
-delta_maxs = c(0.000573111,0.000893806,0.001219991)
+library(tidyverse)
+```
+
+    ## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──
+
+    ## ✓ ggplot2 3.3.5     ✓ purrr   0.3.4
+    ## ✓ tibble  3.1.6     ✓ dplyr   1.0.8
+    ## ✓ tidyr   1.2.0     ✓ stringr 1.4.0
+    ## ✓ readr   2.1.2     ✓ forcats 0.5.1
+
+    ## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+    ## x dplyr::filter() masks stats::filter()
+    ## x dplyr::lag()    masks stats::lag()
+
+``` r
+uhats = c(0.05,0.1,0.15 ,0.2, 0.4)
+a_mins = c(0.0001,0.0094,0.01523,0.0216,0.0607)
+a_maxs = c(0.01,0.0165,0.0223,0.03,0.07884)
+delta_mins = c(-(9.84e-06), 0.000308603,0.000584299,0.000797672,0.000555901)
+delta_maxs = c(0.000573111,0.000893806,0.00108,0.001219991,0.000590642)
 
 transitions = tibble(uhat = uhats,
                      a_lower = a_mins,
@@ -198,7 +191,7 @@ u_vs_a_upper = ggplot(transitions, aes(x=uhat,y=a_upper)) + geom_point() + geom_
 u_vs_a_upper
 ```
 
-![](april12-uhat_comparison_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
+![](april12-uhat_comparison_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
 
 -   *linear* relationship between uhat and a_upper
     -   If uhat goes up by x, then the a_value should go up by mx
@@ -214,24 +207,24 @@ summary(mod)
     ## lm(formula = a_upper ~ uhat, data = transitions)
     ## 
     ## Residuals:
-    ##          1          2          3 
-    ##  7.143e-05 -1.071e-04  3.571e-05 
+    ##         1         2         3         4         5 
+    ##  0.004571  0.001033 -0.003205 -0.005543  0.003144 
     ## 
     ## Coefficients:
     ##              Estimate Std. Error t value Pr(>|t|)   
-    ## (Intercept) 0.0032500  0.0001637   19.86   0.0320 * 
-    ## uhat        0.1335714  0.0012372  107.97   0.0059 **
+    ## (Intercept) -0.004610   0.003954  -1.166  0.32795   
+    ## uhat         0.200764   0.018239  11.008  0.00161 **
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## 
-    ## Residual standard error: 0.0001336 on 1 degrees of freedom
-    ## Multiple R-squared:  0.9999, Adjusted R-squared:  0.9998 
-    ## F-statistic: 1.166e+04 on 1 and 1 DF,  p-value: 0.005896
+    ## Residual standard error: 0.004928 on 3 degrees of freedom
+    ## Multiple R-squared:  0.9758, Adjusted R-squared:  0.9678 
+    ## F-statistic: 121.2 on 1 and 3 DF,  p-value: 0.001606
 
-a_upper = 0.0032500 + 0.1335714(uhat)
+a_upper = -0.004610 + 0.200764(uhat) ?
 
 ``` r
-predicted_a_upper = 0.0032500 + (0.1335714*transitions$uhat)
+predicted_a_upper = -0.004610 + (0.200764*transitions$uhat)
 
 transitions_edit = transitions %>% add_column(predicted_a_upper)
 
@@ -240,9 +233,9 @@ plot = ggplot(transitions_edit) + geom_point(aes(x=uhat,y=a_upper),color="black"
 plot
 ```
 
-![](april12-uhat_comparison_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
-\* Wonder if we can use this equation. + No, it only involves SLiM
-results, not the equation at all.
+![](april12-uhat_comparison_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
+\*But this equation only involves SLiM results, not the delta or AUC
+equation at all.
 
 ### uhat vs the lower value for a (below which P(increase) is always 100%)
 
@@ -252,8 +245,8 @@ u_vs_a_lower = ggplot(transitions_edit, aes(x=uhat,y=a_lower)) + geom_point() + 
 u_vs_a_lower
 ```
 
-![](april12-uhat_comparison_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
-Not as linear, but there’s probably some error in the a_min for uhat=5%.
+![](april12-uhat_comparison_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
+Not very linear
 
 ### uhat vs delta_upper
 
@@ -263,30 +256,5 @@ u_vs_delta_upper = ggplot(transitions_edit, aes(x=uhat,y=delta_upper)) + geom_po
 u_vs_delta_upper
 ```
 
-![](april12-uhat_comparison_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
-Also not very informative
-
-But delta_upper should be intrinsically linked to a_upper.
-
-``` r
-source("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/scripts/auc-equations.R")
-
-delta_upper_should_be = rep(-1,3)
-for (i in 1:3){
-  delta_upper_should_be[i] = factored_delta(a=transitions_edit$a_upper[i],
-                                            b = 1,
-                                            sigma=0.01,
-                                            k=0.2,
-                                            uhat = transitions_edit$uhat[i])
-}
-
-transitions_edit2 = transitions_edit %>% add_column(delta_upper_should_be=delta_upper_should_be)
-
-u_vs_delta_upper_edit = ggplot(transitions_edit2, aes(x=uhat,y=delta_upper_should_be)) + geom_point() + geom_line()
-
-
-u_vs_delta_upper_edit
-```
-
-![](april12-uhat_comparison_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
-\* Would be useful to run uhat=15%. \* Still not linear?
+![](april12-uhat_comparison_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
+Weird that the slope becomes negative between uhat=20% and uhat=40%?

@@ -26,6 +26,11 @@ knitr::include_graphics(paste0(dir,fig))
 
 ![](../../cluster/u_hat=0.15_run/figures/april13_full_a_vs_p_increase_uhat15.png)<!-- -->
 
+-   a_predicted = 0.006154545
+-   delta_predicted = -0.000017000
+-   a_observed = 0.01927273
+-   delta_observed = 0.000880852
+
 ### Zoomed in – a from 0 to 0.1
 
 ``` r
