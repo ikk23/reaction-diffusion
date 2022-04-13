@@ -1,5 +1,5 @@
 ---
-title: "uhat=20, 10, and 5% comparison after debugging + wt gens"
+title: "uhat=40, 20, 10, and 5% comparison after debugging + wt gens"
 author: "Isabel Kim"
 date: "4/12/2022"
 output: github_document
@@ -14,6 +14,9 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 source("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/plotting_functions.R")
 
+summary_u40 = read_csv("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.4_run/csvs/summary_april12_full_range_uhat40.csv")
+obs_vs_pred_u40 = get_a_pred_and_a_obs(summary_u40)
+
 summary_u20 = read_csv("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.2_run/csvs/summary_april11_full_range_uhat20.csv")
 obs_vs_pred_u20 = get_a_pred_and_a_obs(summary_u20)
 
@@ -21,13 +24,13 @@ summary_u10 = read_csv("/Users/isabelkim/Desktop/year2/underdominance/reaction-d
 obs_vs_pred_u10 = get_a_pred_and_a_obs(summary_u10)
 
 summary_u5 = read_csv("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.05_run/csvs/summary_april11_full_range_uhat5.csv")
+#summary_u5$p_increase[150] = 1.0
+#write_csv(x = summary_u5, file = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.05_run/csvs/summary_april11_full_range_uhat5.csv")
 obs_vs_pred_u5 = get_a_pred_and_a_obs(summary_u5)
 
-compiled = rbind(summary_u5,summary_u10, summary_u20)
+compiled = rbind(summary_u5,summary_u10, summary_u20,summary_u40)
 compiled$u_hat = as.character(compiled$u_hat)
 #View(compiled)
-
-compiled$p_increase[150] = 1.0 # fix
 ```
 
 ## Compare a vs P(increase) graphs
@@ -36,22 +39,31 @@ compiled_plot = ggplot(data = compiled, aes(x = a, y = p_increase, color = u_hat
   geom_line() +
   xlab("a") +
   ylab("P(increase)") +
-  xlim(0, 0.05) +
+  xlim(0, 0.1) +
   geom_vline(xintercept = obs_vs_pred_u5$a_pred, color = "coral1") +
   geom_vline(xintercept = obs_vs_pred_u10$a_pred, color = "green3") +
-  geom_vline(xintercept = obs_vs_pred_u20$a_pred, color = "dodgerblue") +
+  geom_vline(xintercept = obs_vs_pred_u20$a_pred, color = "turquoise") +
+  geom_vline(xintercept = obs_vs_pred_u40$a_pred, color = "purple") +
   labs(title = paste0("for u_hat = 5,   a_pred is ", round(obs_vs_pred_u5$a_pred, 4),
                       " and a_obs is ", round(obs_vs_pred_u5$a_obs, 4),
                       "\nfor u_hat = 10, a_pred is ", round(obs_vs_pred_u10$a_pred,4), 
                       " and a_obs is ", round(obs_vs_pred_u10$a_obs, 4), 
                       "\nfor u_hat = 20, a_pred is ", round(obs_vs_pred_u20$a_pred,4), 
-                      " and a_obs is ", round(obs_vs_pred_u20$a_obs,4)))
+                      " and a_obs is ", round(obs_vs_pred_u20$a_obs,4),
+                      "\nfor u_hat = 40, a_pred is ",round(obs_vs_pred_u40$a_pred,4),
+                      " and a_obs is ", round(obs_vs_pred_u40$a_obs,4)))
 
-#ggsave(filename = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat_comparisons/april12-a_vs_p.png",plot = compiled_plot)
+#ggsave(filename = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat_comparisons/april12-a_vs_p_uhat_5_10_20_40.png",plot = compiled_plot)
 ```
 
+### just uhat=5, 10, and 20:
 ```{r}
 knitr::include_graphics("../../cluster/u_hat_comparisons/april12-a_vs_p.png")
+```
+
+### uhat = 5, 10, 20, 40
+```{r}
+knitr::include_graphics("../../cluster/u_hat_comparisons/april12-a_vs_p_uhat_5_10_20_40.png")
 ```
 
 ## Compare delta vs P(increase) graphs
@@ -62,10 +74,13 @@ compiled_delta_v_p_increase = ggplot(data = compiled, aes(x = delta, y = p_incre
   ylab("P(increase)") +
   labs(title = paste0("for u_hat = 5,   delta_obs is ", round(obs_vs_pred_u5$delta_obs, 4),
                       "\nfor u_hat = 10, delta_obs is ", round(obs_vs_pred_u10$delta_obs,4), 
-                      "\nfor u_hat = 20, delta_obs is ", round(obs_vs_pred_u20$delta_obs,4)))
+                      "\nfor u_hat = 20, delta_obs is ", round(obs_vs_pred_u20$delta_obs,4),
+                      "\nfor u_hat = 40, delta_obs is ",round(obs_vs_pred_u40$delta_obs,4)))
 
 #ggsave(filename = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat_comparisons/april12-delta_vs_p.png",plot = compiled_delta_v_p_increase)
 ```
+
+
 ```{r}
 knitr::include_graphics("../../cluster/u_hat_comparisons/april12-delta_vs_p.png")
 ```

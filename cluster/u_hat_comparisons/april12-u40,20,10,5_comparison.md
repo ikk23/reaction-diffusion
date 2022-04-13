@@ -170,7 +170,7 @@ u_vs_a_upper = ggplot(transitions, aes(x=uhat,y=a_upper)) + geom_point() + geom_
 u_vs_a_upper
 ```
 
-![](april12-u20,10,5_comparison_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
+![](april12-u40,20,10,5_comparison_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
 
 -   *linear* relationship between uhat and a_upper
     -   If uhat goes up by x, then the a_value should go up by mx
@@ -212,7 +212,7 @@ plot = ggplot(transitions_edit) + geom_point(aes(x=uhat,y=a_upper),color="black"
 plot
 ```
 
-![](april12-u20,10,5_comparison_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
+![](april12-u40,20,10,5_comparison_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
 \* Wonder if we can use this equation. + No, it only involves SLiM
 results, not the equation at all.
 
@@ -224,7 +224,7 @@ u_vs_a_lower = ggplot(transitions_edit, aes(x=uhat,y=a_lower)) + geom_point() + 
 u_vs_a_lower
 ```
 
-![](april12-u20,10,5_comparison_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
+![](april12-u40,20,10,5_comparison_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
 Not as linear, but there’s probably some error in the a_min for uhat=5%.
 
 ### uhat vs delta_upper
@@ -235,7 +235,7 @@ u_vs_delta_upper = ggplot(transitions_edit, aes(x=uhat,y=delta_upper)) + geom_po
 u_vs_delta_upper
 ```
 
-![](april12-u20,10,5_comparison_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
+![](april12-u40,20,10,5_comparison_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
 Also not very informative
 
 But delta_upper should be intrinsically linked to a_upper.
@@ -260,5 +260,5 @@ u_vs_delta_upper_edit = ggplot(transitions_edit2, aes(x=uhat,y=delta_upper_shoul
 u_vs_delta_upper_edit
 ```
 
-![](april12-u20,10,5_comparison_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
+![](april12-u40,20,10,5_comparison_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
 \* Would be useful to run uhat=15%. \* Still not linear?
