@@ -19,7 +19,8 @@
 
 * [First runs (with the delta bug)](cluster/slurm_management.md)
 * [Second cluster run of uhat=20% only (adding the drive in gen 10) on 4/6](cluster/april6-cluster_runs_2.md)
-* [uhat=10% and uhat=5% runs on 4/11](cluster/april11-cluster_runs.md)
+* [uhat=10%, 5%, 40%, and 15% runs starting on 4/11](cluster/april11-cluster_runs.md)
+* [a vs the change in the number of drive alleles for uhat=40% on 4/13]()
 
 ### Output from specific runs
 
