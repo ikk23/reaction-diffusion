@@ -5,10 +5,10 @@ initialize() {
 	initializeSex("A");
 	
 	// Parameters that can be changed at the command line
-	defineCfgParam("a", 0.0001);
+	defineCfgParam("a", 0.025);
 	defineCfgParam("sigma",0.01);
 	defineCfgParam("k", 0.2);
-	defineCfgParam("u_hat", 0.2);
+	defineCfgParam("u_hat", 0.4);
 	// save the boundaries for the drive release
 	defineConstant("drive_x_min", 0.5 - (a/2));
 	defineConstant("drive_x_max", 0.5 + (a/2));
@@ -201,13 +201,17 @@ late() {
 		homoz_freq = length(drive_homozygotes)/N; // freq(DD)
 		het_freq = length(drive_heterozygotes)/N; // freq(Dd)
 		
+		// count the number of drive alleles
+		num_dr = sum(all.genomes.countOfMutationsOfType(m2)==CHROM_LENGTH);
+
+		
 		// Color
 		all.color = "blue";
 		drive_homozygotes.color = "red";
 		drive_heterozygotes.color = "red";
 		
 		
-		catn("GEN:: " + gen + " N: " + N + " rate_dr: " + rate_dr + " freq(DD) = "+homoz_freq+" freq(Dd) = "+het_freq);
+		catn("GEN:: " + gen + " N: " + N + " rate_dr: " + rate_dr + " num_drive: " + num_dr);
 		
 		//catn("Generation: " + gen + " N: " + N + " rate_dr: " + rate_dr);
 		
@@ -230,4 +234,4 @@ late() {
 
 
 //Stop the simulation after 100 generations
-100 late() { sim.simulationFinished(); }
+11 late() { sim.simulationFinished(); }

@@ -1,18 +1,19 @@
 
-u_hat = 0.15
+u_hat = 0.4
 
-a_seq = c(seq(0.0001,0.1,length.out=100),seq(0.12,1.0,length.out=50))
+a_seq = seq(0.01,0.1,length.out=200)
+python_script = "python_driver_num_drives.py"
 
 
 # Start writing to a new output file
-sink('/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.15_run/slurm_text/uhat15_april12_full_a_run.txt')
+sink('/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.4_run/slurm_text/uhat40_a_vs_dr_change_april13.txt')
 
 for (i in 1:length(a_seq)){
   a = a_seq[i]
   if (i == 1){
-    line = paste0("python python_driver.py -a ",a," -u_hat ",u_hat," -header","\n")
+    line = paste0("python ",python_script," -a ",a," -u_hat ",u_hat," -header","\n")
   } else {
-    line = paste0("python python_driver.py -a ",a, " -u_hat ", u_hat, "\n")
+    line = paste0("python ",python_script, " -a ",a, " -u_hat ", u_hat, "\n")
   }
   cat(line)
 }
