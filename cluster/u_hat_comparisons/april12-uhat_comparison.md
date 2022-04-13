@@ -397,10 +397,11 @@ increase in *a* is needed in order for the drive to spread..
 -   The delta value at which P(increase)=100% increases with uhat (a
     greater increase in AUC is needed for the drive to spread as the
     frequency threshold gets higher).
-    -   But an exception is uhat=40% – this transition is very sharp and
-        occurs at a very low delta value compared to the other runs’.
-        There could be an issue of not enough data in this region
-        though.
+    -   But an exception is with uhat=40% – this transition is very
+        sharp and occurs at a low delta value compared to the other
+        runs’. (There could be an issue of not enough data in this
+        region though). This causes the strange upside-down U shape in
+        the “a vs delta_observed” plot.
 -   The threshold for a (at which delta=0) is expected to increase
     non-linearly with uhat (as uhat increases, a larger increase in a is
     needed). But in the actual data, the a_observed
