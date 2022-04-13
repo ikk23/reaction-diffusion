@@ -6,10 +6,16 @@ Isabel Kim
 ## Order of operations:
 
 ``` r
-knitr::include_graphics("./slim/order-slim.png")
+knitr::include_graphics("order-slim.png")
 ```
 
-![](./slim/order-slim.png)<!-- -->
+![](order-slim.png)<!-- -->
+
+### 0. introduction
+
+-   Introduce a population of 30,000 wild-type individuals, each with a
+    random x coordinate drawn from the uniform distribution between 0
+    and 1.
 
 ### 1a. reproduction
 
@@ -20,10 +26,10 @@ knitr::include_graphics("./slim/order-slim.png")
     density-dependent factor (beta = 2, exponent = 2)
 
 ``` r
-knitr::include_graphics("./slim/num-offspring-code.png")
+knitr::include_graphics("num-offspring-code.png")
 ```
 
-![](./slim/num-offspring-code.png)<!-- -->
+![](num-offspring-code.png)<!-- -->
 
 ### 1b. modifyChild
 
@@ -50,9 +56,10 @@ knitr::include_graphics("./slim/num-offspring-code.png")
     wt = blue)
 -   If gen \< drive release generation, print out just the generation
     and the population size
--   If gen >= drive release generation, print out the generation,
-    population size, frequency of the drive allele, genotype frequency
-    of d/d homozygotes, and genotype frequency of d/wt heterozygotes
+-   If gen >= drive release generation (“GEN::”), print out the
+    generation, population size, frequency of the drive allele, genotype
+    frequency of d/d homozygotes, and genotype frequency of d/wt
+    heterozygotes
     -   if the drive allele has already been lost, end the simulation
 -   Evaluate the i1 interaction (which calculates distances used for
     local mating / density regulation)
