@@ -136,7 +136,7 @@ write_csv(x = data, file = "/Users/isabelkim/Desktop/year2/underdominance/reacti
 ```
 
 Create summary (avg replicate) file
-```{r}
+```{r eval=F}
 data = read_csv("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.4_run/csvs/uhat40_april14_a_full_vs_change.csv")
 
 nreps = 100
@@ -164,6 +164,10 @@ p = ggplot(summarize_data, aes(x = a, y = change_in_drive_alleles)) + geom_point
 print(p)
 ggsave(plot = p, filename = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.4_run/figures/uhat40_a_vs_change_in_dr_alleles.png")
 ```
+```{r}
+knitr::include_graphics("../../cluster/u_hat=0.4_run/figures/uhat40_a_vs_change_in_dr_alleles.png")
+```
+
 
 Still not crossing 0 when a = 0.000502512866532663?
 
@@ -187,12 +191,45 @@ a_seq_lowest = seq(0.00009, 0.000502512866532663, length.out=10)
 
 1. Run SLiM for 110 generations. Copy and paste the SLiM output console into a text file within the `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.4_run/num_drive_testing/` folder.
   + ex: `a0_0005.txt`
-2. Run the python script `num_drives_and_gen.py` within this same folder. Provide the path to the text file as an argument, and pipe the output to a csv. The csv will contain a "gen" column (generation - 10) and a "num_drive_alleles" column.
-  + ex: `python num_drives_and_gen.py a0_0005.txt > a0_0005.csv`
-3. Go into the R script, `plot_output.R`. Only need to input the csv name (without the path), like `a0_0005.csv` and the value of a (here `a=0.0005`). This will print out a figure named "a_VALUE.png" in the subdirectory, `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.4_run/num_drive_testing/figures/`
+2. Run the python script `num_drives_and_gen.py` within this same folder. Provide the path to the text file as an argument, and pipe the output to a csv. The csv will contain a "gen" column (generation - 10) and a "num_drive_alleles" column. Make sure the csv name is in the format: `a_VALUE_replicateNUM.csv`, like `a_0.0005_replicate1.csv`
+  + ex: `python num_drives_and_gen.py a0_0005.txt > a_0.0005_replicate1.csv`
+  + Do this *5* times to get 5 replicate csvs
+3. Go into the R script, `plot_output.R`. Only need to input the value of a, the number of replicates, and whether or not to output a compiled csv file with all replicates' data. Also need to edit line 13. 
+  + This will print out a figure named "a_VALUE.png" in the subdirectory, `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.4_run/num_drive_testing/figures/`
 
 
 
+### a = 0.0005
+```{r}
+fig_dir = "../../cluster/u_hat=0.4_run/num_drive_testing/figures/"
+knitr::include_graphics(paste0(fig_dir,"a_5e-04.png"))
+```
+
+When the number of drive alleles *does* increase from generation 0 to 1, it always decreases right after that.
 
 
+### a* = 0.0258
 
+ex command: `python num_drives_and_gen.py a_0.0258.txt > a_0.0258_replicate1.csv`
+
+
+```{r}
+knitr::include_graphics(paste0(fig_dir,"a_0.0258.png"))
+```
+Drive allele count increases from gen10 to gen11, then decreases until being lost.
+
+### a = 0.0682 (the a that caused P(increase)=50%)
+
+```{r}
+knitr::include_graphics(paste0(fig_dir,"a_0.0682.png"))
+```
+Takes longer for the drive to reach its optimum allele count, then decreases.
+
+### a = 0.1 (P(increase)=100%)
+
+example command: `python num_drives_and_gen.py a_0.1.txt > a_0.1_replicate1.csv`
+
+```{r}
+knitr::include_graphics(paste0(fig_dir,"a_0.1.png"))
+```
+Drive count increases almost linearly.

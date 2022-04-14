@@ -5,7 +5,7 @@ initialize() {
 	initializeSex("A");
 	
 	// Parameters that can be changed at the command line
-	defineCfgParam("a", 0.0005);
+	defineCfgParam("a", 0.1);
 	defineCfgParam("sigma",0.01);
 	defineCfgParam("k", 0.2);
 	defineCfgParam("u_hat", 0.4);
@@ -235,4 +235,4 @@ late() {
 
 
 //Stop the simulation after 100 generations
-11 late() { sim.simulationFinished(); }
+110 late() { sim.simulationFinished(); }
