@@ -1,0 +1,20 @@
+python python_driver_num_drives.py -a 0.000502512866532663 -u_hat 0.4 -header
+python python_driver_num_drives.py -a 0.000954774173065326 -u_hat 0.4
+python python_driver_num_drives.py -a 0.00140703547959799 -u_hat 0.4
+python python_driver_num_drives.py -a 0.00185929678613065 -u_hat 0.4
+python python_driver_num_drives.py -a 0.00231155809266331 -u_hat 0.4
+python python_driver_num_drives.py -a 0.00276381939919598 -u_hat 0.4
+python python_driver_num_drives.py -a 0.00321608070572864 -u_hat 0.4
+python python_driver_num_drives.py -a 0.0036683420122613 -u_hat 0.4
+python python_driver_num_drives.py -a 0.00412060331879396 -u_hat 0.4
+python python_driver_num_drives.py -a 0.00457286462532663 -u_hat 0.4
+python python_driver_num_drives.py -a 0.00502512593185929 -u_hat 0.4
+python python_driver_num_drives.py -a 0.00547738723839195 -u_hat 0.4
+python python_driver_num_drives.py -a 0.00592964854492462 -u_hat 0.4
+python python_driver_num_drives.py -a 0.00638190985145728 -u_hat 0.4
+python python_driver_num_drives.py -a 0.00683417115798994 -u_hat 0.4
+python python_driver_num_drives.py -a 0.0072864324645226 -u_hat 0.4
+python python_driver_num_drives.py -a 0.00773869377105527 -u_hat 0.4
+python python_driver_num_drives.py -a 0.00819095507758793 -u_hat 0.4
+python python_driver_num_drives.py -a 0.00864321638412059 -u_hat 0.4
+python python_driver_num_drives.py -a 0.00909547769065326 -u_hat 0.4
