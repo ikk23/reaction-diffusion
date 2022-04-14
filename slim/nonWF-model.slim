@@ -5,7 +5,7 @@ initialize() {
 	initializeSex("A");
 	
 	// Parameters that can be changed at the command line
-	defineCfgParam("a", 0.025);
+	defineCfgParam("a", 0.0005);
 	defineCfgParam("sigma",0.01);
 	defineCfgParam("k", 0.2);
 	defineCfgParam("u_hat", 0.4);
@@ -203,15 +203,16 @@ late() {
 		
 		// count the number of drive alleles
 		num_dr = sum(all.genomes.countOfMutationsOfType(m2)==CHROM_LENGTH);
-
+		n_d_wt = length(drive_heterozygotes);
+		n_d_d = length(drive_homozygotes);
 		
 		// Color
 		all.color = "blue";
 		drive_homozygotes.color = "red";
-		drive_heterozygotes.color = "red";
+		drive_heterozygotes.color = "orange";
 		
 		
-		catn("GEN:: " + gen + " N: " + N + " rate_dr: " + rate_dr + " num_drive: " + num_dr);
+		catn("GEN:: " + gen + " N: " + N + " rate_dr: " + rate_dr + " num_drive: " + num_dr + " num_d_d: " + n_d_d + " num_d_wt: " + n_d_wt);
 		
 		//catn("Generation: " + gen + " N: " + N + " rate_dr: " + rate_dr);
 		

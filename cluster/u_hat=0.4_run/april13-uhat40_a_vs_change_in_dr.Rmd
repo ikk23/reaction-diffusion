@@ -120,4 +120,79 @@ a_seq = seq_low[2:21]
 * merge SLURM script: `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.4_run/slurm_merge/lower_uhat40_april13_a_vs_change_merge.sh`
   + creates: `/home/ikk23/underdom/out_u40/lower_uhat40_april13_a_vs_change` on the cluster
   + on the cluster: `/home/ikk23/underdom/merge_scripts/lower_uhat40_april13_a_vs_change_merge.sh`
+* raw csv: `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.4_run/csv_raw/lower_uhat40_april13_a_vs_change.csv`
+
+Create concacenated file
+```{r eval=F}
+library(tidyverse)
+lower = read_csv("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.4_run/csv_raw/lower_uhat40_april13_a_vs_change.csv") %>% arrange(a)
+
+upper = read_csv("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.4_run/csv_raw/uhat40_april13_a_vs_change.csv") %>% arrange(a)
+
+data = rbind(lower, upper)
+
+# output this csv
+write_csv(x = data, file = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.4_run/csvs/uhat40_april14_a_full_vs_change.csv")
+```
+
+Create summary (avg replicate) file
+```{r}
+data = read_csv("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.4_run/csvs/uhat40_april14_a_full_vs_change.csv")
+
+nreps = 100
+starts = seq(1, nrow(data), by = nreps)
+nparams = length(starts)
+a_vector = rep(-1,nparams)
+change_in_drive_alleles_vector = rep(-1,nparams)
+
+for (i in 1:nparams){
+  j = starts[i]
+  rows = data[j:(j+nreps-1),]
+  
+  a_vector[i] = rows$a[1]
+  
+  change_in_drive_alleles_vector[i] = mean(rows$change)
+  
+}
+
+# Compile summary tibble
+summarize_data = tibble(a = a_vector, change_in_drive_alleles = change_in_drive_alleles_vector)
+
+# plot
+p = ggplot(summarize_data, aes(x = a, y = change_in_drive_alleles)) + geom_point() + geom_line() + ylim(0, max(summarize_data$change_in_drive_alleles)) + geom_hline(yintercept= 0) 
+
+print(p)
+ggsave(plot = p, filename = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.4_run/figures/uhat40_a_vs_change_in_dr_alleles.png")
+```
+
+Still not crossing 0 when a = 0.000502512866532663?
+
+Run 10 jobs at the lowest range
+```{r}
+a_seq_lowest = seq(0.00009, 0.000502512866532663, length.out=10)
+```
+
+## PROBLEM
+
+* When the drive is initially released (at generation 10), there are only drive homozygotes. They have a reproductive advantage compared to the only other genotype there, the wild-types. Thus, none of the drive homozygotes released should have any trouble finding a mate. This resembles more of a *Fisher* wave, with a selective advantage, than a bistable wave. The bistable dynamics would come more into play if we have *heterozygotes* with a reproductive disadvantage. 
+  + The point is that we aren't modeling the "reaction" correctly between generation 10 to generation 11. The drive is essentially *expected* to increase from generation 10 to generation 11 if only homozygotes are present.
+  
+### How to combat?
+
+* Release both homozygotes and heterozygotes?
+* Release just heterozygotes? (Would the drive ever spread?)
+* Look at another generation transition point?
+
+## Plotting the number of drive alleles over time locally
+
+1. Run SLiM for 110 generations. Copy and paste the SLiM output console into a text file within the `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.4_run/num_drive_testing/` folder.
+  + ex: `a0_0005.txt`
+2. Run the python script `num_drives_and_gen.py` within this same folder. Provide the path to the text file as an argument, and pipe the output to a csv. The csv will contain a "gen" column (generation - 10) and a "num_drive_alleles" column.
+  + ex: `python num_drives_and_gen.py a0_0005.txt > a0_0005.csv`
+3. Go into the R script, `plot_output.R`. Only need to input the csv name (without the path), like `a0_0005.csv` and the value of a (here `a=0.0005`). This will print out a figure named "a_VALUE.png" in the subdirectory, `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.4_run/num_drive_testing/figures/`
+
+
+
+
+
 
