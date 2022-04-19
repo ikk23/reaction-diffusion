@@ -109,10 +109,17 @@ function (void) defineCfgParam(string$ name, lifs value) {
 		// If we're running in SLiMgui, open a plot window
 		if (exists("slimgui")) slimgui.openDocument(pngPath);		
 		
+		// PATH TO PLOT FOR OVERALL DRIVE RATE
+		defineConstant("pngPathForDriveRate",writeTempFile("plot2_", ".png", ""));
+		if (exists("slimgui")) slimgui.openDocument(pngPathForDriveRate);	
 		
-		sim.setValue("d", NULL);
-		sim.setValue("dd", NULL);
-		sim.setValue("dwt",NULL);
+		// within window 
+		sim.setValue("d", NULL); // count of drive alleles
+		sim.setValue("dd", NULL); // count of dd homozygotes
+		sim.setValue("dwt",NULL); // count of dwt heterozygotes
+		
+		// over entire range
+		sim.setValue("drive_rate", NULL); // overall drive rate
 	}
 
 }
@@ -302,9 +309,6 @@ late() {
 		
 		
 				
-		
-		
-		
 		// Color
 		all.color = "blue";
 		drive_homozygotes.color = "red";
@@ -330,7 +334,7 @@ late() {
 		
 			catn("GEN:: " + gen + " N: " + N + " overall drive rate: " + rate_dr + " d_in_window: " + num_dr + " d_d_in_window: " + n_d_d + " d_wt_in_window: " + n_d_wt);
 		
-		
+			sim.setValue("drive_rate", c(sim.getValue("drive_rate"), rate_dr));
 			sim.setValue("d", c(sim.getValue("d"), num_dr));
 			sim.setValue("dd", c(sim.getValue("dd"), n_d_d));
 			sim.setValue("dwt", c(sim.getValue("dwt"), n_d_wt));		
@@ -338,7 +342,9 @@ late() {
 			d_alleles = sim.getValue("d");
 			d_d_count = sim.getValue("dd");
 			d_wt_count = sim.getValue("dwt");
+			dr_rate_overall = sim.getValue("drive_rate");
 			
+			// PLOT OF GENOTYPE AND ALLELE COUNTS WITHIN THE WINDOW
 			rstr = paste('{',
 				'library(tidyverse)',
 				'info = tibble(generation = c(' + paste(seqLen(gen-10+1), sep = ", ") + '), drive_homozygotes = c(' + paste(d_d_count, sep=", ") + '), drive_heterozygotes = c(' + paste(d_wt_count, sep = ", ") + '), drive_count = c(' + paste(d_alleles, sep=", ") + '))',
@@ -350,7 +356,24 @@ late() {
 			sep='\n');
 			scriptPath = writeTempFile("plot_", ".R", rstr);
 			system(RSCRIPT, args=scriptPath);
+			
+			
+			// PLOT OF OVERALL DRIVE RATE
+			rstr2 = paste('{',
+				'library(tidyverse)',
+				'info = tibble(generation = c(' + paste(seqLen(gen-10+1), sep = ", ") + '), drive_rate = c(' + paste(dr_rate_overall, sep=", ") + '))',
+				'p = ggplot(info, aes(x = generation, y = drive_rate)) + geom_line(color = "black") + ylim(0, 1) + xlim(0, 100) + xlab("Generation") + ylab("Frequency") + ggtitle("Drive allele frequency over entire range")',
+				'png("' + pngPathForDriveRate + '")',
+				'print(p)',
+				'dev.off()',
+				'}',	
+			sep='\n');
+			scriptPath2 = writeTempFile("plot2_", ".R", rstr2);
+			system(RSCRIPT, args=scriptPath2);
+			
+		
 			deleteFile(scriptPath);
+			deleteFile(scriptPath2);
 			
 		
 		}
