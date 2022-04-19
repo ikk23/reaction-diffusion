@@ -329,3 +329,22 @@ knitr::include_graphics(paste0(fig_dir,"a_0.1.png"))
 
 ![](../../cluster/u_hat=0.4_run/num_drive_testing/figures/a_0.1.png)<!-- -->
 Drive count increases almost linearly.
+
+## Trouble shooting
+
+-   Tried decreasing the mating radius from 0.01 to 0.0005. This did not
+    prevent all drive homozygotes in generation 10 from only mating with
+    wild-type and producing heterozygotes.
+    -   I think the problem is that there are so few drive individuals,
+        and they spread out, so none of them are close enough to be able
+        to really mate with each other.
+    -   Maybe we also need to decrease sigma so they drive can’t move as
+        far?
+
+``` r
+knitr::include_graphics("../../cluster/u_hat=0.4_run/num_drive_testing/a_0.0005_uhat_0.4.png")
+```
+
+![](../../cluster/u_hat=0.4_run/num_drive_testing/a_0.0005_uhat_0.4.png)<!-- -->
+This figure shows a= 0.0005 (sigma=0.01 and m=0.005) after dispersal
+(gen10).

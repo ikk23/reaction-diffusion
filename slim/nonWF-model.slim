@@ -5,73 +5,84 @@ initialize() {
 	initializeSex("A");
 	
 	// Parameters that can be changed at the command line
-	defineCfgParam("a", 0.1);
+	defineCfgParam("a", 0.05);
 	defineCfgParam("sigma",0.01);
 	defineCfgParam("k", 0.2);
 	defineCfgParam("u_hat", 0.4);
 	// save the boundaries for the drive release
 	defineConstant("drive_x_min", 0.5 - (a/2));
 	defineConstant("drive_x_max", 0.5 + (a/2));
-	
 	defineConstant("DRIVE_RELEASE_GENERATION",10); // when to release the drive
-	defineConstant("NO_DRIVE", F); // don't release drive at all -- for wt N testing
-	
 	defineConstant("alpha", 1 - 2*u_hat);
 	defineConstant("beta", a/sigma);
 	catn("-----------------------------------");
 	catn("a = " + a + " sigma = " + sigma + " so beta = " + beta);
-	defineConstant("m", sigma); // mating radius
-	
+	defineConstant("m", 0.001); // mating radius
 	catn("-----------------------------------");
 	print(paste("Frequency threshold of:", u_hat, " and alpha of: " + alpha));
-	
 	defineConstant("POPSIZE", 30000);
 	defineConstant("CHROM_LENGTH", 1);
-	defineConstant("GROWTH_AT_ZERO_DENSITY", 2); // in empty areas, the expected # of offspring is 2*fitness*this value 
-	defineConstant("EXPONENT_OF_COMPETITION_FACTOR", 2); // increase from 1 to make the penalty for crowded individuals more severe
-	defineConstant("EXPECTED_ADULT_COMPETITION", POPSIZE*(2*m));
-	
-	catn("-----------------------------------");
-	catn("EXPECTED_ADULT_COMPETITION when m is " + m + " = " + EXPECTED_ADULT_COMPETITION);
-	
-	// checks
-	defineConstant("RELEASE_DRIVE_EVERYWHERE", F); // if F, only release between -a/2 and a/2
-	defineConstant("b", 0.18); // if releasing the drive uniformly, make b < 1. Drive released at this introduction frequency everywhere
-	
-	defineConstant("MATING_DEACTIVATION", F);
-	
-	// Fitness values are based on alpha (1 - 2u_hat) and k
 	d_d_fitness = 	1 + (2*alpha*k);
 	d_wt_fitness = 1 + ((alpha-1)*k);
 	wt_wt_fitness = 1;
 	fitnesses = c(d_d_fitness, d_wt_fitness, wt_wt_fitness);
-	// don't need to normalize
-	//if (any(fitnesses > 1)) {
-	//	fitnesses = fitnesses/max(fitnesses);
-	//}
 	defineConstant("drive_homozygote_fitness", fitnesses[0]);
 	defineConstant("drive_heterozygote_fitness", fitnesses[1]);
 	defineConstant("wt_homozygote_fitness", fitnesses[2]);
 	print(paste("d/d fitness:",drive_homozygote_fitness, "d/wt fitness:", drive_heterozygote_fitness, "wt/wt fitness:", wt_homozygote_fitness));
-	
 	catn("-----------------------------------");
 	
-	// Define a chromosome of length 1. The mutation can either be drive or wt.
+	defineConstant("GROWTH_AT_ZERO_DENSITY", 2);
+	defineConstant("EXPONENT_OF_COMPETITION_FACTOR", 2);
+	defineConstant("EXPECTED_ADULT_COMPETITION", POPSIZE*(2*m));
+	catn("-----------------------------------");
+	catn("EXPECTED_ADULT_COMPETITION when m is " + m + " = " + EXPECTED_ADULT_COMPETITION);
+	
+	// Plot the number of drive alleles, drive homozygotes, and drive heterozygotes
+	// between [0.5-MIDPOINT_WINDOW_WIDTH] and [0.5+MIDPOINT_WINDOW_WIDTH]
+	defineConstant("LIVEPLOT", T);
+	defineConstant("MIDPOINT_WINDOW_WIDTH", 0.001);
+	defineConstant("window_lower", 0.5 - MIDPOINT_WINDOW_WIDTH);
+	defineConstant("window_upper", 0.5 + MIDPOINT_WINDOW_WIDTH);
+	if (LIVEPLOT){
+		if (fileExists("/usr/bin/Rscript"))
+			defineConstant("RSCRIPT", "/usr/bin/Rscript");
+		else if (fileExists("/usr/local/bin/Rscript"))
+			defineConstant("RSCRIPT", "/usr/local/bin/Rscript");
+		else
+			stop("Couldn't find Rscript.");
+	}
+	
+	// CHECKS	
+	defineConstant("VIABILITY_SELECTION", T);
+	defineConstant("EXPECTED_NUM_OFFSPRING_MULTIPLIER", 2.1); // this*p is used in the Poisson distribution if VIABILITY_SELECTION=True
+	defineConstant("PANMICTIC_CHECK", F); // remove all spatial processes
+	// don't use if VIABILITY_SELECTION is true
+	defineConstant("GLOBAL_DENSITY_CONTROL", F); // should also be true if PANMICTIC_CHECK is true. If F, local density control is used.	
+	defineConstant("NO_DRIVE", F); // don't release drive at all -- for wt N testing	
+	defineConstant("MATING_DEACTIVATION", F);
+	defineConstant("RELEASE_HETEROZYGOTES", F);
+	defineConstant("WT_MIDDLE_PERCENTAGE", 0.8);
+	defineConstant("lower_homz", 0.5 - ((WT_MIDDLE_PERCENTAGE/2)*a));
+	defineConstant("upper_homz", 0.5 + ((WT_MIDDLE_PERCENTAGE/2)*a));
+	defineConstant("RELEASE_DRIVE_EVERYWHERE", F); // if F, only release between -a/2 and a/2
+	defineConstant("b", 0.45); // intro frequency if RELEASE_DRIVE_EVERYWHERE is true. If not, this is 1 inside the release square.
+	
+	// Chromosome of length 1. The mutation can either be drive or wt.
 	initializeMutationRate(0.0);
 	initializeRecombinationRate(0.0);
 	wt = initializeMutationType("m1", 0.5, "f", 0.0);
 	dr = initializeMutationType("m2", 0.5, "f", 0.0);
 	variations = c(wt, dr);
 	
-	// NEW - these mutations overwrite one another.
 	variations.mutationStackPolicy = "l";
 	variations.mutationStackGroup = 1;
 	
 	initializeGenomicElementType("g1", variations, c(1, 1));
 	initializeGenomicElement(g1, 0, CHROM_LENGTH-1);
 	
-	// Define an interaction for mating and local competition
-	initializeInteractionType(1, "x", reciprocal=T, maxDistance=m); // i1
+	// Interaction for mating and local competition
+	initializeInteractionType(1, "x", reciprocal=T, maxDistance=m);
 
 }
 
@@ -90,36 +101,79 @@ function (void) defineCfgParam(string$ name, lifs value) {
 	
 	all.genomes.addNewDrawnMutation(m1, seqLen(CHROM_LENGTH));
 	all.tagF = wt_homozygote_fitness;
+	
+	if (LIVEPLOT){
+	
+		// PATH TO PLOT FOR GENOTYPE COUNTS
+		defineConstant("pngPath", writeTempFile("plot_", ".png", ""));
+		// If we're running in SLiMgui, open a plot window
+		if (exists("slimgui")) slimgui.openDocument(pngPath);		
+		
+		
+		sim.setValue("d", NULL);
+		sim.setValue("dd", NULL);
+		sim.setValue("dwt",NULL);
+	}
 
 }
 
 reproduction(NULL, "F") {
 	
-	all_neighbors = i1.nearestNeighbors(individual, subpop.individualCount);
-	neighbors = all_neighbors[all_neighbors.sex == "M"]; // male neighbors
-	num_neighbors = length(neighbors);
 	
-	// females in empty areas cannot mate
-	if (num_neighbors == 0){
-		catn("empty area - can't mate"); // should be rare
-		return;
+	if (!PANMICTIC_CHECK){
+		all_neighbors = i1.nearestNeighbors(individual, subpop.individualCount);
+		neighbors = all_neighbors[all_neighbors.sex == "M"]; // male neighbors
+		num_neighbors = length(neighbors);
+		
+		// females in empty areas cannot mate
+		if (num_neighbors == 0){
+			catn("empty area - can't mate"); // should be rare
+			return;
+		}
+		
+		if (!VIABILITY_SELECTION){
+			mating_weights = neighbors.tagF;
+			mate_id = sample(x = seqLen(num_neighbors), size = 1, weights = mating_weights);
+		} else {
+			mate_id = sample(x = seqLen(num_neighbors), size = 1);
+		}
+		selected_mate = neighbors[mate_id];
+	
+	
+	} else {
+		// male can be anywhere if this is panmictic
+		all = p1.individuals;
+		males = all[all.sex=="M"];
+		mating_weights = males.tagF;
+		mate_id = sample(x = seqLen(length(males)), size = 1, weights = mating_weights);
+		selected_mate = males[mate_id];
 	}
 	
-	// get the fitness values of each male in this circle and sample based on these mating weights
-	// determine the female's fecundity based on her fitness and the number of individuals surrounding her
-	mating_weights = neighbors.tagF;
-	mate_id = sample(x = seqLen(num_neighbors), size = 1, weights = mating_weights);
-	selected_mate = neighbors[mate_id];
-	female_fitness = individual.tagF;
 	
-	adult_density_force = i1.totalOfNeighborStrengths(individual);
-	competition_ratio = adult_density_force / EXPECTED_ADULT_COMPETITION;
-	actual_competition_factor = GROWTH_AT_ZERO_DENSITY/ ((GROWTH_AT_ZERO_DENSITY-1) * competition_ratio + 1);
-	actual_competition_factor_exponentiated = actual_competition_factor^EXPONENT_OF_COMPETITION_FACTOR;
+	// local density control
+	if (!GLOBAL_DENSITY_CONTROL & !PANMICTIC_CHECK){
+		adult_density_force = i1.totalOfNeighborStrengths(individual);
+		competition_ratio = adult_density_force / EXPECTED_ADULT_COMPETITION;
+		actual_competition_factor = GROWTH_AT_ZERO_DENSITY/ ((GROWTH_AT_ZERO_DENSITY-1) * competition_ratio + 1);
+		actual_competition_factor_exponentiated = actual_competition_factor^EXPONENT_OF_COMPETITION_FACTOR;
+		if (!VIABILITY_SELECTION){
+			female_fitness = individual.tagF;
+			p = female_fitness * actual_competition_factor_exponentiated;
+		} else {
+			p = actual_competition_factor_exponentiated; // fitness doesn't affect fecundity, but the # offspring is limited by clustering
+		}
+	} else {
+		female_fitness = individual.tagF;
+		p = female_fitness;
+	}
 	
-	p = female_fitness * actual_competition_factor_exponentiated;
-	expected_value = 2*p;
+	if (!VIABILITY_SELECTION){
+		expected_value = 2*p;
+	} else {
+		expected_value = p*EXPECTED_NUM_OFFSPRING_MULTIPLIER;
+	}
 	num_offspring = rpois(1,expected_value);
+	
 	for (i in seqLen(num_offspring)) {
 		offspring = subpop.addCrossed(individual, selected_mate);
 	}
@@ -131,8 +185,28 @@ reproduction(NULL, "F") {
 	// at the drive release generation, convert all offspring whose parents were within the release square to d/d
 	gen = sim.generation;
 	if (gen == DRIVE_RELEASE_GENERATION){
-		if (parent1.x >= drive_x_min & parent1.x <= drive_x_max){
-			child.genomes.addNewDrawnMutation(m2, seqLen(CHROM_LENGTH));
+		
+		if (!RELEASE_HETEROZYGOTES & !RELEASE_DRIVE_EVERYWHERE & !PANMICTIC_CHECK){
+			if (parent1.x >= drive_x_min & parent1.x <= drive_x_max){
+				child.genomes.addNewDrawnMutation(m2, seqLen(CHROM_LENGTH));
+			}
+		} else if (RELEASE_HETEROZYGOTES) {
+			// heterozygous from drive_x_min to lower_homz
+			// homozygous from lower_homz to upper_homz
+			// heterozygous from upper_homz to drive_x_max
+			if (parent1.x >= drive_x_min & parent1.x < lower_homz){
+				child.genome1.addNewDrawnMutation(m1, seqLen(CHROM_LENGTH));
+				child.genome1.addNewDrawnMutation(m2, seqLen(CHROM_LENGTH));
+			} else if (parent1.x >= lower_homz & parent1.x < upper_homz){
+				child.genomes.addNewDrawnMutation(m2, seqLen(CHROM_LENGTH));
+			} else if (parent1.x >= upper_homz & parent1.x < drive_x_max){
+				child.genome1.addNewDrawnMutation(m1, seqLen(CHROM_LENGTH));
+				child.genome1.addNewDrawnMutation(m2, seqLen(CHROM_LENGTH));
+			}
+		} else if (PANMICTIC_CHECK | RELEASE_DRIVE_EVERYWHERE){
+			if (runif(1) < b){
+				child.genomes.addNewDrawnMutation(m2, seqLen(CHROM_LENGTH));
+			}
 		}
 	}
 	
@@ -153,15 +227,20 @@ reproduction(NULL, "F") {
 		print("Unknown genotype -- there are " + child.countOfMutationsOfType(m1) + " wt mutations and " + child.countOfMutationsOfType(m2) + " drives");
 	}
 	
-	// draw a displacement distance from the exponential distribution with an average dispersal distance of sigma
-	distance = rexp(1,mu = sigma);
+	if (!PANMICTIC_CHECK){
+		// draw a displacement distance from the exponential distribution with an average dispersal distance of sigma
+		distance = rexp(1,mu = sigma);
+		
+		// if this draw is 1, go right. If it's 0, go left.
+		right = rbinom(1, 1, 0.5);
+		if (right){
+			position = parent1.x + distance;
+		} else {
+			position = parent1.x - distance;
+		}
 	
-	// if this draw is 1, go right. If it's 0, go left.
-	right = rbinom(1, 1, 0.5);
-	if (right){
-		position = parent1.x + distance;
 	} else {
-		position = parent1.x - distance;
+		position = parent1.x; // no movement
 	}
 	child.setSpatialPosition(p1.pointPeriodic(position));
 	
@@ -173,8 +252,23 @@ reproduction(NULL, "F") {
 // why was this in a late() event in our gene drive models?
 // check this
 early() {
+	
 	all = p1.individuals;
 	all[all.age > 0].fitnessScaling = 0.0;
+	
+	if (GLOBAL_DENSITY_CONTROL){
+		juveniles = all[all.age==0];
+		juveniles.fitnessScaling = POPSIZE/length(juveniles);
+	}
+	
+	if (VIABILITY_SELECTION){
+		juveniles = all[all.age==0];
+		
+		// probability of juvenial survival is now dependent on relative fitness value
+		juveniles.fitnessScaling = juveniles.tagF/drive_homozygote_fitness; // genotype-based fitness values play a role in survival probability
+	}
+
+
 }
 
 
@@ -206,15 +300,61 @@ late() {
 		n_d_wt = length(drive_heterozygotes);
 		n_d_d = length(drive_homozygotes);
 		
+		
+				
+		
+		
+		
 		// Color
 		all.color = "blue";
 		drive_homozygotes.color = "red";
 		drive_heterozygotes.color = "orange";
 		
 		
+		if (!LIVEPLOT){
 		catn("GEN:: " + gen + " N: " + N + " rate_dr: " + rate_dr + " num_drive: " + num_dr + " num_d_d: " + n_d_d + " num_d_wt: " + n_d_wt);
-		
+		}
 		//catn("Generation: " + gen + " N: " + N + " rate_dr: " + rate_dr);
+		
+		// live plotting
+		if (LIVEPLOT) {
+		
+			// get the number of drive alleles inside the window
+			drive_homz_inside_window = drive_homozygotes[drive_homozygotes.x >= window_lower  & drive_homozygotes.x <= window_upper];
+			drive_hetz_inside_window = drive_heterozygotes[drive_heterozygotes.x >= window_lower & drive_heterozygotes.x <= window_upper];
+			
+			n_d_d = length(drive_homz_inside_window);
+			n_d_wt = length(drive_hetz_inside_window);
+			num_dr = (2*n_d_d) + n_d_wt;
+		
+		
+			catn("GEN:: " + gen + " N: " + N + " overall drive rate: " + rate_dr + " d_in_window: " + num_dr + " d_d_in_window: " + n_d_d + " d_wt_in_window: " + n_d_wt);
+		
+		
+			sim.setValue("d", c(sim.getValue("d"), num_dr));
+			sim.setValue("dd", c(sim.getValue("dd"), n_d_d));
+			sim.setValue("dwt", c(sim.getValue("dwt"), n_d_wt));		
+			
+			d_alleles = sim.getValue("d");
+			d_d_count = sim.getValue("dd");
+			d_wt_count = sim.getValue("dwt");
+			
+			rstr = paste('{',
+				'library(tidyverse)',
+				'info = tibble(generation = c(' + paste(seqLen(gen-10+1), sep = ", ") + '), drive_homozygotes = c(' + paste(d_d_count, sep=", ") + '), drive_heterozygotes = c(' + paste(d_wt_count, sep = ", ") + '), drive_count = c(' + paste(d_alleles, sep=", ") + '))',
+				'p = ggplot(info, aes(x = generation)) + geom_line(aes(y=drive_homozygotes), color = "red") + geom_line(aes(y=drive_heterozygotes), color = "orange") + geom_line(aes(y=drive_count), color = "purple") + ylim(0,' + POPSIZE*MIDPOINT_WINDOW_WIDTH*2*2 +') + xlim(0, 100) + xlab("Generation") + ylab("Count") + ggtitle("Homozygote count (red), heterozygote count (orange),\ndrive allele count (purple). Window = [' + window_lower + ',' + window_upper + ']")',
+				'png("' + pngPath + '")',
+				'print(p)',
+				'dev.off()',
+				'}',	
+			sep='\n');
+			scriptPath = writeTempFile("plot_", ".R", rstr);
+			system(RSCRIPT, args=scriptPath);
+			deleteFile(scriptPath);
+			
+		
+		}
+		
 		
 		
 		if (rate_dr == 0){
@@ -230,7 +370,10 @@ late() {
 		catn("Generation: " + gen + " N: " + N);
 	}
 	
-	i1.evaluate();
+	if (!PANMICTIC_CHECK){
+		i1.evaluate();
+	}
+
 }
 
 

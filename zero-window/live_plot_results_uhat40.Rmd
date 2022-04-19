@@ -1,0 +1,46 @@
+---
+title: "live_plot_results_uhat40"
+author: "Isabel Kim"
+date: "4/19/2022"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Parameters
+
+* uhat = 40%
+* sigma = 0.01
+* k = 0.2
+* m = 0.001
+* N = 30,000
+* window = [0.499, 0.501]
+* a_predicted = 0.025
+
+## a vs P(increase) from before
+```{r}
+knitr::include_graphics("../cluster/u_hat=0.4_run/figures/april12_zoomed_in_a_vs_p_increase_uhat40.png")
+```
+
+## Live plots
+
+### a = 0.06 (within the transition boundary; P(increase) around 20%)
+```{r}
+knitr::include_graphics("../zero-window/uhat40_a0.06.png")
+```
+
+### a = 0.0682 (the a that caused P(increase)=50%)
+
+Drive spreads
+```{r}
+knitr::include_graphics("../zero-window/uhat40_a0.0682.png")
+```
+
+The number of drive heterozygotes initially increases, but in generation 25, the number of drive heterozygotes starts to decline and the number of drive homozygotes starts to increase.
+
+### a = 0.05 (P(increase) still 0 but high above the a_predicted)
+```{r}
+knitr::include_graphics("../zero-window/uhat40_a0.05.png")
+```

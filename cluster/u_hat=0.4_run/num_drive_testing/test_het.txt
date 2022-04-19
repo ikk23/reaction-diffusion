@@ -1,0 +1,42 @@
+// Initial random seed:
+1733832009051
+
+// RunInitializeCallbacks():
+initializeSLiMModelType(modelType = 'nonWF');
+initializeSLiMOptions(dimensionality = 'x', periodicity = 'x');
+initializeSex("A");
+-----------------------------------
+a = 0.1 sigma = 0.01 so beta = 10.0
+-----------------------------------
+"Frequency threshold of: 0.4  and alpha of: 0.2"
+-----------------------------------
+EXPECTED_ADULT_COMPETITION when m is 0.001 = 60.0
+"d/d fitness: 1.08 d/wt fitness: 0.84 wt/wt fitness: 1.0"
+-----------------------------------
+initializeMutationRate(0);
+initializeRecombinationRate(0);
+initializeMutationType(1, 0.5, "f", 0);
+initializeMutationType(2, 0.5, "f", 0);
+initializeGenomicElementType(1, c(m1, m2), c(1, 1));
+initializeGenomicElement(g1, 0, 0);
+initializeInteractionType(1, "x", reciprocal=T, maxDistance=0.001);
+
+// Starting run at generation <start>:
+1 
+
+Generation: 1 N: 30000
+Generation: 2 N: 30260
+Generation: 3 N: 31041
+Generation: 4 N: 30239
+Generation: 5 N: 29902
+Generation: 6 N: 30193
+Generation: 7 N: 30491
+Generation: 8 N: 30521
+Generation: 9 N: 30859
+GEN:: 10 N: 30552 rate_dr: 0.087392 num_drive: 5340 num_d_d: 2377 num_d_wt: 586
+GEN:: 11 N: 30307 rate_dr: 0.0957205 num_drive: 5802 num_d_d: 2434 num_d_wt: 934
+GEN:: 12 N: 30649 rate_dr: 0.0929884 num_drive: 5700 num_d_d: 2245 num_d_wt: 1210
+GEN:: 13 N: 30791 rate_dr: 0.0973824 num_drive: 5997 num_d_d: 2241 num_d_wt: 1515
+GEN:: 14 N: 30227 rate_dr: 0.0950971 num_drive: 5749 num_d_d: 2067 num_d_wt: 1615
+GEN:: 15 N: 30724 rate_dr: 0.0971879 num_drive: 5972 num_d_d: 2113 num_d_wt: 1746
+GEN:: 16 N: 30280 rate_dr: 0.0997028 num_drive: 6038 num_d_d: 2105 num_d_wt: 1828
