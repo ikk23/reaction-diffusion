@@ -11,6 +11,7 @@
 * [nonWF model](slim/nonWF-model.slim)
   + [Order of operations in the model](slim/slim_order_of_operations.md)
   + [Figuring out how / how long to let the wild-type population stabilize](slim/wt-stabilize/wild-type-stabilization.md)
+  + [Live-plotting on 4/19 (before changing the model)](zero-window/live_plot_results_uhat40.md)
 
 
 ## CLUSTER:
