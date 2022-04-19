@@ -71,4 +71,10 @@ knitr::include_graphics("../zero-window/uhat40_a0.08_drive_rate.png")
 ```
 Homozygotes stay at a greater frequency at x=0 than heterozygotes the entire time; drive always increases.
 
+## April 19, 2022 at 1:40pm --> changing the SLiM model
+
+* Old copy: `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/slim/nonWF-model-copy-april19.slim`
+* Current copy: `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/slim/nonWF-model.slim`
+
+
 
