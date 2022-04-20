@@ -22,7 +22,6 @@
 * [Second cluster run of uhat=20% only (adding the drive in gen 10) on 4/6](cluster/april6-cluster_runs_2.md)
 * [uhat=10%, 5%, 40%, and 15% runs starting on 4/11](cluster/april11-cluster_runs.md)
 * [a vs the change in the number of drive alleles for uhat=40% on 4/13](cluster/u_hat=0.4_run/april13-uhat40_a_vs_change_in_dr.md)
-* [uhat=40% windowed drive analysis on the cluster for 5 values of a on 4/20](cluster/u_hat=0.4_run/april20-uhat40_windowed_drive_counts.md)
 
 ### Output from specific runs
 
@@ -55,4 +54,5 @@
 
 * [a vs the change in the number of drive alleles for uhat=40% on 4/19](cluster/u_hat=0.4_run/april19-uhat40_a_vs_change_in_dr_revised_model.md)
 * [full range of a vs outcome](cluster/u_hat=0.4_run/april19-uhat40_a_vs_p_increase.md)
-  + Submitted jobs to the cluster at 8:46pm on 4/19
+* [uhat=40% windowed drive analysis on the cluster for 5 values of a on 4/20](cluster/u_hat=0.4_run/april20-uhat40_windowed_drive_counts.md)
+
