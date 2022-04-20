@@ -60,6 +60,13 @@ a_observed is almost the same value as it was in the last SLiM model.
 ```{r}
 knitr::include_graphics("../../cluster/u_hat=0.4_run/figures/revised_april19_zoomed_in_a_vs_p_increase_uhat4.png")
 ```
+* P(increase) = 0.0 at a*=0.025
+* P(increase) = ~0.25 at a=0.0654
+* P(increase) = 0.5 at a=0.0694
+* P(increase) = ~0.75 at a=0.0721
+* P(increase) = ~0.9 at a=0.0748
+
+
 
 #### a vs delta -- zoomed in (same plot that we had for the last slim model)
 ```{r}

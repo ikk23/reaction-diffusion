@@ -1,0 +1,65 @@
+// Initial random seed:
+1893803730300
+
+// RunInitializeCallbacks():
+initializeSLiMModelType(modelType = 'nonWF');
+initializeSLiMOptions(dimensionality = 'x', periodicity = 'x');
+initializeSex("A");
+-----------------------------------
+a = 0.0721 sigma = 0.01 so beta = 7.21
+-----------------------------------
+"Frequency threshold of: 0.4  and alpha of: 0.2"
+"d/d fitness: 1.08 d/wt fitness: 0.84 wt/wt fitness: 1.0"
+-----------------------------------
+-----------------------------------
+EXPECTED_ADULT_COMPETITION when m is 0.001 = 60.0
+initializeMutationRate(0);
+initializeRecombinationRate(0);
+initializeMutationType(1, 0.5, "f", 0);
+initializeMutationType(2, 0.5, "f", 0);
+initializeGenomicElementType(1, c(m1, m2), c(1, 1));
+initializeGenomicElement(g1, 0, 0);
+initializeInteractionType(1, "x", reciprocal=T, maxDistance=0.001);
+
+// Starting run at generation <start>:
+1 
+
+GEN = 1 N = 27764
+GEN = 2 N = 26851
+GEN = 3 N = 26222
+GEN = 4 N = 25882
+GEN = 5 N = 25709
+GEN = 6 N = 25724
+GEN = 7 N = 25775
+GEN = 8 N = 25801
+GEN = 9 N = 25452
+GEN:: 10 N: 25409 overall_n_drives: 3536 overall_drive_rate: 0.0695816 drive_alleles_in_window: 128 d_d_in_window: 64 d_wt_in_window: 0
+GEN:: 11 N: 25974 overall_n_drives: 3791 overall_drive_rate: 0.0729768 drive_alleles_in_window: 81 d_d_in_window: 39 d_wt_in_window: 3
+GEN:: 12 N: 25698 overall_n_drives: 3795 overall_drive_rate: 0.0738384 drive_alleles_in_window: 128 d_d_in_window: 60 d_wt_in_window: 8
+GEN:: 13 N: 25677 overall_n_drives: 3861 overall_drive_rate: 0.075184 drive_alleles_in_window: 99 d_d_in_window: 43 d_wt_in_window: 13
+GEN:: 14 N: 26108 overall_n_drives: 3823 overall_drive_rate: 0.0732151 drive_alleles_in_window: 105 d_d_in_window: 48 d_wt_in_window: 9
+GEN:: 15 N: 25447 overall_n_drives: 3710 overall_drive_rate: 0.0728966 drive_alleles_in_window: 79 d_d_in_window: 32 d_wt_in_window: 15
+GEN:: 16 N: 25318 overall_n_drives: 3690 overall_drive_rate: 0.0728731 drive_alleles_in_window: 68 d_d_in_window: 33 d_wt_in_window: 2
+GEN:: 17 N: 25104 overall_n_drives: 3690 overall_drive_rate: 0.0734943 drive_alleles_in_window: 96 d_d_in_window: 42 d_wt_in_window: 12
+GEN:: 18 N: 25313 overall_n_drives: 3796 overall_drive_rate: 0.0749812 drive_alleles_in_window: 55 d_d_in_window: 20 d_wt_in_window: 15
+GEN:: 19 N: 25250 overall_n_drives: 3730 overall_drive_rate: 0.0738614 drive_alleles_in_window: 68 d_d_in_window: 28 d_wt_in_window: 12
+GEN:: 20 N: 25205 overall_n_drives: 3908 overall_drive_rate: 0.0775243 drive_alleles_in_window: 55 d_d_in_window: 22 d_wt_in_window: 11
+GEN:: 21 N: 25350 overall_n_drives: 3886 overall_drive_rate: 0.0766469 drive_alleles_in_window: 93 d_d_in_window: 34 d_wt_in_window: 25
+GEN:: 22 N: 25264 overall_n_drives: 4048 overall_drive_rate: 0.080114 drive_alleles_in_window: 68 d_d_in_window: 27 d_wt_in_window: 14
+GEN:: 23 N: 25195 overall_n_drives: 4245 overall_drive_rate: 0.0842429 drive_alleles_in_window: 119 d_d_in_window: 55 d_wt_in_window: 9
+GEN:: 24 N: 25030 overall_n_drives: 4222 overall_drive_rate: 0.0843388 drive_alleles_in_window: 86 d_d_in_window: 30 d_wt_in_window: 26
+GEN:: 25 N: 25029 overall_n_drives: 4329 overall_drive_rate: 0.0864797 drive_alleles_in_window: 81 d_d_in_window: 33 d_wt_in_window: 15
+GEN:: 26 N: 25108 overall_n_drives: 4509 overall_drive_rate: 0.0897921 drive_alleles_in_window: 91 d_d_in_window: 42 d_wt_in_window: 7
+GEN:: 27 N: 25069 overall_n_drives: 4431 overall_drive_rate: 0.0883761 drive_alleles_in_window: 65 d_d_in_window: 23 d_wt_in_window: 19
+GEN:: 28 N: 25585 overall_n_drives: 4648 overall_drive_rate: 0.0908345 drive_alleles_in_window: 121 d_d_in_window: 54 d_wt_in_window: 13
+GEN:: 29 N: 25089 overall_n_drives: 4582 overall_drive_rate: 0.0913149 drive_alleles_in_window: 65 d_d_in_window: 25 d_wt_in_window: 15
+GEN:: 30 N: 25033 overall_n_drives: 4860 overall_drive_rate: 0.0970719 drive_alleles_in_window: 79 d_d_in_window: 34 d_wt_in_window: 11
+GEN:: 31 N: 25421 overall_n_drives: 4608 overall_drive_rate: 0.0906337 drive_alleles_in_window: 47 d_d_in_window: 15 d_wt_in_window: 17
+GEN:: 32 N: 25327 overall_n_drives: 4779 overall_drive_rate: 0.094346 drive_alleles_in_window: 111 d_d_in_window: 48 d_wt_in_window: 15
+GEN:: 33 N: 25332 overall_n_drives: 4850 overall_drive_rate: 0.0957287 drive_alleles_in_window: 63 d_d_in_window: 28 d_wt_in_window: 7
+GEN:: 34 N: 25119 overall_n_drives: 4707 overall_drive_rate: 0.093694 drive_alleles_in_window: 99 d_d_in_window: 36 d_wt_in_window: 27
+GEN:: 35 N: 24943 overall_n_drives: 4571 overall_drive_rate: 0.0916289 drive_alleles_in_window: 80 d_d_in_window: 33 d_wt_in_window: 14
+GEN:: 36 N: 24720 overall_n_drives: 4579 overall_drive_rate: 0.0926173 drive_alleles_in_window: 105 d_d_in_window: 38 d_wt_in_window: 29
+GEN:: 37 N: 24935 overall_n_drives: 4656 overall_drive_rate: 0.0933627 drive_alleles_in_window: 119 d_d_in_window: 47 d_wt_in_window: 25
+GEN:: 38 N: 24933 overall_n_drives: 4796 overall_drive_rate: 0.0961778 drive_alleles_in_window: 94 d_d_in_window: 37 d_wt_in_window: 20
+GEN:: 39 N: 24807 overall_n_drives: 4660 overall_drive_rate: 0.0939251 drive_alleles_in_window: 80 d_d_in_window: 29 d_wt_in_window: 22

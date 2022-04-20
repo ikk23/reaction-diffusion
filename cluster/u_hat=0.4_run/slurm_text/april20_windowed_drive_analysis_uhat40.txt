@@ -1,0 +1,5 @@
+python python_driver_windowed.py -a 0.025 -u_hat 0.4 -nreps 20 -header
+python python_driver_windowed.py -a 0.0654 -u_hat 0.4 -nreps 20
+python python_driver_windowed.py -a 0.0694 -u_hat 0.4 -nreps 20
+python python_driver_windowed.py -a 0.0721 -u_hat 0.4 -nreps 20
+python python_driver_windowed.py -a 0.0748 -u_hat 0.4 -nreps 20
