@@ -37,3 +37,55 @@ drive alleles from generation 10 to 11 was equal to 0 around a=0.045.
     -   On the cluster:
         `/home/ikk23/underdom/merge_scripts/merge_april19_uhat40_a_full_vs_outcome.sh`
     -   Creates `uhat40_april19_a_full_vs_outcome.csv`
+
+## Results
+
+### Files
+
+-   Raw csv:
+    `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.4_run/csv_raw/uhat40_april19_a_full_vs_outcome.csv`
+-   Summary csv:
+    `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.4_run/csvs/summary_uhat40_april19_a_full_vs_outcome.csv`
+
+### Plots
+
+#### a vs P(increase) - full range
+
+``` r
+knitr::include_graphics("../../cluster/u_hat=0.4_run/figures/revised_april19_full_a_vs_p_increase_uhat4.png")
+```
+
+![](../../cluster/u_hat=0.4_run/figures/revised_april19_full_a_vs_p_increase_uhat4.png)<!-- -->
+
+a_observed is almost the same value as it was in the last SLiM model.
+
+#### a vs P(increase) – zoomed in
+
+``` r
+knitr::include_graphics("../../cluster/u_hat=0.4_run/figures/revised_april19_zoomed_in_a_vs_p_increase_uhat4.png")
+```
+
+![](../../cluster/u_hat=0.4_run/figures/revised_april19_zoomed_in_a_vs_p_increase_uhat4.png)<!-- -->
+
+#### a vs delta – zoomed in (same plot that we had for the last slim model)
+
+``` r
+knitr::include_graphics("../../cluster/u_hat=0.4_run/figures/revised_april19_zoomed_in_a_vs_delta_uhat40.png")
+```
+
+![](../../cluster/u_hat=0.4_run/figures/revised_april19_zoomed_in_a_vs_delta_uhat40.png)<!-- -->
+
+#### delta vs P(increase) – full range
+
+``` r
+knitr::include_graphics("../../cluster/u_hat=0.4_run/figures/revised_april19_delta_vs_p_increase_uhat40.png")
+```
+
+![](../../cluster/u_hat=0.4_run/figures/revised_april19_delta_vs_p_increase_uhat40.png)<!-- -->
+
+## Conclusions
+
+-   The organization of the SLiM generation cycle doesn’t affect the
+    long-term success of the drive very much. Results here are almost
+    identical to what they were for the last SLiM model. Focusing on the
+    window around the midpoint might yield different results, however.

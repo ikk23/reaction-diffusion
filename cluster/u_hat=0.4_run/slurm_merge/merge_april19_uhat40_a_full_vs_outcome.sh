@@ -1,7 +1,7 @@
 #!/bin/bash -l
 #SBATCH --ntasks=1
 #SBATCH --mem=1000
-#SBATCH --partition=short
+#SBATCH --partition=regular
 #SBATCH --job-name=merge_april19_uhat40_a_full_vs_outcome
 #SBATCH --output=merge_april19_uhat40_a_full_vs_outcome.txt
 
