@@ -1,0 +1,32 @@
+---
+title: "uhat=40% and a vs P(increase) with revised SLiM model"
+author: "Isabel Kim"
+date: "4/19/2022"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Parameters
+
+* uhat = 40%
+* sigma = 0.01
+* k = 0.2
+* m = 0.001
+* N = 30,000
+* window = [0.499, 0.501]
+* a_predicted = 0.025
+
+## Cluster job: a vs outcome (whether the overall rate of the drive increased or decreased)
+
+### Description
+
+Same job as before, but this time with the revised SLiM model.
+
+The predicted value of a that causes delta=0 is around 0.025. The last SLiM model saw an a_observed of 0.0682.
+
+### Files
+
+

@@ -40,7 +40,7 @@ initialize() {
 	
 	// Plot the number of drive alleles, drive homozygotes, and drive heterozygotes
 	// between [0.5-MIDPOINT_WINDOW_WIDTH] and [0.5+MIDPOINT_WINDOW_WIDTH]
-	defineConstant("LIVEPLOT", T);
+	defineConstant("LIVEPLOT", F);
 	defineConstant("MIDPOINT_WINDOW_WIDTH", 0.001);
 	defineConstant("window_lower", 0.5 - MIDPOINT_WINDOW_WIDTH);
 	defineConstant("window_upper", 0.5 + MIDPOINT_WINDOW_WIDTH);
@@ -248,7 +248,7 @@ late() {
 		d_wt_count = sim.getValue("dwt");
 		dr_rate_overall = sim.getValue("drive_rate");
 		
-		catn("GEN:: " + gen + " N: " + N + " overall drive rate: " + rate_dr + " overall number of drive alleles: "+num_drive_alleles + " drive_alleles_in_window: " + num_dr + " d_d_in_window: " + n_d_d + " d_wt_in_window: " + n_d_wt);
+		catn("GEN:: " + gen + " N: " + N +" overall_n_drives: "+num_drive_alleles + " overall_drive_rate: " + rate_dr + " drive_alleles_in_window: " + num_dr + " d_d_in_window: " + n_d_d + " d_wt_in_window: " + n_d_wt);
 		
 		// live plotting
 		if (LIVEPLOT) {

@@ -1,7 +1,7 @@
 
 # INPUT
-a = 0.1
-nreplicates = 5
+a = 0.025
+nreplicates = 1
 output_csv = TRUE # if true, output the compiled replicate csv
 
 library(tidyverse)
@@ -36,4 +36,4 @@ p = ggplot(compiled, aes(x=gen, y = num_drive_alleles, color = replicate)) +
 
 print(p)
 
-ggsave(plot = p, filename = paste0(dir, "/figures/a_",a,".png"))
+ggsave(plot = p, filename = paste0(dir, "/figures/a_",a,"_revised_model.png"))

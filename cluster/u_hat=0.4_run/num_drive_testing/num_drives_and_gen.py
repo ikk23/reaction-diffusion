@@ -27,7 +27,7 @@ def parse_slim(slim_string):
           spaced_line = line.split()
           gen = int(spaced_line[1])
           gen_adjust = gen - 10
-          ndrives = float(spaced_line[7])
+          ndrives = float(spaced_line[5])
           csv_line = "{},{}".format(gen_adjust,ndrives)
           print(csv_line)
     return

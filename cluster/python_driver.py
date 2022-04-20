@@ -22,7 +22,7 @@ def parse_slim(slim_string):
     for line in line_split:
         if line.startswith("GEN::"):
           spaced_line = line.split()
-          drive_freq = float(spaced_line[5])
+          drive_freq = float(spaced_line[7]) # overall frequency of the drive allele
           drive_rates.append(drive_freq)
     
     initial_drive_rate = drive_rates[0]
@@ -32,6 +32,10 @@ def parse_slim(slim_string):
     if initial_drive_rate >= last_drive_rate:
       outcome = "decrease"
     else:
+      outcome = "increase"
+    
+    # Correct for when drives fix upon release (at a=1)
+    if last_drive_rate == 1:
       outcome = "increase"
 
     return (outcome)
@@ -96,7 +100,7 @@ def main():
     parser.add_argument('-sigma', '--sigma', default=0.01, type=float,help="average dispersal distance")
     parser.add_argument('-nreps', '--num_repeats', type=int, default=50,help="number of replicates")
     parser.add_argument('-k', '--k', default=0.2, type=float,help="selection coefficient")
-    parser.add_argument('-u_hat', '--u_hat', default=0.2, type=float,help="threshold frequency")
+    parser.add_argument('-u_hat', '--u_hat', default=0.4, type=float,help="threshold frequency")
     
     args_dict = vars(parser.parse_args())
     sim_reps = args_dict.pop("num_repeats")
@@ -112,7 +116,6 @@ def main():
     k = args_dict["k"]
     u_hat = args_dict["u_hat"]
     
-    beta = a/sigma
     delta = delta_function(a,1,sigma,k,u_hat)
     
     # Run the file with the desired arguments.

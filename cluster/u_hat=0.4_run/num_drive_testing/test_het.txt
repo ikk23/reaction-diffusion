@@ -1,18 +1,18 @@
 // Initial random seed:
-1733832009051
+2365241463212
 
 // RunInitializeCallbacks():
 initializeSLiMModelType(modelType = 'nonWF');
 initializeSLiMOptions(dimensionality = 'x', periodicity = 'x');
 initializeSex("A");
 -----------------------------------
-a = 0.1 sigma = 0.01 so beta = 10.0
+a = 0.025 sigma = 0.01 so beta = 2.5
 -----------------------------------
 "Frequency threshold of: 0.4  and alpha of: 0.2"
------------------------------------
-EXPECTED_ADULT_COMPETITION when m is 0.001 = 60.0
 "d/d fitness: 1.08 d/wt fitness: 0.84 wt/wt fitness: 1.0"
 -----------------------------------
+-----------------------------------
+EXPECTED_ADULT_COMPETITION when m is 0.001 = 60.0
 initializeMutationRate(0);
 initializeRecombinationRate(0);
 initializeMutationType(1, 0.5, "f", 0);
@@ -24,19 +24,59 @@ initializeInteractionType(1, "x", reciprocal=T, maxDistance=0.001);
 // Starting run at generation <start>:
 1 
 
-Generation: 1 N: 30000
-Generation: 2 N: 30260
-Generation: 3 N: 31041
-Generation: 4 N: 30239
-Generation: 5 N: 29902
-Generation: 6 N: 30193
-Generation: 7 N: 30491
-Generation: 8 N: 30521
-Generation: 9 N: 30859
-GEN:: 10 N: 30552 rate_dr: 0.087392 num_drive: 5340 num_d_d: 2377 num_d_wt: 586
-GEN:: 11 N: 30307 rate_dr: 0.0957205 num_drive: 5802 num_d_d: 2434 num_d_wt: 934
-GEN:: 12 N: 30649 rate_dr: 0.0929884 num_drive: 5700 num_d_d: 2245 num_d_wt: 1210
-GEN:: 13 N: 30791 rate_dr: 0.0973824 num_drive: 5997 num_d_d: 2241 num_d_wt: 1515
-GEN:: 14 N: 30227 rate_dr: 0.0950971 num_drive: 5749 num_d_d: 2067 num_d_wt: 1615
-GEN:: 15 N: 30724 rate_dr: 0.0971879 num_drive: 5972 num_d_d: 2113 num_d_wt: 1746
-GEN:: 16 N: 30280 rate_dr: 0.0997028 num_drive: 6038 num_d_d: 2105 num_d_wt: 1828
+GEN = 1 N = 27706
+GEN = 2 N = 26663
+GEN = 3 N = 26426
+GEN = 4 N = 26348
+GEN = 5 N = 26076
+GEN = 6 N = 26054
+GEN = 7 N = 25937
+GEN = 8 N = 25626
+GEN = 9 N = 25667
+GEN:: 10 N: 25606 overall_n_drives: 1268 overall_drive_rate: 0.0247598 drive_alleles_in_window: 124 d_d_in_window: 62 d_wt_in_window: 0
+GEN:: 11 N: 25449 overall_n_drives: 1254 overall_drive_rate: 0.0246375 drive_alleles_in_window: 104 d_d_in_window: 40 d_wt_in_window: 24
+GEN:: 12 N: 25513 overall_n_drives: 1228 overall_drive_rate: 0.0240662 drive_alleles_in_window: 58 d_d_in_window: 17 d_wt_in_window: 24
+GEN:: 13 N: 25390 overall_n_drives: 1117 overall_drive_rate: 0.0219968 drive_alleles_in_window: 41 d_d_in_window: 12 d_wt_in_window: 17
+GEN:: 14 N: 25257 overall_n_drives: 1098 overall_drive_rate: 0.0217365 drive_alleles_in_window: 45 d_d_in_window: 11 d_wt_in_window: 23
+GEN:: 15 N: 25207 overall_n_drives: 1038 overall_drive_rate: 0.0205895 drive_alleles_in_window: 29 d_d_in_window: 4 d_wt_in_window: 21
+GEN:: 16 N: 25323 overall_n_drives: 971 overall_drive_rate: 0.0191723 drive_alleles_in_window: 19 d_d_in_window: 2 d_wt_in_window: 15
+GEN:: 17 N: 25502 overall_n_drives: 902 overall_drive_rate: 0.0176849 drive_alleles_in_window: 25 d_d_in_window: 3 d_wt_in_window: 19
+GEN:: 18 N: 25174 overall_n_drives: 734 overall_drive_rate: 0.0145785 drive_alleles_in_window: 16 d_d_in_window: 2 d_wt_in_window: 12
+GEN:: 19 N: 25649 overall_n_drives: 666 overall_drive_rate: 0.012983 drive_alleles_in_window: 11 d_d_in_window: 0 d_wt_in_window: 11
+GEN:: 20 N: 25797 overall_n_drives: 652 overall_drive_rate: 0.0126371 drive_alleles_in_window: 16 d_d_in_window: 5 d_wt_in_window: 6
+GEN:: 21 N: 25215 overall_n_drives: 562 overall_drive_rate: 0.0111442 drive_alleles_in_window: 10 d_d_in_window: 0 d_wt_in_window: 10
+GEN:: 22 N: 25316 overall_n_drives: 528 overall_drive_rate: 0.0104282 drive_alleles_in_window: 2 d_d_in_window: 0 d_wt_in_window: 2
+GEN:: 23 N: 25632 overall_n_drives: 450 overall_drive_rate: 0.00877809 drive_alleles_in_window: 2 d_d_in_window: 0 d_wt_in_window: 2
+GEN:: 24 N: 25678 overall_n_drives: 391 overall_drive_rate: 0.00761352 drive_alleles_in_window: 8 d_d_in_window: 0 d_wt_in_window: 8
+GEN:: 25 N: 25454 overall_n_drives: 326 overall_drive_rate: 0.00640371 drive_alleles_in_window: 1 d_d_in_window: 0 d_wt_in_window: 1
+GEN:: 26 N: 24932 overall_n_drives: 252 overall_drive_rate: 0.00505375 drive_alleles_in_window: 6 d_d_in_window: 0 d_wt_in_window: 6
+GEN:: 27 N: 25666 overall_n_drives: 213 overall_drive_rate: 0.00414946 drive_alleles_in_window: 2 d_d_in_window: 0 d_wt_in_window: 2
+GEN:: 28 N: 25907 overall_n_drives: 190 overall_drive_rate: 0.00366696 drive_alleles_in_window: 0 d_d_in_window: 0 d_wt_in_window: 0
+GEN:: 29 N: 25582 overall_n_drives: 198 overall_drive_rate: 0.00386991 drive_alleles_in_window: 2 d_d_in_window: 0 d_wt_in_window: 2
+GEN:: 30 N: 25408 overall_n_drives: 165 overall_drive_rate: 0.00324701 drive_alleles_in_window: 4 d_d_in_window: 0 d_wt_in_window: 4
+GEN:: 31 N: 25293 overall_n_drives: 158 overall_drive_rate: 0.00312339 drive_alleles_in_window: 4 d_d_in_window: 1 d_wt_in_window: 2
+GEN:: 32 N: 25438 overall_n_drives: 144 overall_drive_rate: 0.00283041 drive_alleles_in_window: 5 d_d_in_window: 0 d_wt_in_window: 5
+GEN:: 33 N: 25727 overall_n_drives: 151 overall_drive_rate: 0.00293466 drive_alleles_in_window: 4 d_d_in_window: 0 d_wt_in_window: 4
+GEN:: 34 N: 25407 overall_n_drives: 123 overall_drive_rate: 0.00242059 drive_alleles_in_window: 4 d_d_in_window: 0 d_wt_in_window: 4
+GEN:: 35 N: 24871 overall_n_drives: 104 overall_drive_rate: 0.00209079 drive_alleles_in_window: 5 d_d_in_window: 0 d_wt_in_window: 5
+GEN:: 36 N: 25183 overall_n_drives: 79 overall_drive_rate: 0.00156852 drive_alleles_in_window: 0 d_d_in_window: 0 d_wt_in_window: 0
+GEN:: 37 N: 25691 overall_n_drives: 79 overall_drive_rate: 0.0015375 drive_alleles_in_window: 0 d_d_in_window: 0 d_wt_in_window: 0
+GEN:: 38 N: 25534 overall_n_drives: 68 overall_drive_rate: 0.00133156 drive_alleles_in_window: 2 d_d_in_window: 0 d_wt_in_window: 2
+GEN:: 39 N: 25342 overall_n_drives: 49 overall_drive_rate: 0.000966775 drive_alleles_in_window: 0 d_d_in_window: 0 d_wt_in_window: 0
+GEN:: 40 N: 25625 overall_n_drives: 42 overall_drive_rate: 0.000819512 drive_alleles_in_window: 0 d_d_in_window: 0 d_wt_in_window: 0
+GEN:: 41 N: 25970 overall_n_drives: 39 overall_drive_rate: 0.000750866 drive_alleles_in_window: 0 d_d_in_window: 0 d_wt_in_window: 0
+GEN:: 42 N: 25854 overall_n_drives: 37 overall_drive_rate: 0.000715557 drive_alleles_in_window: 0 d_d_in_window: 0 d_wt_in_window: 0
+GEN:: 43 N: 25996 overall_n_drives: 43 overall_drive_rate: 0.00082705 drive_alleles_in_window: 0 d_d_in_window: 0 d_wt_in_window: 0
+GEN:: 44 N: 26004 overall_n_drives: 44 overall_drive_rate: 0.000846024 drive_alleles_in_window: 0 d_d_in_window: 0 d_wt_in_window: 0
+GEN:: 45 N: 26000 overall_n_drives: 36 overall_drive_rate: 0.000692308 drive_alleles_in_window: 0 d_d_in_window: 0 d_wt_in_window: 0
+GEN:: 46 N: 25465 overall_n_drives: 21 overall_drive_rate: 0.000412331 drive_alleles_in_window: 0 d_d_in_window: 0 d_wt_in_window: 0
+GEN:: 47 N: 25237 overall_n_drives: 20 overall_drive_rate: 0.000396244 drive_alleles_in_window: 0 d_d_in_window: 0 d_wt_in_window: 0
+GEN:: 48 N: 25424 overall_n_drives: 13 overall_drive_rate: 0.000255664 drive_alleles_in_window: 0 d_d_in_window: 0 d_wt_in_window: 0
+GEN:: 49 N: 25620 overall_n_drives: 9 overall_drive_rate: 0.000175644 drive_alleles_in_window: 0 d_d_in_window: 0 d_wt_in_window: 0
+GEN:: 50 N: 25695 overall_n_drives: 23 overall_drive_rate: 0.000447558 drive_alleles_in_window: 0 d_d_in_window: 0 d_wt_in_window: 0
+GEN:: 51 N: 25854 overall_n_drives: 21 overall_drive_rate: 0.000406127 drive_alleles_in_window: 0 d_d_in_window: 0 d_wt_in_window: 0
+GEN:: 52 N: 26017 overall_n_drives: 19 overall_drive_rate: 0.000365146 drive_alleles_in_window: 0 d_d_in_window: 0 d_wt_in_window: 0
+GEN:: 53 N: 26148 overall_n_drives: 14 overall_drive_rate: 0.000267707 drive_alleles_in_window: 0 d_d_in_window: 0 d_wt_in_window: 0
+GEN:: 54 N: 25911 overall_n_drives: 8 overall_drive_rate: 0.000154375 drive_alleles_in_window: 0 d_d_in_window: 0 d_wt_in_window: 0
+GEN:: 55 N: 25956 overall_n_drives: 1 overall_drive_rate: 1.92634e-05 drive_alleles_in_window: 0 d_d_in_window: 0 d_wt_in_window: 0
+GEN:: 56 N: 25857 overall_n_drives: 0 overall_drive_rate: 0.0 drive_alleles_in_window: 0 d_d_in_window: 0 d_wt_in_window: 0

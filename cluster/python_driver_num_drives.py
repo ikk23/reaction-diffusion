@@ -21,7 +21,7 @@ def parse_slim(slim_string):
     for line in line_split:
         if line.startswith("GEN::"):
           spaced_line = line.split()
-          ndrives = float(spaced_line[7])
+          ndrives = float(spaced_line[5])
           drive_number.append(ndrives)
     
     drives_gen10 = drive_number[0]
