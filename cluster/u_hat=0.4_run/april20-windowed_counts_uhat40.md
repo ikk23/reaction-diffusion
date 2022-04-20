@@ -1,33 +1,64 @@
----
-title: "uhat=40% u(t) and allele counts in window"
-author: "Isabel Kim"
-date: "4/20/2022"
-output: github_document
----
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
+uhat=40% u(t) and allele counts in window
+================
+Isabel Kim
+4/20/2022
 
 ## a = 0.025
 
-```{r}
+``` r
 knitr::include_graphics("./window_testing/live-plots/a=0.025_drive_rate_in_window.png")
+```
+
+![](./window_testing/live-plots/a=0.025_drive_rate_in_window.png)<!-- -->
+
+``` r
 knitr::include_graphics("./window_testing/live-plots/a=0.025_allele_counts.png")
+```
+
+![](./window_testing/live-plots/a=0.025_allele_counts.png)<!-- -->
+
+``` r
 knitr::include_graphics("./window_testing/live-plots/a=0.025_overall_drive_rate.png")
 ```
 
+![](./window_testing/live-plots/a=0.025_overall_drive_rate.png)<!-- -->
+
 ## a=0.0694
 
-```{r}
+``` r
 knitr::include_graphics("./window_testing/live-plots/a=0.0694_drive_rate_in_window.png")
+```
+
+![](./window_testing/live-plots/a=0.0694_drive_rate_in_window.png)<!-- -->
+
+``` r
 knitr::include_graphics("./window_testing/live-plots/a=0.0694_allele_counts.png")
+```
+
+![](./window_testing/live-plots/a=0.0694_allele_counts.png)<!-- -->
+
+``` r
 knitr::include_graphics("./window_testing/live-plots/a=0.0694_overall_drive_rate.png")
 ```
 
+![](./window_testing/live-plots/a=0.0694_overall_drive_rate.png)<!-- -->
+
 ## a = 0.0748
-```{r}
+
+``` r
 knitr::include_graphics("./window_testing/live-plots/a=0.0748_drive_rate_in_window.png")
+```
+
+![](./window_testing/live-plots/a=0.0748_drive_rate_in_window.png)<!-- -->
+
+``` r
 knitr::include_graphics("./window_testing/live-plots/a=0.0748_allele_counts.png")
+```
+
+![](./window_testing/live-plots/a=0.0748_allele_counts.png)<!-- -->
+
+``` r
 knitr::include_graphics("./window_testing/live-plots/a=0.0748_overall_drive_rate.png")
 ```
+
+![](./window_testing/live-plots/a=0.0748_overall_drive_rate.png)<!-- -->
