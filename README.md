@@ -53,3 +53,5 @@
 ## Revised SLiM model -- cluster results (4/19/22 on)
 
 * [a vs the change in the number of drive alleles for uhat=40% on 4/19](cluster/u_hat=0.4_run/april19-uhat40_a_vs_change_in_dr_revised_model.md)
+* [full range of a vs outcome](cluster/u_hat=0.4_run/april19-uhat40_a_vs_p_increase.md)
+  + Submitted jobs to the cluster at 8:46pm on 4/19
