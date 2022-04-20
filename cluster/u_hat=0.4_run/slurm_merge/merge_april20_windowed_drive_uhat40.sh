@@ -1,7 +1,7 @@
 #!/bin/bash -l
 #SBATCH --ntasks=1
 #SBATCH --mem=1000
-#SBATCH --partition=regular
+#SBATCH --partition=short
 #SBATCH --job-name=merge_april20_windowed_drive_uhat40
 #SBATCH --output=merge_april20_windowed_drive_uhat40.txt
 

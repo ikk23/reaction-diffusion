@@ -5,7 +5,7 @@ initialize() {
 	initializeSex("A");
 	
 	// Parameters that can be changed at the command line
-	defineCfgParam("a", 0.0694);
+	defineCfgParam("a", 0.0748);
 	defineCfgParam("sigma",0.01);
 	defineCfgParam("k", 0.2);
 	defineCfgParam("u_hat", 0.4);
@@ -40,7 +40,7 @@ initialize() {
 	
 	// Plot the number of drive alleles, drive homozygotes, and drive heterozygotes
 	// between [0.5-MIDPOINT_WINDOW_WIDTH] and [0.5+MIDPOINT_WINDOW_WIDTH]
-	defineConstant("LIVEPLOT", F);
+	defineConstant("LIVEPLOT", T);
 	defineConstant("MIDPOINT_WINDOW_WIDTH", 0.001);
 	defineConstant("window_lower", 0.5 - MIDPOINT_WINDOW_WIDTH);
 	defineConstant("window_upper", 0.5 + MIDPOINT_WINDOW_WIDTH);
@@ -105,13 +105,19 @@ function (void) defineCfgParam(string$ name, lifs value) {
 		defineConstant("pngPathForDriveRate",writeTempFile("plot2_", ".png", ""));
 		if (exists("slimgui")) slimgui.openDocument(pngPathForDriveRate);	
 		
+		// PATH TO PLOT FOR THE DRIVE FREQUENCY WITHIN THE WINDOW
+		defineConstant("pngPathForu",writeTempFile("plot3_", ".png", ""));
+		if (exists("slimgui")) slimgui.openDocument(pngPathForu);	
+
 		// within window 
 		sim.setValue("d", NULL); // count of drive alleles
 		sim.setValue("dd", NULL); // count of dd homozygotes
 		sim.setValue("dwt",NULL); // count of dwt heterozygotes
+		sim.setValue("d_rate_in_window", NULL);
 		
 		// over entire range
 		sim.setValue("drive_rate", NULL); // overall drive rate
+		
 	}
 
 }
@@ -234,21 +240,26 @@ late() {
 		drive_heterozygotes.color = "orange";
 		
 		// Analyze within the small window around the midpoint
+		all_inside_window = all[all.x >= window_lower & all.x <= window_upper];
+		Nw = length(all_inside_window);
 		drive_homz_inside_window = drive_homozygotes[drive_homozygotes.x >= window_lower  & drive_homozygotes.x <= window_upper];
 		drive_hetz_inside_window = drive_heterozygotes[drive_heterozygotes.x >= window_lower & drive_heterozygotes.x <= window_upper];
 		n_d_d = length(drive_homz_inside_window);
 		n_d_wt = length(drive_hetz_inside_window);
 		num_dr = (2*n_d_d) + n_d_wt;		
-		sim.setValue("drive_rate", c(sim.getValue("drive_rate"), rate_dr));
+		drive_freq_in_window = num_dr/(2*Nw);
+		sim.setValue("drive_rate", c(sim.getValue("drive_rate"), rate_dr)); // overall
 		sim.setValue("d", c(sim.getValue("d"), num_dr));
 		sim.setValue("dd", c(sim.getValue("dd"), n_d_d));
-		sim.setValue("dwt", c(sim.getValue("dwt"), n_d_wt));			
+		sim.setValue("dwt", c(sim.getValue("dwt"), n_d_wt));	
+		sim.setValue("d_rate_in_window", c(sim.getValue("d_rate_in_window"), drive_freq_in_window));		
 		d_alleles = sim.getValue("d");
 		d_d_count = sim.getValue("dd");
 		d_wt_count = sim.getValue("dwt");
 		dr_rate_overall = sim.getValue("drive_rate");
+		drive_freq_in_window = sim.getValue("d_rate_in_window");
 		
-		catn("GEN:: " + gen + " N: " + N +" overall_n_drives: "+num_drive_alleles + " overall_drive_rate: " + rate_dr + " drive_alleles_in_window: " + num_dr + " d_d_in_window: " + n_d_d + " d_wt_in_window: " + n_d_wt);
+		catn("GEN:: " + gen + " N: " + N +" overall_n_drives: "+num_drive_alleles + " overall_drive_rate: " + rate_dr + " drive_alleles_in_window: " + num_dr + " d_d_in_window: " + n_d_d + " d_wt_in_window: " + n_d_wt + " drive_rate_in_window: " + drive_freq_in_window);
 		
 		// live plotting
 		if (LIVEPLOT) {
@@ -271,7 +282,7 @@ late() {
 			rstr2 = paste('{',
 				'library(tidyverse)',
 				'info = tibble(generation = c(' + paste(seqLen(gen-10+1), sep = ", ") + '), drive_rate = c(' + paste(dr_rate_overall, sep=", ") + '))',
-				'p = ggplot(info, aes(x = generation, y = drive_rate)) + geom_line(color = "black") + ylim(0, 0.3) + xlim(0, 100) + xlab("Generation") + ylab("Frequency") + ggtitle("Drive allele frequency over entire range")',
+				'p = ggplot(info, aes(x = generation, y = drive_rate)) + geom_line(color = "black") + ylim(0, 0.5) + xlim(0, 100) + xlab("Generation") + ylab("Frequency") + ggtitle("Drive allele frequency over entire range")',
 				'png("' + pngPathForDriveRate + '")',
 				'print(p)',
 				'dev.off()',
@@ -280,9 +291,22 @@ late() {
 			scriptPath2 = writeTempFile("plot2_", ".R", rstr2);
 			system(RSCRIPT, args=scriptPath2);
 			
+			// PLOT OF THE DRIVE FREQUENCY WITHIN THE WINDOW
+			rstr3 = paste('{',
+				'library(tidyverse)',
+				'info = tibble(generation = c(' + paste(seqLen(gen-10+1), sep = ", ") + '), drive_rate = c(' + paste(drive_freq_in_window, sep=", ") + '))',
+				'p = ggplot(info, aes(x = generation, y = drive_rate)) + geom_line(color = "black") + ylim(0, 1.0) + xlim(0, 100) + xlab("Generation") + ylab("Frequency") + ggtitle("Drive allele frequency INSIDE WINDOW - u(t)")',
+				'png("' + pngPathForu + '")',
+				'print(p)',
+				'dev.off()',
+				'}',	
+			sep='\n');
+			scriptPath3 = writeTempFile("plot3_",".R", rstr3);
+			system(RSCRIPT, args=scriptPath3);
 		
 			deleteFile(scriptPath);
 			deleteFile(scriptPath2);
+			deleteFile(scriptPath3);
 		} // end liveplot and output
 		
 		// end simulation if drive is lost
