@@ -50,8 +50,6 @@
 
 * [See Latex document](correct_model_equations.pdf)
 
-## Revised SLiM model
+## Revised SLiM model -- cluster results (4/19/22 on)
 
-* [nonWF model](slim/nonWF-model.slim)
-  + [Order of operations in the model](slim/slim_order_of_operations.md)
 * [a vs the change in the number of drive alleles for uhat=40% on 4/19](cluster/u_hat=0.4_run/april19-uhat40_a_vs_change_in_dr_revised_model.md)
