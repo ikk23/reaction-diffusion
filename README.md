@@ -55,4 +55,5 @@
 * [a vs the change in the number of drive alleles for uhat=40% on 4/19](cluster/u_hat=0.4_run/april19-uhat40_a_vs_change_in_dr_revised_model.md)
 * [full range of a vs outcome](cluster/u_hat=0.4_run/april19-uhat40_a_vs_p_increase.md)
 * [uhat=40% windowed drive analysis on the cluster for 5 values of a on 4/20](cluster/u_hat=0.4_run/april20-uhat40_windowed_drive_counts.md)
+* [uhat=40% analysis of u(t) in the small window for 5 values of a on 4/20](cluster/u_hat=0.4_run/april20-ut_windowed_uhat40.md)
 
