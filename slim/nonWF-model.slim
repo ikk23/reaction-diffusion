@@ -5,7 +5,7 @@ initialize() {
 	initializeSex("A");
 	
 	// Parameters that can be changed at the command line
-	defineCfgParam("a", 0.0748);
+	defineCfgParam("a", 0.025);
 	defineCfgParam("sigma",0.01);
 	defineCfgParam("k", 0.2);
 	defineCfgParam("u_hat", 0.4);
@@ -40,7 +40,7 @@ initialize() {
 	
 	// Plot the number of drive alleles, drive homozygotes, and drive heterozygotes
 	// between [0.5-MIDPOINT_WINDOW_WIDTH] and [0.5+MIDPOINT_WINDOW_WIDTH]
-	defineConstant("LIVEPLOT", T);
+	defineConstant("LIVEPLOT", F);
 	defineConstant("MIDPOINT_WINDOW_WIDTH", 0.001);
 	defineConstant("window_lower", 0.5 - MIDPOINT_WINDOW_WIDTH);
 	defineConstant("window_upper", 0.5 + MIDPOINT_WINDOW_WIDTH);
@@ -257,7 +257,7 @@ late() {
 		d_d_count = sim.getValue("dd");
 		d_wt_count = sim.getValue("dwt");
 		dr_rate_overall = sim.getValue("drive_rate");
-		drive_freq_in_window = sim.getValue("d_rate_in_window");
+		drive_freq_in_window_vector = sim.getValue("d_rate_in_window");
 		
 		catn("GEN:: " + gen + " N: " + N +" overall_n_drives: "+num_drive_alleles + " overall_drive_rate: " + rate_dr + " drive_alleles_in_window: " + num_dr + " d_d_in_window: " + n_d_d + " d_wt_in_window: " + n_d_wt + " drive_rate_in_window: " + drive_freq_in_window);
 		
@@ -294,7 +294,7 @@ late() {
 			// PLOT OF THE DRIVE FREQUENCY WITHIN THE WINDOW
 			rstr3 = paste('{',
 				'library(tidyverse)',
-				'info = tibble(generation = c(' + paste(seqLen(gen-10+1), sep = ", ") + '), drive_rate = c(' + paste(drive_freq_in_window, sep=", ") + '))',
+				'info = tibble(generation = c(' + paste(seqLen(gen-10+1), sep = ", ") + '), drive_rate = c(' + paste(drive_freq_in_window_vector, sep=", ") + '))',
 				'p = ggplot(info, aes(x = generation, y = drive_rate)) + geom_line(color = "black") + ylim(0, 1.0) + xlim(0, 100) + xlab("Generation") + ylab("Frequency") + ggtitle("Drive allele frequency INSIDE WINDOW - u(t)")',
 				'png("' + pngPathForu + '")',
 				'print(p)',

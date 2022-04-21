@@ -2,8 +2,8 @@ from argparse import ArgumentParser
 from slimutil import run_slim, configure_slim_command_line
 
 # For a given value of a, run SLiM nreps times and tracks the overall number of drive alleles, overall rate
-# of the drive, the windowed number of drive alleles, the windowed number of drive homozygotes, and 
-# the windowed number of drive heterozygotes.
+# of the drive, the windowed number of drive alleles, the windowed number of drive homozygotes, 
+# the windowed number of drive heterozygotes, and the windowed rate of the drive aka u(t).
 
 # Make sure slimutil.py is also transferred to this cluster directory
 
@@ -34,7 +34,9 @@ def parse_slim(slim_string, a, replicate_number):
 
           dwt_in_window = int(spaced_line[13])
           
-          csv_line = "{},{},{},{},{},{},{},{}".format(a,replicate_number,gen,overall_drives,overall_dr_rate,drives_in_window,dd_in_window,dwt_in_window)
+          d_rate_in_window = float(spaced_line[15])
+          
+          csv_line = "{},{},{},{},{},{},{},{},{}".format(a,replicate_number,gen,overall_drives,overall_dr_rate,drives_in_window,dd_in_window,dwt_in_window,d_rate_in_window)
           print(csv_line)
           
     return 
@@ -63,7 +65,7 @@ def main():
     sim_reps = args_dict.pop("num_repeats")
     
     if args_dict.pop("print_header", None):
-      print(f"a,replicate,gen,overall_d_count, overall_d_rate, windowed_d_count, windowed_dd_count, windowed_dwt_count") # 8 columns
+      print(f"a,replicate,gen,overall_d_count, overall_d_rate, windowed_d_count, windowed_dd_count, windowed_dwt_count, windowed_drive_rate") # 9 columns
 
     # Assemble the command line arguments to use for SLiM:
     clargs = configure_slim_command_line(args_dict)
