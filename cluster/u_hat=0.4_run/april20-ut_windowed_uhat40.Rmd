@@ -111,6 +111,10 @@ replicate_summary = tibble(a = a_vector,
 
 rp = ggplot(data = replicate_summary, aes(x=gen, y = windowed_drive_rate)) + geom_line(color = "red") + xlab("Generations since release") + ylab("Drive rate within [0.499, 0.501]") + ggtitle("a = 0.025")
 
+one_rep = data %>% filter(replicate == 1) %>% ggplot(data = ., aes(x=gen, y = windowed_drive_rate)) + geom_line(color = "red") + xlab("Generations since release") + ylab("Drive rate around x=0") + ggtitle("a = 0.025")
+
+ggsave(plot = one_rep, filename = "/Users/isabelkim/Desktop/lab-meeting/figures/a=0.025_windowed_drive_rate.png")
+
 #ggsave(plot = rp,filename = paste0(fig_dir, "a=0.025_uhat40_windowed_drive_rate_averaged.png"))
 
 #ggsave(filename = paste0(fig_dir, "a=0.025_uhat40_windowed_drive_rate_all_replicates.png"), plot  = rate_dr_all_replicates)
@@ -340,13 +344,15 @@ knitr::include_graphics("../../cluster/u_hat=0.4_run/figures/new_mod/a=0.0721_uh
 
 #### a = 0.0748
 ```{r eval=F}
-a = 0.0748
+a = 0.0748 
 
 file = paste0("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.4_run/csv_raw/new_mod/a",a,"_revised_uhat40_april20.csv")
 
 data = read_csv(file,col_names = c("a","replicate","gen","overall_d_count", "overall_d_rate", "windowed_d_count", "windowed_dd_count", "windowed_dwt_count", "windowed_drive_rate")) %>% mutate(replicate = as.factor(replicate + 1))
 
 rate_dr_all_replicates = ggplot(data = data, mapping = aes(x=gen,y=windowed_drive_rate, color = replicate)) + geom_line() + xlab("Gens since release") + ylab("Rate") + ggtitle(paste0("a = ",a," - drive rate in [0.499,0.501] window"))
+
+one_rep = data %>% filter(replicate == 1) %>% ggplot(data = ., aes(x=gen, y = windowed_drive_rate)) + geom_line(color = "red") + xlab("Generations since release") + ylab("Drive rate around x=0") + ggtitle("a = 0.0748") + ylim(0,1)
 
 #ggsave(filename = paste0(fig_dir, "a=",a,"_uhat40_windowed_drive_rate_all_replicates.png"), plot  = rate_dr_all_replicates)
 

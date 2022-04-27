@@ -247,15 +247,21 @@ u_t0_to_t1 = function(x_grid, a, b, sigma, k, u_hat){
                    u_x_t1_two_step = u_x_t1_two_step_vector,
                    diff_in_u_x_t1 = diff_in_u_x_t1_vector)
   
+
   plot = ggplot(results, aes(x = x)) +
     geom_point(aes(y = u_x_t0), color = "black") +
-    geom_point(aes(y = u_x_prime_t1), color = "yellow") +
-    geom_point(aes(y=u_x_t1_two_step), color = "purple") +
-    geom_point(aes(y = u_x_t1_full_sol), color = "blue") +
     xlab("x") + ylab("u(x,t)") + 
-    geom_vline(xintercept = -a/2, color = "grey") + 
-    geom_vline(xintercept = a/2, color="grey") +
-    geom_hline(yintercept = u_hat, color = "red")
+    geom_vline(xintercept = -a/2, color = "black") + 
+    geom_vline(xintercept = a/2, color="black") + theme_minimal()
+  
+  plot = plot + 
+        geom_point(aes(y = u_x_prime_t1), color = "yellow") 
+
+  plot = plot +
+    geom_point(aes(y=u_x_t1_two_step), color = "purple")
+  plot = plot +
+        geom_hline(yintercept = u_hat, color = "red")
+
   
   
   print(plot)

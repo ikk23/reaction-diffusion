@@ -80,12 +80,12 @@ print(paste("Initial:",initial_sol,"factored:",sol_factored))
 
 
 # b = u_hat and a = 10
-b = 0.3
+b = 1
 u_hat = 0.3
-a = 10
-x_grid = seq(-20,20,by=0.1)
+a = 1
+x_grid = seq(-5,5,length.out=100)
 k = 0.1
-sigma = 2
+sigma = 0.01
 print(paste("ratio of sigma to a = ",sigma/a))
 res = u_t0_to_t1(x_grid,a,b,sigma,k,u_hat) # HERE, u(x,t=1) < 0 between -a/2 and a/2
 

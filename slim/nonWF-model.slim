@@ -40,7 +40,7 @@ initialize() {
 	
 	// Plot the number of drive alleles, drive homozygotes, and drive heterozygotes
 	// between [0.5-MIDPOINT_WINDOW_WIDTH] and [0.5+MIDPOINT_WINDOW_WIDTH]
-	defineConstant("LIVEPLOT", F);
+	defineConstant("LIVEPLOT", T);
 	defineConstant("MIDPOINT_WINDOW_WIDTH", 0.001);
 	defineConstant("window_lower", 0.5 - MIDPOINT_WINDOW_WIDTH);
 	defineConstant("window_upper", 0.5 + MIDPOINT_WINDOW_WIDTH);
@@ -55,7 +55,7 @@ initialize() {
 	
 	// CHECKS	
 	defineConstant("EXPECTED_NUM_OFFSPRING_MULTIPLIER", 2.0); // this*p is used in the Poisson distribution if VIABILITY_SELECTION=True
-	defineConstant("PANMICTIC_CHECK", F); // remove all spatial processes
+	defineConstant("PANMICTIC_CHECK", T); // remove all spatial processes
 	// don't use if VIABILITY_SELECTION is true
 	defineConstant("RELEASE_DRIVE_EVERYWHERE", F); // if F, only release between -a/2 and a/2
 	defineConstant("b", 0.45); // intro frequency if RELEASE_DRIVE_EVERYWHERE is true. If not, this is 1 inside the release square.
@@ -146,12 +146,16 @@ reproduction(NULL, "F") {
 	}
 	
 	// the expected number of offspring depends on the number of individuals surrounding the female
-	adult_density_force = i1.totalOfNeighborStrengths(individual);
-	competition_ratio = adult_density_force / EXPECTED_ADULT_COMPETITION;
-	actual_competition_factor = GROWTH_AT_ZERO_DENSITY/ ((GROWTH_AT_ZERO_DENSITY-1) * competition_ratio + 1);
-	actual_competition_factor_exponentiated = actual_competition_factor^EXPONENT_OF_COMPETITION_FACTOR;
-	p = actual_competition_factor_exponentiated; // fitness doesn't affect fecundity, but the # offspring is 
-	expected_value = p*EXPECTED_NUM_OFFSPRING_MULTIPLIER;
+	if (!PANMICTIC_CHECK){
+		adult_density_force = i1.totalOfNeighborStrengths(individual);
+		competition_ratio = adult_density_force / EXPECTED_ADULT_COMPETITION;
+		actual_competition_factor = GROWTH_AT_ZERO_DENSITY/ ((GROWTH_AT_ZERO_DENSITY-1) * competition_ratio + 1);
+		actual_competition_factor_exponentiated = actual_competition_factor^EXPONENT_OF_COMPETITION_FACTOR;
+		p = actual_competition_factor_exponentiated; // fitness doesn't affect fecundity, but the # offspring is
+		expected_value = p*EXPECTED_NUM_OFFSPRING_MULTIPLIER;
+	} else {
+		expected_value = 2;
+	}
 	
 	num_offspring = rpois(1,expected_value);
 	
