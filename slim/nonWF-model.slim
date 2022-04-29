@@ -5,7 +5,7 @@ initialize() {
 	initializeSex("A");
 	
 	// Parameters that can be changed at the command line
-	defineCfgParam("a", 0.025);
+	defineCfgParam("a", 0.02);
 	defineCfgParam("sigma",0.01);
 	defineCfgParam("k", 0.2);
 	defineCfgParam("u_hat", 0.4);
@@ -38,10 +38,14 @@ initialize() {
 	catn("-----------------------------------");
 	catn("EXPECTED_ADULT_COMPETITION when m is " + m + " = " + EXPECTED_ADULT_COMPETITION);
 	
+	defineConstant("OUTPUT_WINDOW_POINTS", T); // only output the rate of the drive at specific points
+	defineConstant("X1", 0.47); // x < -a/2
+	defineConstant("X2", 0.5); // -a/2 <= x <= a/2
+	defineConstant("X3", 0.54); // x > a/2
 	// Plot the number of drive alleles, drive homozygotes, and drive heterozygotes
 	// between [0.5-MIDPOINT_WINDOW_WIDTH] and [0.5+MIDPOINT_WINDOW_WIDTH]
-	defineConstant("LIVEPLOT", T);
-	defineConstant("MIDPOINT_WINDOW_WIDTH", 0.001);
+	defineConstant("LIVEPLOT", F);
+	defineConstant("MIDPOINT_WINDOW_WIDTH", 0.0005);
 	defineConstant("window_lower", 0.5 - MIDPOINT_WINDOW_WIDTH);
 	defineConstant("window_upper", 0.5 + MIDPOINT_WINDOW_WIDTH);
 	if (LIVEPLOT){
@@ -55,7 +59,7 @@ initialize() {
 	
 	// CHECKS	
 	defineConstant("EXPECTED_NUM_OFFSPRING_MULTIPLIER", 2.0); // this*p is used in the Poisson distribution if VIABILITY_SELECTION=True
-	defineConstant("PANMICTIC_CHECK", T); // remove all spatial processes
+	defineConstant("PANMICTIC_CHECK", F); // remove all spatial processes
 	// don't use if VIABILITY_SELECTION is true
 	defineConstant("RELEASE_DRIVE_EVERYWHERE", F); // if F, only release between -a/2 and a/2
 	defineConstant("b", 0.45); // intro frequency if RELEASE_DRIVE_EVERYWHERE is true. If not, this is 1 inside the release square.
@@ -216,7 +220,7 @@ late() {
 	if (gen < DRIVE_RELEASE_GENERATION){
 		N = p1.individualCount;
 		all.color = "blue"; // only wild-types
-		catn("GEN = " + gen + " N = " + N);
+		//catn("GEN = " + gen + " N = " + N);
 	}	
 	
 	// convert all individuals within the [0.5 - a/2, 0.5 + a/2] square to drive homozygotes
@@ -226,7 +230,7 @@ late() {
 	}
 	
 	// Output
-	if (gen >= DRIVE_RELEASE_GENERATION){
+	if (gen >= DRIVE_RELEASE_GENERATION & !OUTPUT_WINDOW_POINTS){
 		N = p1.individualCount;
 		num_drive_alleles = sum(all.genomes.countOfMutationsOfType(m2)==CHROM_LENGTH);
 		rate_dr = num_drive_alleles/(2*N); // overall rate of the drive
@@ -316,7 +320,53 @@ late() {
 		// end simulation if drive is lost
 		if (rate_dr == 0)
 			sim.simulationFinished();	
-	}  // end if gen >= 10
+	}  // end if gen >= 10 and !OUTPUT_WINDOW_POINTS
+	
+	if (OUTPUT_WINDOW_POINTS & gen >= DRIVE_RELEASE_GENERATION){
+		drive_homozygotes = all[all.countOfMutationsOfType(m2) == 2*CHROM_LENGTH];
+		drive_heterozygotes = all[all.countOfMutationsOfType(m2)==CHROM_LENGTH];
+		all.color = "blue";
+		drive_homozygotes.color = "red";
+		drive_heterozygotes.color = "orange";
+		
+		// X1: x < -a/2
+		all_x1 = all[all.x >= X1-MIDPOINT_WINDOW_WIDTH & all.x <= X1+MIDPOINT_WINDOW_WIDTH];
+		Nx1 = length(all_x1); // total in window
+		drive_homz_x1 = drive_homozygotes[drive_homozygotes.x >= X1-MIDPOINT_WINDOW_WIDTH  & drive_homozygotes.x <= X1+MIDPOINT_WINDOW_WIDTH];
+		drive_hetz_x1 = drive_heterozygotes[drive_heterozygotes.x >= X1-MIDPOINT_WINDOW_WIDTH & drive_heterozygotes.x <= X1+MIDPOINT_WINDOW_WIDTH];
+		n_d_d_x1 = length(drive_homz_x1);
+		n_d_wt_x1 = length(drive_hetz_x1);
+		num_dr_x1 = (2*n_d_d_x1) + n_d_wt_x1;		
+		drive_freq_x1 = num_dr_x1/(2*Nx1);
+		
+		
+		// X2: -a/2 <= x <= a/2
+		all_x2 = all[all.x >= X2-MIDPOINT_WINDOW_WIDTH & all.x <= X2+MIDPOINT_WINDOW_WIDTH];
+		Nx2 = length(all_x2); // total in window
+		drive_homz_x2 = drive_homozygotes[drive_homozygotes.x >= X2-MIDPOINT_WINDOW_WIDTH  & drive_homozygotes.x <= X2+MIDPOINT_WINDOW_WIDTH];
+		drive_hetz_x2 = drive_heterozygotes[drive_heterozygotes.x >= X2-MIDPOINT_WINDOW_WIDTH & drive_heterozygotes.x <= X2+MIDPOINT_WINDOW_WIDTH];
+		n_d_d_x2 = length(drive_homz_x2);
+		n_d_wt_x2 = length(drive_hetz_x2);
+		num_dr_x2 = (2*n_d_d_x2) + n_d_wt_x2;		
+		drive_freq_x2 = num_dr_x2/(2*Nx2);
+		
+		// X3: x > a/2
+		all_x3 = all[all.x >= X3-MIDPOINT_WINDOW_WIDTH & all.x <= X3+MIDPOINT_WINDOW_WIDTH];
+		Nx3 = length(all_x3); // total in window
+		drive_homz_x3 = drive_homozygotes[drive_homozygotes.x >= X3-MIDPOINT_WINDOW_WIDTH  & drive_homozygotes.x <= X3+MIDPOINT_WINDOW_WIDTH];
+		drive_hetz_x3 = drive_heterozygotes[drive_heterozygotes.x >= X3-MIDPOINT_WINDOW_WIDTH & drive_heterozygotes.x <= X3+MIDPOINT_WINDOW_WIDTH];
+		n_d_d_x3 = length(drive_homz_x3);
+		n_d_wt_x3 = length(drive_hetz_x3);
+		num_dr_x3 = (2*n_d_d_x3) + n_d_wt_x3;		
+		drive_freq_x3 = num_dr_x3/(2*Nx3);
+		
+		catn('GENERATION: ' + gen);
+		catn(X1 + ' -- number here: ' + Nx1 + ' rate here: ' + drive_freq_x1);
+		catn(X2 + ' -- number here: ' + Nx2 + ' rate here: ' + drive_freq_x2);
+		catn(X3 + ' -- number here: ' + Nx3 + ' rate here: ' + drive_freq_x3);
+		
+		
+	}
 	
 	// DISPERSAL
 	for (ind in all){
@@ -339,4 +389,4 @@ late() {
 
 
 //Stop the simulation after 100 generations
-110 late() { sim.simulationFinished(); }
+11 late() { sim.simulationFinished(); }
