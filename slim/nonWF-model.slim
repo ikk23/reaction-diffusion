@@ -5,9 +5,9 @@ initialize() {
 	initializeSex("A");
 	
 	// Parameters that can be changed at the command line
-	defineCfgParam("a", 0.02);
+	defineCfgParam("a", 0.07);
 	defineCfgParam("sigma",0.01);
-	defineCfgParam("k", 0.2);
+	defineCfgParam("k", 0.01);
 	defineCfgParam("u_hat", 0.4);
 	// save the boundaries for the drive release
 	defineConstant("drive_x_min", 0.5 - (a/2));
@@ -227,6 +227,10 @@ late() {
 	if (gen == DRIVE_RELEASE_GENERATION){
 		all_in_range = all[all.x >= drive_x_min & all.x <= drive_x_max];
 		all_in_range.genomes.addNewDrawnMutation(m2, seqLen(CHROM_LENGTH));
+		
+		lower = min(all_in_range.x);
+		upper = max(all_in_range.x);
+		catn("Bounds of drive in generation 10: " + lower + " to " + upper);
 	}
 	
 	// Output
@@ -322,7 +326,72 @@ late() {
 			sim.simulationFinished();	
 	}  // end if gen >= 10 and !OUTPUT_WINDOW_POINTS
 	
-	if (OUTPUT_WINDOW_POINTS & gen >= DRIVE_RELEASE_GENERATION){
+	if (OUTPUT_WINDOW_POINTS & gen == 11){
+		catn("u(x,t=1):");
+		catn("----------------------");
+		drive_homozygotes = all[all.countOfMutationsOfType(m2) == 2*CHROM_LENGTH];
+		drive_heterozygotes = all[all.countOfMutationsOfType(m2)==CHROM_LENGTH];
+		all.color = "blue";
+		drive_homozygotes.color = "red";
+		drive_heterozygotes.color = "orange";
+		
+		// X1: x < -a/2
+		all_x1 = all[all.x >= X1-MIDPOINT_WINDOW_WIDTH & all.x <= X1+MIDPOINT_WINDOW_WIDTH];
+		Nx1 = length(all_x1); // total in window
+		drive_homz_x1 = drive_homozygotes[drive_homozygotes.x >= X1-MIDPOINT_WINDOW_WIDTH  & drive_homozygotes.x <= X1+MIDPOINT_WINDOW_WIDTH];
+		drive_hetz_x1 = drive_heterozygotes[drive_heterozygotes.x >= X1-MIDPOINT_WINDOW_WIDTH & drive_heterozygotes.x <= X1+MIDPOINT_WINDOW_WIDTH];
+		n_d_d_x1 = length(drive_homz_x1);
+		n_d_wt_x1 = length(drive_hetz_x1);
+		num_dr_x1 = (2*n_d_d_x1) + n_d_wt_x1;		
+		drive_freq_x1 = num_dr_x1/(2*Nx1);
+		
+		
+		// X2: -a/2 <= x <= a/2
+		all_x2 = all[all.x >= X2-MIDPOINT_WINDOW_WIDTH & all.x <= X2+MIDPOINT_WINDOW_WIDTH];
+		Nx2 = length(all_x2); // total in window
+		drive_homz_x2 = drive_homozygotes[drive_homozygotes.x >= X2-MIDPOINT_WINDOW_WIDTH  & drive_homozygotes.x <= X2+MIDPOINT_WINDOW_WIDTH];
+		drive_hetz_x2 = drive_heterozygotes[drive_heterozygotes.x >= X2-MIDPOINT_WINDOW_WIDTH & drive_heterozygotes.x <= X2+MIDPOINT_WINDOW_WIDTH];
+		n_d_d_x2 = length(drive_homz_x2);
+		n_d_wt_x2 = length(drive_hetz_x2);
+		num_dr_x2 = (2*n_d_d_x2) + n_d_wt_x2;		
+		drive_freq_x2 = num_dr_x2/(2*Nx2);
+		
+		// X3: x > a/2
+		all_x3 = all[all.x >= X3-MIDPOINT_WINDOW_WIDTH & all.x <= X3+MIDPOINT_WINDOW_WIDTH];
+		Nx3 = length(all_x3); // total in window
+		drive_homz_x3 = drive_homozygotes[drive_homozygotes.x >= X3-MIDPOINT_WINDOW_WIDTH  & drive_homozygotes.x <= X3+MIDPOINT_WINDOW_WIDTH];
+		drive_hetz_x3 = drive_heterozygotes[drive_heterozygotes.x >= X3-MIDPOINT_WINDOW_WIDTH & drive_heterozygotes.x <= X3+MIDPOINT_WINDOW_WIDTH];
+		n_d_d_x3 = length(drive_homz_x3);
+		n_d_wt_x3 = length(drive_hetz_x3);
+		num_dr_x3 = (2*n_d_d_x3) + n_d_wt_x3;		
+		drive_freq_x3 = num_dr_x3/(2*Nx3);
+		
+		catn('GENERATION: ' + gen);
+		catn(X1 + ' -- number here: ' + Nx1 + ' rate here: ' + drive_freq_x1);
+		catn(X2 + ' -- number here: ' + Nx2 + ' rate here: ' + drive_freq_x2);
+		catn(X3 + ' -- number here: ' + Nx3 + ' rate here: ' + drive_freq_x3);
+		
+		catn("----------------------");
+	}
+	
+	
+	// DISPERSAL
+	for (ind in all){
+		distance = rexp(1,mu = sigma);
+		// if this draw is 1, go right. If it's 0, go left.
+		right = rbinom(1, 1, 0.5);
+		if (right){
+			position = ind.x + distance;
+		} else {
+			position = ind.x - distance;
+		}
+		ind.setSpatialPosition(p1.pointPeriodic(position));
+	}
+	
+	// post-dispersal but pre-viability = uprime
+	if (OUTPUT_WINDOW_POINTS & gen == 10){
+		catn("----------------------");
+		catn("u'(x,t=1):");
 		drive_homozygotes = all[all.countOfMutationsOfType(m2) == 2*CHROM_LENGTH];
 		drive_heterozygotes = all[all.countOfMutationsOfType(m2)==CHROM_LENGTH];
 		all.color = "blue";
@@ -368,18 +437,7 @@ late() {
 		
 	}
 	
-	// DISPERSAL
-	for (ind in all){
-		distance = rexp(1,mu = sigma);
-		// if this draw is 1, go right. If it's 0, go left.
-		right = rbinom(1, 1, 0.5);
-		if (right){
-			position = ind.x + distance;
-		} else {
-			position = ind.x - distance;
-		}
-		ind.setSpatialPosition(p1.pointPeriodic(position));
-	}
+	
 	
 	if (!PANMICTIC_CHECK){
 		i1.evaluate();

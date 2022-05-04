@@ -84,3 +84,14 @@ u = dnorm(x_grid)*2.506754 # make u(x=0)=1
 simulate_u_x_t(u, x_grid, 12, 0.0003, 0.2, 0.4)
 ```
 * Even when D is extremely small, the wave widens
+
+## Try to find waves that fail when b=1
+
+### D = 0.01, k = 0.2, uhat = 0.8
+```{r}
+x_grid = seq(-10, 10, length.out = 1000)
+u = dnorm(x_grid)*2.506754 # make u(x=0)=1
+
+
+simulate_u_x_t(u, x_grid, 11, 0.01, 0.1, 0.8, save_plot_path = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/bistable-R-waves/uhat80.gif") # really high invasion threshold
+```

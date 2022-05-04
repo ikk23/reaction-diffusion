@@ -176,12 +176,18 @@ given_x_get_uprime_and_u_t1 = function(x_raw,a,b,sigma,k,uhat){
   return(res)
 }
 
-a = 0.02
-print(paste0("Drive is between ",-a/2," and ",a/2))
-x = 0.04
-x_raw = x + 0.5
+a = 0.07
+print(paste0("Drive is between ",0.5-(a/2)," and ",0.5+(a/2)))
 sigma = 0.01
 uhat = 0.4
 b = 1
-k=0.2
+k=0.01 # k small
+alpha =  1 - (2*uhat) # 0.2
+d_d_fitness = 	1 + (2*alpha*k)
+d_wt_fitness = 1 + ((alpha-1)*k)
+wt_wt_fitness = 1
+print(paste("d/d fitness:", d_d_fitness, "d/wt fitness:", d_wt_fitness, "wt/wt fitness:", wt_wt_fitness))
+
+x = 0.04
+x_raw = x + 0.5
 given_x_get_uprime_and_u_t1(x_raw,a,b,sigma,k,uhat)

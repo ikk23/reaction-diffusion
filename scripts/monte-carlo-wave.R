@@ -31,4 +31,7 @@ diffusion_step = function(u, x_grid, sigma,n){
   
   # now need to find the density at each position?
   num_bins = length(x_grid)/3
+  
+  
+  
 }
