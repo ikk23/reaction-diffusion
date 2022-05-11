@@ -46,6 +46,7 @@
 * [Tutorial](mathematica/mathematica_tutorial.md)
 * [AUC (theta) and delta equations in Mathematica notebook](mathematica/AUC_only.nb)
 * [R scripts to check the factored equation](scripts/auc-equations.R)
+* [Verifying that the SLiM model matches the mathematical predictions](bistable-R-waves/cluster_ux.md)
 
 ## Model equations
 
