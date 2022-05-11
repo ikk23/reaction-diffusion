@@ -1,9 +1,27 @@
 
 u_hat = 0.4
 
-a_seq = c(0.025, 0.0654, 0.0694,0.0721,0.0748)
 nreps = 20
-python_script = "python_driver_windowed.py"
+narray = 50
+python_script = "python_u_driver.py"
+
+# Start writing to a new output file
+sink('/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/bistable-R-waves/may10_u_runs.txt')
+
+for (i in 1:narray){
+  if (i == 1){
+    line = paste0("python ",python_script," -nreps ",nreps," -header","\n")
+  } else {
+    line = paste0("python ",python_script," -nreps ",nreps,"\n")
+  }
+  cat(line)
+}
+
+# Stop writing to the file
+sink()
+
+
+
 
 
 # Start writing to a new output file

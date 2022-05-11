@@ -1,0 +1,41 @@
+// Initial random seed:
+2029679082660
+
+// RunInitializeCallbacks():
+initializeSLiMModelType(modelType = 'nonWF');
+initializeSLiMOptions(dimensionality = 'x', periodicity = 'x');
+initializeSex("A");
+-----------------------------------
+a = 0.02 sigma = 0.01 so beta = 2.0
+-----------------------------------
+"Frequency threshold of: 0.4  and alpha of: 0.2"
+"d/d fitness: 1.004 d/wt fitness: 0.992 wt/wt fitness: 1.0"
+-----------------------------------
+-----------------------------------
+EXPECTED_ADULT_COMPETITION when m is 0.001 = 60.0
+initializeMutationRate(0);
+initializeRecombinationRate(0);
+initializeMutationType(1, 0.5, "f", 0);
+initializeMutationType(2, 0.5, "f", 0);
+initializeGenomicElementType(1, c(m1, m2), c(1, 1));
+initializeGenomicElement(g1, 0, 0);
+initializeInteractionType(1, "x", reciprocal=T, maxDistance=0.001);
+
+// Starting run at generation <start>:
+1 
+
+Bounds of drive in generation 10: 0.490045 to 0.509809
+----------------------
+u'(x,t=1):
+GENERATION: 10
+UPRIME_X1:: 0.137931
+UPRIME_X2:: 0.6
+UPRIME_X3:: 0.0
+u(x,t=1):
+----------------------
+
+GENERATION: 11
+U_X1:: 0.108108
+U_X2:: 0.673077
+U_X3:: 0.0
+----------------------

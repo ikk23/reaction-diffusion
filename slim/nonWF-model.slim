@@ -5,9 +5,9 @@ initialize() {
 	initializeSex("A");
 	
 	// Parameters that can be changed at the command line
-	defineCfgParam("a", 0.07);
+	defineCfgParam("a", 0.02);
 	defineCfgParam("sigma",0.01);
-	defineCfgParam("k", 0.01);
+	defineCfgParam("k", 0.2);
 	defineCfgParam("u_hat", 0.4);
 	// save the boundaries for the drive release
 	defineConstant("drive_x_min", 0.5 - (a/2));
@@ -366,10 +366,11 @@ late() {
 		num_dr_x3 = (2*n_d_d_x3) + n_d_wt_x3;		
 		drive_freq_x3 = num_dr_x3/(2*Nx3);
 		
+		catn();
 		catn('GENERATION: ' + gen);
-		catn(X1 + ' -- number here: ' + Nx1 + ' rate here: ' + drive_freq_x1);
-		catn(X2 + ' -- number here: ' + Nx2 + ' rate here: ' + drive_freq_x2);
-		catn(X3 + ' -- number here: ' + Nx3 + ' rate here: ' + drive_freq_x3);
+		catn('U_X1:: ' + drive_freq_x1);
+		catn('U_X2:: ' + drive_freq_x2);
+		catn('U_X3:: ' + drive_freq_x3);
 		
 		catn("----------------------");
 	}
@@ -430,10 +431,12 @@ late() {
 		drive_freq_x3 = num_dr_x3/(2*Nx3);
 		
 		catn('GENERATION: ' + gen);
-		catn(X1 + ' -- number here: ' + Nx1 + ' rate here: ' + drive_freq_x1);
-		catn(X2 + ' -- number here: ' + Nx2 + ' rate here: ' + drive_freq_x2);
-		catn(X3 + ' -- number here: ' + Nx3 + ' rate here: ' + drive_freq_x3);
 		
+		if (gen == 10){
+			catn('UPRIME_X1:: ' + drive_freq_x1);
+			catn('UPRIME_X2:: ' + drive_freq_x2);
+			catn('UPRIME_X3:: ' + drive_freq_x3);
+		} 
 		
 	}
 	
