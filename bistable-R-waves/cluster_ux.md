@@ -117,40 +117,40 @@ u_x1 = mean(data$`u(x=0.47)`)
 u_x2 = mean(data$`u(x=0.5)`)
 u_x3 = mean(data$`u(x=0.54)`)
 
-print(paste0("Expected u'(x=0.47, t=1) = ",0.05850982, " vs observed = ", uprime_x1))
+print(paste0("Expected u'(x=0.47, t=1) = ",0.05850982, " vs observed = ", uprime_x1, " -- percent difference = ", (abs(0.05850982-uprime_x1)/0.05850982)*100))
 ```
 
-    ## [1] "Expected u'(x=0.47, t=1) = 0.05850982 vs observed = 0.0590608175"
+    ## [1] "Expected u'(x=0.47, t=1) = 0.05850982 vs observed = 0.0590608175 -- percent difference = 0.941717988535949"
 
 ``` r
-print(paste0("Expected u(x=0.47, t=1) = ",0.05098523, " vs observed = ", u_x1))
+print(paste0("Expected u(x=0.47, t=1) = ",0.05098523, " vs observed = ", u_x1, " -- percent difference = ", (abs(0.05098523-u_x1)/0.05098523)*100))
 ```
 
-    ## [1] "Expected u(x=0.47, t=1) = 0.05098523 vs observed = 0.0526556363"
+    ## [1] "Expected u(x=0.47, t=1) = 0.05098523 vs observed = 0.0526556363 -- percent difference = 3.27625529981919"
 
 ``` r
-print(paste0("Expected u'(x=0.5, t=1) = ",0.6321206, " vs observed = ", uprime_x2))
+print(paste0("Expected u'(x=0.5, t=1) = ",0.6321206, " vs observed = ", uprime_x2, " -- percent difference = ", (abs(0.6321206-uprime_x2)/0.6321206)*100))
 ```
 
-    ## [1] "Expected u'(x=0.5, t=1) = 0.6321206 vs observed = 0.628664427"
+    ## [1] "Expected u'(x=0.5, t=1) = 0.6321206 vs observed = 0.628664427 -- percent difference = 0.546758482479452"
 
 ``` r
-print(paste0("Expected u(x=0.5, t=1) = ", 0.6537119, " vs observed = ", u_x2))
+print(paste0("Expected u(x=0.5, t=1) = ", 0.6537119, " vs observed = ", u_x2, " -- percent difference = ", (abs(0.6537119-u_x2)/0.6537119)*100))
 ```
 
-    ## [1] "Expected u(x=0.5, t=1) = 0.6537119 vs observed = 0.651572027"
+    ## [1] "Expected u(x=0.5, t=1) = 0.6537119 vs observed = 0.651572027 -- percent difference = 0.327341907038859"
 
 ``` r
-print(paste0("Expected u'(x=0.54, t=1) = ",0.02152456, " vs observed = ", uprime_x3))
+print(paste0("Expected u'(x=0.54, t=1) = ",0.02152456, " vs observed = ", uprime_x3, " -- percent difference = ", (abs(0.02152456-uprime_x3)/0.02152456)*100))
 ```
 
-    ## [1] "Expected u'(x=0.54, t=1) = 0.02152456 vs observed = 0.0210994993"
+    ## [1] "Expected u'(x=0.54, t=1) = 0.02152456 vs observed = 0.0210994993 -- percent difference = 1.97477068056211"
 
 ``` r
-print(paste0("Expected u(x=0.54, t=1) = ",0.01833609, " vs observed = ", u_x3))
+print(paste0("Expected u(x=0.54, t=1) = ",0.01833609, " vs observed = ", u_x3, " -- percent difference = ", (abs(0.01833609-u_x3)/0.01833609)*100))
 ```
 
-    ## [1] "Expected u(x=0.54, t=1) = 0.01833609 vs observed = 0.0186565021"
+    ## [1] "Expected u(x=0.54, t=1) = 0.01833609 vs observed = 0.0186565021 -- percent difference = 1.74743961226194"
 
 Good - results are extremely close to the mathematical formulas when the
 number of replicates is large.

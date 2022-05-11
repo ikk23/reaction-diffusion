@@ -92,17 +92,17 @@ u_x1 = mean(data$`u(x=0.47)`)
 u_x2 = mean(data$`u(x=0.5)`)
 u_x3 = mean(data$`u(x=0.54)`)
 
-print(paste0("Expected u'(x=0.47, t=1) = ",0.05850982, " vs observed = ", uprime_x1))
+print(paste0("Expected u'(x=0.47, t=1) = ",0.05850982, " vs observed = ", uprime_x1, " -- percent difference = ", (abs(0.05850982-uprime_x1)/0.05850982)*100))
 
-print(paste0("Expected u(x=0.47, t=1) = ",0.05098523, " vs observed = ", u_x1))
+print(paste0("Expected u(x=0.47, t=1) = ",0.05098523, " vs observed = ", u_x1, " -- percent difference = ", (abs(0.05098523-u_x1)/0.05098523)*100))
 
-print(paste0("Expected u'(x=0.5, t=1) = ",0.6321206, " vs observed = ", uprime_x2))
+print(paste0("Expected u'(x=0.5, t=1) = ",0.6321206, " vs observed = ", uprime_x2, " -- percent difference = ", (abs(0.6321206-uprime_x2)/0.6321206)*100))
 
-print(paste0("Expected u(x=0.5, t=1) = ", 0.6537119, " vs observed = ", u_x2))
+print(paste0("Expected u(x=0.5, t=1) = ", 0.6537119, " vs observed = ", u_x2, " -- percent difference = ", (abs(0.6537119-u_x2)/0.6537119)*100))
 
-print(paste0("Expected u'(x=0.54, t=1) = ",0.02152456, " vs observed = ", uprime_x3))
+print(paste0("Expected u'(x=0.54, t=1) = ",0.02152456, " vs observed = ", uprime_x3, " -- percent difference = ", (abs(0.02152456-uprime_x3)/0.02152456)*100))
 
-print(paste0("Expected u(x=0.54, t=1) = ",0.01833609, " vs observed = ", u_x3))
+print(paste0("Expected u(x=0.54, t=1) = ",0.01833609, " vs observed = ", u_x3, " -- percent difference = ", (abs(0.01833609-u_x3)/0.01833609)*100))
 
 ```
 
