@@ -5,7 +5,7 @@ initialize() {
 	initializeSex("A");
 	
 	// Parameters that can be changed at the command line
-	defineCfgParam("a", 0.25);
+	defineCfgParam("a", 0.07);
 	defineCfgParam("sigma",0.01);
 	defineCfgParam("k", 0.2);
 	defineCfgParam("u_hat", 0.4);
@@ -246,21 +246,8 @@ late() {
 	}  // end if gen >= 10 and !OUTPUT_WINDOW_POINTS
 	
 	
-	// DISPERSAL
-	for (ind in all){
-		distance = rexp(1,mu = sigma);
-		// if this draw is 1, go right. If it's 0, go left.
-		right = rbinom(1, 1, 0.5);
-		if (right){
-			position = ind.x + distance;
-		} else {
-			position = ind.x - distance;
-		}
-		ind.setSpatialPosition(p1.pointPeriodic(position));
-	}
-	
-	// u'(x, t=1) density check
-	if (gen == 10){
+	// After 1 round of dispersal and reaction, but before the 2nd dispersal --> u(x,t=1)
+	if (gen == 11){
 		cell_width = 1.0/NCELLS;
 		positions = (0:NCELLS)*cell_width;
 		cell_track = c();
@@ -284,8 +271,8 @@ late() {
 			
 			rstr = paste('{',
 				'library(tidyverse)',
-				'info = tibble(x = c(' + paste(positions[0:(NCELLS-1)], sep = ", ") + '), u_prime_x = c(' + paste(cell_track, sep=", ") + '))',
-				'p = ggplot(info, aes(x = x)) + geom_line(aes(y=u_prime_x), color = "red") + ylim(0,1) + xlim(0, 1) + xlab("x") + ylab("uprime(x,t=1)") + ggtitle("uprime(x,t=1)") + geom_hline(yintercept =' + u_hat +')',
+				'info = tibble(x = c(' + paste(positions[0:(NCELLS-1)], sep = ", ") + '), u_x = c(' + paste(cell_track, sep=", ") + '))',
+				'p = ggplot(info, aes(x = x)) + geom_line(aes(y=u_x), color = "red") + ylim(0,1) + xlim(0, 1) + xlab("x") + ylab("u(x,t=1)") + ggtitle("u(x,t=1)") + geom_hline(yintercept =' + u_hat +')',
 				'png("' + pngPath + '")',
 				'print(p)',
 				'dev.off()',
@@ -298,10 +285,10 @@ late() {
 
 		} 
 		
-		catn("left_x: ");
-		catn(positions[0:(NCELLS-1)]);
-		catn("u'(x,t=1)");
-		catn(cell_track);
+		//catn("left_x: ");
+		//catn(positions[0:(NCELLS-1)]);
+		//catn("u(x,t=1)");
+		//catn(cell_track);
 		
 		// Figure out at which x-left position u'(x,t=1) is closest to uhat
 		diff_from_uhat = abs(cell_track - u_hat);
@@ -317,11 +304,24 @@ late() {
 		x_pos_2 = (x_vector[two_low_pos[1]] + x_vector[two_low_pos[1]] + cell_width)/2;
 		uprime_2 = cell_track[two_low_pos[1]];
 		
-		catn("1st xintercept at " + x_pos_1 + " --> u' = " + uprime_1);
-		catn("2nd xintercept at " + x_pos_2 + " --> u' = " + uprime_2);
+		catn("1st xintercept at " + x_pos_1 + " --> u = " + uprime_1);
+		catn("2nd xintercept at " + x_pos_2 + " --> u = " + uprime_2);
 	
+	}	
+	
+	// DISPERSAL
+	for (ind in all){
+		distance = rexp(1,mu = sigma);
+		// if this draw is 1, go right. If it's 0, go left.
+		right = rbinom(1, 1, 0.5);
+		if (right){
+			position = ind.x + distance;
+		} else {
+			position = ind.x - distance;
+		}
+		ind.setSpatialPosition(p1.pointPeriodic(position));
 	}
-	
+
 	
 	if (!PANMICTIC_CHECK){
 		i1.evaluate();
@@ -331,4 +331,4 @@ late() {
 
 
 //Stop the simulation after 100 generations
-12 late() { sim.simulationFinished(); }
+11 late() { sim.simulationFinished(); }

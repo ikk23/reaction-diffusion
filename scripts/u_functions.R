@@ -176,18 +176,65 @@ given_x_get_uprime_and_u_t1 = function(x_raw,a,b,sigma,k,uhat){
   return(res)
 }
 
-a = 0.02
-print(paste0("Drive is between ",0.5-(a/2)," and ",0.5+(a/2)))
-sigma = 0.01
-uhat = 0.4
-b = 1
-k=0.2 
-alpha =  1 - (2*uhat) # 0.2
-d_d_fitness = 	1 + (2*alpha*k)
-d_wt_fitness = 1 + ((alpha-1)*k)
-wt_wt_fitness = 1
-print(paste("d/d fitness:", d_d_fitness, "d/wt fitness:", d_wt_fitness, "wt/wt fitness:", wt_wt_fitness))
+u1_minus_uhat = function(x_raw,a,b,sigma,k,uhat){
+  x = x_raw - 0.5
+  u1 = u_t1_sub1(x,a,b,sigma,k,uhat)
+  diff = u1 - uhat
+  return(diff)
+}
 
-x = 0.04
-x_raw = x + 0.5
-given_x_get_uprime_and_u_t1(x_raw,a,b,sigma,k,uhat)
+u2_minus_uhat = function(x_raw, a, b, sigma, k, uhat){
+  x = x_raw - 0.5
+  u2 = u_t1_sub2(x,a,b,sigma,k,uhat)
+  diff = u2 - uhat
+  return(diff)
+}
+
+u3_minus_uhat = function(x_raw, a, b, sigma, k, uhat){
+  x = x_raw - 0.5
+  u3 = u_t1_sub3(x,a,b,sigma,k,uhat)
+  diff = u3 - uhat
+  return(diff)
+}
+
+u_minus_uhat = function(x_raw,a,b,sigma,k,uhat){
+  x = x_raw - 0.5
+  if (x < -a/2){
+    diff = u1_minus_uhat(x_raw,a,b,sigma,k,uhat)
+  } else if ((x >= -a/2) & (x <= a/2)){
+    diff = u2_minus_uhat(x_raw,a,b,sigma,k,uhat)
+  } else if (x > a/2){
+    diff = u3_minus_uhat(x_raw, a,b,sigma,k,uhat)
+  } else {
+    print("NA -- error")
+  }
+  return(diff)
+}
+
+
+# Find the width of the wave after 1 round of dispersal and reaction
+find_wave_width = function(a,b,sigma,k,uhat, n = 5000, plot = TRUE){
+  x_raw_vector = seq(0,1.0,length.out = n)
+  diff_vector = rep(-1,n)
+  for (i in 1:n){
+    diff_vector[i] = u_minus_uhat(x_raw_vector[i],a,b,sigma,k,uhat) 
+  }
+  indices_in_order = order(abs(diff_vector))
+  two_x_intercept_indices = sort(indices_in_order[1:2])
+  x_left = x_raw_vector[two_x_intercept_indices[1]]
+  x_right = x_raw_vector[two_x_intercept_indices[2]]
+  wave_width = x_right - x_left
+  
+  if (plot){
+    plot(x_raw_vector, diff_vector, xlab = "x", ylab="u(x,t=1) - uhat")
+    abline(v = x_left)
+    abline(v = x_right)
+    abline(h = uhat)
+  }
+  
+  change_in_wave_width = wave_width - a
+  
+  return(list(x_left = x_left, x_right = x_right, wave_width=wave_width, change_in_wave_width = change_in_wave_width))
+}
+
+

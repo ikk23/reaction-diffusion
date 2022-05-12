@@ -2,17 +2,18 @@
 u_hat = 0.4
 
 nreps = 20
-narray = 50
-python_script = "python_u_driver.py"
+python_script = "python_driver_homozygotes.py"
+a_vector = c(0.02, 0.07,0.1, 0.25)
 
 # Start writing to a new output file
-sink('/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/bistable-R-waves/may10_u_runs.txt')
+sink('/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/bistable-R-waves/may12_ndd.txt')
 
-for (i in 1:narray){
+for (i in 1:length(a_vector)){
+  a = a_vector[i]
   if (i == 1){
-    line = paste0("python ",python_script," -nreps ",nreps," -header","\n")
+    line = paste0("python ",python_script," -a ",a," -nreps ",nreps," -header","\n")
   } else {
-    line = paste0("python ",python_script," -nreps ",nreps,"\n")
+    line = paste0("python ",python_script," -a ",a," -nreps ",nreps,"\n")
   }
   cat(line)
 }

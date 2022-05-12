@@ -5,7 +5,7 @@ initialize() {
 	initializeSex("A");
 	
 	// Parameters that can be changed at the command line
-	defineCfgParam("a", 0.25);
+	defineCfgParam("a", 0.07);
 	defineCfgParam("sigma",0.01);
 	defineCfgParam("k", 0.2);
 	defineCfgParam("u_hat", 0.4);
@@ -41,7 +41,7 @@ initialize() {
 
 	// Plot the number of drive alleles, drive homozygotes, and drive heterozygotes
 	// between [0.5-MIDPOINT_WINDOW_WIDTH] and [0.5+MIDPOINT_WINDOW_WIDTH]
-	defineConstant("LIVEPLOT", T);
+	defineConstant("LIVEPLOT", F);
 	defineConstant("UPPERBOUND",10000);
 
 	if (LIVEPLOT){
