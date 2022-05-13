@@ -5,7 +5,7 @@ initialize() {
 	initializeSex("A");
 	
 	// Parameters that can be changed at the command line
-	defineCfgParam("a", 0.07);
+	defineCfgParam("a", 0.2);
 	defineCfgParam("sigma",0.01);
 	defineCfgParam("k", 0.2);
 	defineCfgParam("u_hat", 0.4);
@@ -102,7 +102,7 @@ function (void) defineCfgParam(string$ name, lifs value) {
 		if (exists("slimgui")) slimgui.openDocument(pngPath);		
 		
 		// over entire range
-		sim.setValue("num_drive_homozygotes", NULL); // number of drive homozygotes
+		sim.setValue("overall_drive_fitness", NULL); // d fitness
 		
 	}
 
@@ -235,19 +235,28 @@ late() {
 		
 		// count the number of drive homozygotes
 		nhomz = length(drive_homozygotes);
-		catn("GEN:: " + gen + " n_dd:: " + nhomz);
-		sim.setValue("num_drive_homozygotes", c(sim.getValue("num_drive_homozygotes"), nhomz));
+		
+		
+		// count the number of drive heterozygotes
+		nhet = length(drive_heterozygotes);
+		// W_AA*N_AA + 1/2*W_Aa*N_aa
+		overall_fitness = (drive_homozygote_fitness*nhomz) + (0.5*drive_heterozygote_fitness*nhet);
+		
+		catn("GEN:: " + gen + " n_dd:: " + nhomz + " n_dwt:: " + nhet + " fitness:: " + overall_fitness);
+		
+		
+		sim.setValue("overall_drive_fitness", c(sim.getValue("overall_drive_fitness"), overall_fitness));
 		
 		
 		// live plotting
 		if (LIVEPLOT) {
 			
-			d_d_count = sim.getValue("num_drive_homozygotes");
+			d_fitness = sim.getValue("overall_drive_fitness");
 			// PLOT OF GENOTYPE AND ALLELE COUNTS WITHIN THE WINDOW
 			rstr = paste('{',
 				'library(tidyverse)',
-				'info = tibble(generation = c(' + paste(seqLen(gen-10+1), sep = ", ") + '), number_drive_homozygotes = c(' + paste(d_d_count, sep=", ") + '))',
-				'p = ggplot(info, aes(x = generation)) + geom_line(aes(y=number_drive_homozygotes), color = "red") + ylim(0,' + UPPERBOUND +') + xlim(0, 100) + xlab("Generation") + ylab("Count") + ggtitle("Drive homozygote count")',
+				'info = tibble(generation = c(' + paste(seqLen(gen-10+1), sep = ", ") + '), drive_fitness = c(' + paste(d_fitness, sep=", ") + '))',
+				'p = ggplot(info, aes(x = generation)) + geom_line(aes(y=drive_fitness), color = "red") + ylim(0,' + UPPERBOUND +') + xlim(0, 100) + xlab("Generation") + ylab("Fitness") + ggtitle("Overall drive fitness")',
 				'png("' + pngPath + '")',
 				'print(p)',
 				'dev.off()',

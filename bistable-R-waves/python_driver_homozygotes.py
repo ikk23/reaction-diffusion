@@ -1,7 +1,8 @@
 from argparse import ArgumentParser
 from slimutil import run_slim, configure_slim_command_line
 
-# For a given value of a, run SLiM nreps times and track the total number of drive homozygotes over time
+# For a given value of a, run SLiM nreps times and track 
+# the number of homozygotes, heterozygotes, and drive allele fitness over time
 
 # Make sure slimutil.py is also transferred to this cluster directory
 
@@ -22,7 +23,9 @@ def parse_slim(slim_string, a, replicate_number):
           spaced_line = line.split()
           gen = int(spaced_line[1]) - 10
           num_dd = int(spaced_line[3])
-          csv_line = "{},{},{},{}".format(a,replicate_number,gen,num_dd)
+          num_dwt = int(spaced_line[5])
+          d_fitness = float(spaced_line[7])
+          csv_line = "{},{},{},{},{},{}".format(a,replicate_number,gen,num_dd, num_dwt, d_fitness)
           print(csv_line)
           
     return 
@@ -50,8 +53,7 @@ def main():
     args_dict = vars(parser.parse_args())
     sim_reps = args_dict.pop("num_repeats")
     
-    if args_dict.pop("print_header", None):
-      print(f"a,replicate,gen,num_dd") # 4 columns
+    print(f"a,replicate,gen,num_dd, num_dwt, d_fitness") # 6 columns
 
     # Assemble the command line arguments to use for SLiM:
     clargs = configure_slim_command_line(args_dict)
