@@ -128,7 +128,7 @@ replicate_average = function(data){
 library(tidyverse)
 plot_drive_fitness_over_time = function(replicate_avg_data){
   a = replicate_avg_data$a[1]
-  plot = ggplot(replicate_avg_data, aes(x = gen, y = avg_d_fitness)) + theme_minimal() + ggtitle(paste("a =", a, " -- 20 replicates")) + geom_line(color = "red") + ylab("Average overall drive fitness") + xlab("Generation")
+  plot = ggplot(replicate_avg_data, aes(x = gen, y = avg_d_fitness)) + theme_minimal() + ggtitle(paste("a =", a, " -- 100 replicates")) + geom_line(color = "red") + ylab("Average overall drive fitness") + xlab("Generation")
   return(plot)
 }
 ```
@@ -183,3 +183,252 @@ a0_25_plot
 ```
 
 ![](overall-drive-fitness_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+
+## May 14: Running more replicates
+
+-   Already have 20
+-   Let’s go up to 100 –> 80 more
+-   For each parameter do 3 array jobs (each will have a header): 30,
+    30, 20 replicates –> 80 total + 20 from a few days ago = 100
+
+### Files
+
+-   Text file: `may12_ndd.txt`
+-   SLURM script: `may12_ndd.sh`
+-   Python driver: `python_driver_homozygotes.py`
+-   Submitted at 12:51pm
+    -   Output will be in `/home/ikk23/underdom/out_u40/`
+
+### Compile all data
+
+#### a = 0.02
+
+``` r
+path = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/bistable-R-waves/d_fitness_results/"
+compiled_data = read_csv("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/bistable-R-waves/d_fitness_results/a0.02_results.csv")
+```
+
+    ## Rows: 824 Columns: 6
+    ## ── Column specification ────────────────────────────────────────────────────────
+    ## Delimiter: ","
+    ## dbl (6): a, replicate, gen, num_dd, num_dwt, d_fitness
+    ## 
+    ## ℹ Use `spec()` to retrieve the full column specification for this data.
+    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+
+``` r
+for (i in 1:3){
+  name = paste0(path,"a0.02_rep",i,".csv")
+  data = read_csv(name)
+  compiled_data = rbind(compiled_data, data)
+}
+```
+
+    ## Rows: 1189 Columns: 6
+    ## ── Column specification ────────────────────────────────────────────────────────
+    ## Delimiter: ","
+    ## dbl (6): a, replicate, gen, num_dd, num_dwt, d_fitness
+    ## 
+    ## ℹ Use `spec()` to retrieve the full column specification for this data.
+    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+    ## Rows: 1289 Columns: 6
+    ## ── Column specification ────────────────────────────────────────────────────────
+    ## Delimiter: ","
+    ## dbl (6): a, replicate, gen, num_dd, num_dwt, d_fitness
+    ## 
+    ## ℹ Use `spec()` to retrieve the full column specification for this data.
+    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+    ## Rows: 837 Columns: 6
+    ## ── Column specification ────────────────────────────────────────────────────────
+    ## Delimiter: ","
+    ## dbl (6): a, replicate, gen, num_dd, num_dwt, d_fitness
+    ## 
+    ## ℹ Use `spec()` to retrieve the full column specification for this data.
+    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+
+``` r
+rep_avg = replicate_average(compiled_data)
+plot = plot_drive_fitness_over_time(rep_avg)
+
+#ggsave(plot = plot, filename = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/bistable-R-waves/d_fitness_results/a0.02_100_replicates.png")
+```
+
+``` r
+knitr::include_graphics("../bistable-R-waves/d_fitness_results/a0.02_100_replicates.png")
+```
+
+![](../bistable-R-waves/d_fitness_results/a0.02_100_replicates.png)<!-- -->
+
+#### a = 0.07
+
+``` r
+path = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/bistable-R-waves/d_fitness_results/"
+compiled_data = read_csv("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/bistable-R-waves/d_fitness_results/a0.07_results.csv")
+```
+
+    ## Rows: 1912 Columns: 6
+    ## ── Column specification ────────────────────────────────────────────────────────
+    ## Delimiter: ","
+    ## dbl (6): a, replicate, gen, num_dd, num_dwt, d_fitness
+    ## 
+    ## ℹ Use `spec()` to retrieve the full column specification for this data.
+    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+
+``` r
+for (i in 1:3){
+  name = paste0(path,"a0.07_rep",i,".csv")
+  data = read_csv(name)
+  compiled_data = rbind(compiled_data, data)
+}
+```
+
+    ## Rows: 2944 Columns: 6
+    ## ── Column specification ────────────────────────────────────────────────────────
+    ## Delimiter: ","
+    ## dbl (6): a, replicate, gen, num_dd, num_dwt, d_fitness
+    ## 
+    ## ℹ Use `spec()` to retrieve the full column specification for this data.
+    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+    ## Rows: 2926 Columns: 6
+    ## ── Column specification ────────────────────────────────────────────────────────
+    ## Delimiter: ","
+    ## dbl (6): a, replicate, gen, num_dd, num_dwt, d_fitness
+    ## 
+    ## ℹ Use `spec()` to retrieve the full column specification for this data.
+    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+    ## Rows: 1988 Columns: 6
+    ## ── Column specification ────────────────────────────────────────────────────────
+    ## Delimiter: ","
+    ## dbl (6): a, replicate, gen, num_dd, num_dwt, d_fitness
+    ## 
+    ## ℹ Use `spec()` to retrieve the full column specification for this data.
+    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+
+``` r
+rep_avg = replicate_average(compiled_data)
+plot = plot_drive_fitness_over_time(rep_avg)
+
+#ggsave(plot = plot, filename = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/bistable-R-waves/d_fitness_results/a0.07_100_replicates.png")
+```
+
+``` r
+knitr::include_graphics("../bistable-R-waves/d_fitness_results/a0.07_100_replicates.png")
+```
+
+![](../bistable-R-waves/d_fitness_results/a0.07_100_replicates.png)<!-- -->
+#### a = 0.1
+
+``` r
+path = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/bistable-R-waves/d_fitness_results/"
+compiled_data = read_csv("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/bistable-R-waves/d_fitness_results/a0.1_results.csv")
+```
+
+    ## Rows: 2020 Columns: 6
+    ## ── Column specification ────────────────────────────────────────────────────────
+    ## Delimiter: ","
+    ## dbl (6): a, replicate, gen, num_dd, num_dwt, d_fitness
+    ## 
+    ## ℹ Use `spec()` to retrieve the full column specification for this data.
+    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+
+``` r
+for (i in 1:3){
+  name = paste0(path,"a0.1_rep",i,".csv")
+  data = read_csv(name)
+  compiled_data = rbind(compiled_data, data)
+}
+```
+
+    ## Rows: 3030 Columns: 6
+    ## ── Column specification ────────────────────────────────────────────────────────
+    ## Delimiter: ","
+    ## dbl (6): a, replicate, gen, num_dd, num_dwt, d_fitness
+    ## 
+    ## ℹ Use `spec()` to retrieve the full column specification for this data.
+    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+    ## Rows: 3030 Columns: 6
+    ## ── Column specification ────────────────────────────────────────────────────────
+    ## Delimiter: ","
+    ## dbl (6): a, replicate, gen, num_dd, num_dwt, d_fitness
+    ## 
+    ## ℹ Use `spec()` to retrieve the full column specification for this data.
+    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+    ## Rows: 2020 Columns: 6
+    ## ── Column specification ────────────────────────────────────────────────────────
+    ## Delimiter: ","
+    ## dbl (6): a, replicate, gen, num_dd, num_dwt, d_fitness
+    ## 
+    ## ℹ Use `spec()` to retrieve the full column specification for this data.
+    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+
+``` r
+rep_avg = replicate_average(compiled_data)
+plot = plot_drive_fitness_over_time(rep_avg)
+#plot
+
+#ggsave(plot = plot, filename = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/bistable-R-waves/d_fitness_results/a0.1_100_replicates.png")
+```
+
+``` r
+knitr::include_graphics("../bistable-R-waves/d_fitness_results/a0.1_100_replicates.png")
+```
+
+![](../bistable-R-waves/d_fitness_results/a0.1_100_replicates.png)<!-- -->
+
+#### a = 0.25
+
+``` r
+path = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/bistable-R-waves/d_fitness_results/"
+compiled_data = read_csv("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/bistable-R-waves/d_fitness_results/a0.25_results.csv")
+```
+
+    ## Rows: 2020 Columns: 6
+    ## ── Column specification ────────────────────────────────────────────────────────
+    ## Delimiter: ","
+    ## dbl (6): a, replicate, gen, num_dd, num_dwt, d_fitness
+    ## 
+    ## ℹ Use `spec()` to retrieve the full column specification for this data.
+    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+
+``` r
+for (i in 1:3){
+  name = paste0(path,"a0.25_rep",i,".csv")
+  data = read_csv(name)
+  compiled_data = rbind(compiled_data, data)
+}
+```
+
+    ## Rows: 3030 Columns: 6
+    ## ── Column specification ────────────────────────────────────────────────────────
+    ## Delimiter: ","
+    ## dbl (6): a, replicate, gen, num_dd, num_dwt, d_fitness
+    ## 
+    ## ℹ Use `spec()` to retrieve the full column specification for this data.
+    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+    ## Rows: 3030 Columns: 6
+    ## ── Column specification ────────────────────────────────────────────────────────
+    ## Delimiter: ","
+    ## dbl (6): a, replicate, gen, num_dd, num_dwt, d_fitness
+    ## 
+    ## ℹ Use `spec()` to retrieve the full column specification for this data.
+    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+    ## Rows: 2020 Columns: 6
+    ## ── Column specification ────────────────────────────────────────────────────────
+    ## Delimiter: ","
+    ## dbl (6): a, replicate, gen, num_dd, num_dwt, d_fitness
+    ## 
+    ## ℹ Use `spec()` to retrieve the full column specification for this data.
+    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+
+``` r
+rep_avg = replicate_average(compiled_data)
+plot = plot_drive_fitness_over_time(rep_avg)
+
+#ggsave(plot = plot, filename = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/bistable-R-waves/d_fitness_results/a0.25_100_replicates.png")
+```
+
+``` r
+knitr::include_graphics("../bistable-R-waves/d_fitness_results/a0.25_100_replicates.png")
+```
+
+![](../bistable-R-waves/d_fitness_results/a0.25_100_replicates.png)<!-- -->

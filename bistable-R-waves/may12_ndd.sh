@@ -4,9 +4,7 @@
 #SBATCH --partition=regular
 #SBATCH --job-name=ndd
 #SBATCH --output=ndd.txt
-#SBATCH --array=1-4
-
-# Run 4 array jobs, each with 20 replicates
+#SBATCH --array=1-30
 
 # Create and move to working directory for job:
 WORKDIR=/workdir/$USER/$SLURM_JOB_ID-$SLURM_ARRAY_TASK_ID

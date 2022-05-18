@@ -46,7 +46,7 @@ def main():
     parser.add_argument('-header', '--print_header', action='store_true', default=False,
                         help='If this is set, python prints a header for a csv file.')
     parser.add_argument('-sigma', '--sigma', default=0.01, type=float,help="average dispersal distance")
-    parser.add_argument('-nreps', '--num_repeats', type=int, default=50,help="number of replicates")
+    parser.add_argument('-nreps', '--num_repeats', type=int, default=20,help="number of replicates")
     parser.add_argument('-k', '--k', default=0.2, type=float,help="selection coefficient")
     parser.add_argument('-u_hat', '--u_hat', default=0.4, type=float,help="threshold frequency")
     
