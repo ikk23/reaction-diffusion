@@ -65,4 +65,8 @@
 * [Drive fitness](bistable-R-waves/overall-drive-fitness.md)
 * [Four metrics - overall number of drive alleles, number of dd, number of dwt, and drive allele fitness](bistable-R-waves/4_graphs_5_a.md)
 
+## Diagnostics (5/21)
+
+* [Disabling viability selection in generation 10 --> number of drive alleles plots](diagnostics-may21/disable-gen10.md)
+
 
