@@ -196,6 +196,8 @@ knitr::include_graphics("../bistable-R-waves/four_plots/figures/a0.02_first_5_re
 ![](../bistable-R-waves/four_plots/figures/a0.02_first_5_replicates.png)<!-- -->
 No longer see the bump in single replicates either.
 
+This also is the case in SLiM liveplots.
+
 ## a = 0.056
 
 ``` r
@@ -559,3 +561,62 @@ knitr::include_graphics("../bistable-R-waves/four_plots/figures/a0.25_cutoff_gen
 ```
 
 ![](../bistable-R-waves/four_plots/figures/a0.25_cutoff_gen_50_4_stats.png)<!-- -->
+
+## Notes from April 19th:
+
+Recall the a vs P(increase) graph:
+
+``` r
+knitr::include_graphics("../cluster/u_hat=0.4_run/figures/revised_april19_zoomed_in_a_vs_p_increase_uhat4.png")
+```
+
+![](../cluster/u_hat=0.4_run/figures/revised_april19_zoomed_in_a_vs_p_increase_uhat4.png)<!-- -->
+
+See
+`/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.4_run/april19-uhat40_a_vs_change_in_dr_revised_model.md`
+
+The number of drive alleles change in generation 1 *wasn’t always
+positive*
+
+``` r
+knitr::include_graphics("../cluster/u_hat=0.4_run/num_drive_testing/figures/revised_slim_a_vs_change_uhat40.png")
+```
+
+![](../cluster/u_hat=0.4_run/num_drive_testing/figures/revised_slim_a_vs_change_uhat40.png)<!-- -->
+
+In single replicates, there wasn’t always an initial bump in drive
+alleles in this model.
+
+See a = 0.025 single replicate from 4/19:
+
+``` r
+knitr::include_graphics("../cluster/u_hat=0.4_run/num_drive_testing/figures/a_0.025_revised_model.png")
+```
+
+![](../cluster/u_hat=0.4_run/num_drive_testing/figures/a_0.025_revised_model.png)<!-- -->
+
+But initial non-predictive “bumps” *did* occur for some parameters
+
+ex: a = 0.05
+
+``` r
+knitr::include_graphics("../cluster/u_hat=0.4_run/num_drive_testing/figures/a_0.05_revised_model.png")
+```
+
+![](../cluster/u_hat=0.4_run/num_drive_testing/figures/a_0.05_revised_model.png)<!-- -->
+
+ex: a = 0.06
+
+``` r
+knitr::include_graphics("../cluster/u_hat=0.4_run/num_drive_testing/figures/a_0.06_revised_model.png")
+```
+
+![](../cluster/u_hat=0.4_run/num_drive_testing/figures/a_0.06_revised_model.png)<!-- -->
+
+ex: a = 0.075
+
+``` r
+knitr::include_graphics("../cluster/u_hat=0.4_run/num_drive_testing/figures/a_0.075_revised_model.png")
+```
+
+![](../cluster/u_hat=0.4_run/num_drive_testing/figures/a_0.075_revised_model.png)<!-- -->

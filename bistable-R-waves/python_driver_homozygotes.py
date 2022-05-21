@@ -2,7 +2,7 @@ from argparse import ArgumentParser
 from slimutil import run_slim, configure_slim_command_line
 
 # For a given value of a, run SLiM nreps times and track 
-# the number of homozygotes, heterozygotes, and drive allele fitness over time
+# the number of homozygotes, heterozygotes, drive allele fitness, and number of drive alleles over time
 
 # Make sure slimutil.py is also transferred to this cluster directory
 
@@ -21,11 +21,13 @@ def parse_slim(slim_string, a, replicate_number):
     for line in line_split:
         if line.startswith("GEN::"):
           spaced_line = line.split()
-          gen = int(spaced_line[1]) - 10
+          gen = int(spaced_line[1]) - 11 # 11 is the new start gen; should be 0
           num_dd = int(spaced_line[3])
           num_dwt = int(spaced_line[5])
           d_fitness = float(spaced_line[7])
-          csv_line = "{},{},{},{},{},{}".format(a,replicate_number,gen,num_dd, num_dwt, d_fitness)
+          n_d_alleles = int(spaced_line[9])
+          popsize = int(spaced_line[11])
+          csv_line = "{},{},{},{},{},{},{},{}".format(a,replicate_number,gen,num_dd, num_dwt,n_d_alleles,d_fitness, popsize)
           print(csv_line)
           
     return 
@@ -53,7 +55,7 @@ def main():
     args_dict = vars(parser.parse_args())
     sim_reps = args_dict.pop("num_repeats")
     
-    print(f"a,replicate,gen,num_dd, num_dwt, d_fitness") # 6 columns
+    print(f"a,replicate,gen,num_dd, num_dwt,num_d_alleles,d_fitness, popsize") # 8 columns
 
     # Assemble the command line arguments to use for SLiM:
     clargs = configure_slim_command_line(args_dict)

@@ -1,0 +1,35 @@
+#!/bin/bash -l
+#SBATCH --ntasks=1
+#SBATCH --mem=1000
+#SBATCH --partition=regular
+#SBATCH --job-name=may21
+#SBATCH --output=may21.txt
+#SBATCH --array=1-32
+
+# Create and move to working directory for job:
+WORKDIR=/workdir/$USER/$SLURM_JOB_ID-$SLURM_ARRAY_TASK_ID
+mkdir -p $WORKDIR
+cd $WORKDIR
+
+# Copy files over to working directory:
+# Need the python driver, the slim model, the slimutil script, and the text file with command line arguments
+BASE_DIR=/home/ikk23
+cp $BASE_DIR/underdom/main_scripts/python_driver_disable_gen10.py .
+cp $BASE_DIR/underdom/main_scripts/nonWF-model-drive-homozygotes.slim .
+cp $BASE_DIR/underdom/main_scripts/slimutil.py .
+cp $BASE_DIR/underdom/text_files/may21-slurm-text.txt .
+
+# Include SLiM in the path
+PATH=$PATH:/home/ikk23/SLiM/SLiM_build
+export PATH
+
+# Only the first .part file has the header
+# Output all files into an output-specific folder
+prog=`sed -n "${SLURM_ARRAY_TASK_ID}p" may21-slurm-text.txt`
+$prog > ${SLURM_ARRAY_TASK_ID}.csv
+cp ${SLURM_ARRAY_TASK_ID}.csv $BASE_DIR/underdom/out_u40
+
+# Will need to merge later
+
+# Clean up working directory:
+rm -r $WORKDIR

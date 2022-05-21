@@ -5,7 +5,7 @@ initialize() {
 	initializeSex("A");
 	
 	// Parameters that can be changed at the command line
-	defineCfgParam("a", 0.2);
+	defineCfgParam("a", 0.07);
 	defineCfgParam("sigma",0.01);
 	defineCfgParam("k", 0.2);
 	defineCfgParam("u_hat", 0.4);
@@ -41,7 +41,7 @@ initialize() {
 
 	// Plot the number of drive alleles, drive homozygotes, and drive heterozygotes
 	// between [0.5-MIDPOINT_WINDOW_WIDTH] and [0.5+MIDPOINT_WINDOW_WIDTH]
-	defineConstant("LIVEPLOT", F);
+	defineConstant("LIVEPLOT", T);
 	defineConstant("UPPERBOUND",10000);
 
 	if (LIVEPLOT){
@@ -103,6 +103,7 @@ function (void) defineCfgParam(string$ name, lifs value) {
 		
 		// over entire range
 		sim.setValue("overall_drive_fitness", NULL); // d fitness
+		sim.setValue("number_of_drive_alleles", NULL);
 		
 	}
 
@@ -182,10 +183,14 @@ early() {
 	all = p1.individuals;
 	all[all.age > 0].fitnessScaling = 0.0;
 	
-	juveniles = all[all.age==0];
+	
+	// Disable this in generation 10:
+	if (sim.generation != 10){
+		juveniles = all[all.age==0];
 		
 	// probability of juvenial survival is now dependent on relative fitness value
-	juveniles.fitnessScaling = juveniles.tagF/drive_homozygote_fitness; 
+		juveniles.fitnessScaling = juveniles.tagF/drive_homozygote_fitness;  // should this be divided by mean(W)?
+	}
 }
 
 
@@ -242,21 +247,22 @@ late() {
 		// W_AA*N_AA + 1/2*W_Aa*N_aa
 		overall_fitness = (drive_homozygote_fitness*nhomz) + (0.5*drive_heterozygote_fitness*nhet);
 		
-		catn("GEN:: " + gen + " n_dd:: " + nhomz + " n_dwt:: " + nhet + " fitness:: " + overall_fitness);
+		
+		catn("GEN:: " + gen + " n_dd:: " + nhomz + " n_dwt:: " + nhet + " fitness:: " + overall_fitness +" number_of_drive_alleles:: " + num_drive_alleles + " popsize:: " + N);
 		
 		
 		sim.setValue("overall_drive_fitness", c(sim.getValue("overall_drive_fitness"), overall_fitness));
-		
+		sim.setValue("number_of_drive_alleles", c(sim.getValue("number_of_drive_alleles"),num_drive_alleles));
 		
 		// live plotting
 		if (LIVEPLOT) {
 			
-			d_fitness = sim.getValue("overall_drive_fitness");
+			d_allele_num = sim.getValue("number_of_drive_alleles");
 			// PLOT OF GENOTYPE AND ALLELE COUNTS WITHIN THE WINDOW
 			rstr = paste('{',
 				'library(tidyverse)',
-				'info = tibble(generation = c(' + paste(seqLen(gen-10+1), sep = ", ") + '), drive_fitness = c(' + paste(d_fitness, sep=", ") + '))',
-				'p = ggplot(info, aes(x = generation)) + geom_line(aes(y=drive_fitness), color = "red") + ylim(0,' + UPPERBOUND +') + xlim(0, 100) + xlab("Generation") + ylab("Fitness") + ggtitle("Overall drive fitness")',
+				'info = tibble(generation = c(' + paste(seqLen(gen-10+1), sep = ", ") + '), num_drive_alleles = c(' + paste(d_allele_num, sep=", ") + '))',
+				'p = ggplot(info, aes(x = generation)) + geom_line(aes(y=num_drive_alleles), color = "red") + ylim(0,' + UPPERBOUND +') + xlim(0, 100) + xlab("Generation") + ylab("Number of drive alleles") + ggtitle("Overall drive allele count")',
 				'png("' + pngPath + '")',
 				'print(p)',
 				'dev.off()',
@@ -297,4 +303,4 @@ late() {
 
 
 //Stop the simulation after 100 generations
-110 late() { sim.simulationFinished(); }
+111 late() { sim.simulationFinished(); }
