@@ -59,3 +59,10 @@
 * [uhat=40% windowed drive analysis on the cluster for 5 values of a on 4/20](cluster/u_hat=0.4_run/april20-uhat40_windowed_drive_counts.md)
 * [uhat=40% analysis of u(t) in the small window for 5 values of a on 4/20](cluster/u_hat=0.4_run/april20-ut_windowed_uhat40.md)
 
+
+## Drive allele fitness and other metrics (5/15+)
+
+* [Drive fitness](bistable-R-waves/overall-drive-fitness.md)
+* [Four metrics - overall number of drive alleles, number of dd, number of dwt, and drive allele fitness](bistable-R-waves/4_graphs_5_a.md)
+
+
