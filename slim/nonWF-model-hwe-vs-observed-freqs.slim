@@ -1,0 +1,428 @@
+// 1D simulation with periodic boundaries, sexual reproduction, non-overlapping generations, male reproductive success based on fitness, and female fecundity based on fitness and local density
+initialize() {
+	initializeSLiMModelType("nonWF");
+	initializeSLiMOptions(dimensionality="x", periodicity="x");
+	initializeSex("A");
+	
+	// Parameters that can be changed at the command line
+	defineCfgParam("a", 0.0688);
+	defineCfgParam("sigma",0.01);
+	defineCfgParam("k", 0.2);
+	defineCfgParam("u_hat", 0.4);
+	// save the boundaries for the drive release
+	defineConstant("drive_x_min", 0.5 - (a/2));
+	defineConstant("drive_x_max", 0.5 + (a/2));
+	defineConstant("DRIVE_RELEASE_GENERATION",10); // when to release the drive
+	defineConstant("alpha", 1 - 2*u_hat);
+	defineConstant("beta", a/sigma);
+	catn("-----------------------------------");
+	catn("a = " + a + " sigma = " + sigma + " so beta = " + beta);
+	defineConstant("m", 0.001); // mating radius
+	catn("-----------------------------------");
+	print(paste("Frequency threshold of:", u_hat, " and alpha of: " + alpha));
+	defineConstant("POPSIZE", 30000);
+	defineConstant("CHROM_LENGTH", 1);
+	d_d_fitness = 	1 + (2*alpha*k);
+	d_wt_fitness = 1 + ((alpha-1)*k);
+	wt_wt_fitness = 1;
+	fitnesses = c(d_d_fitness, d_wt_fitness, wt_wt_fitness);
+	defineConstant("drive_homozygote_fitness", fitnesses[0]);
+	defineConstant("drive_heterozygote_fitness", fitnesses[1]);
+	defineConstant("wt_homozygote_fitness", fitnesses[2]);
+	
+	print(paste("d/d fitness:",drive_homozygote_fitness, "d/wt fitness:", drive_heterozygote_fitness, "wt/wt fitness:", wt_homozygote_fitness));
+	catn("-----------------------------------");
+	
+	defineConstant("GROWTH_AT_ZERO_DENSITY", 2);
+	defineConstant("EXPONENT_OF_COMPETITION_FACTOR", 1);
+	defineConstant("EXPECTED_ADULT_COMPETITION", POPSIZE*(2*m));
+	catn("-----------------------------------");
+	catn("EXPECTED_ADULT_COMPETITION when m is " + m + " = " + EXPECTED_ADULT_COMPETITION);
+	
+	defineConstant("OUTPUT_WINDOW_POINTS", T); // only output the rate of the drive at specific points
+	defineConstant("X1", 0.47); // x < -a/2
+	defineConstant("X2", 0.5); // -a/2 <= x <= a/2
+	defineConstant("X3", 0.54); // x > a/2
+	defineConstant("LAST_GEN_FREQ", T);
+	defineConstant("USE_SCALED_FITNESS", T);
+	// Plot the number of drive alleles, drive homozygotes, and drive heterozygotes
+	// between [0.5-MIDPOINT_WINDOW_WIDTH] and [0.5+MIDPOINT_WINDOW_WIDTH]
+	defineConstant("LIVEPLOT", F);
+	defineConstant("MIDPOINT_WINDOW_WIDTH", 0.0005);
+	defineConstant("window_lower", 0.5 - MIDPOINT_WINDOW_WIDTH);
+	defineConstant("window_upper", 0.5 + MIDPOINT_WINDOW_WIDTH);
+	if (LIVEPLOT){
+		if (fileExists("/usr/bin/Rscript"))
+			defineConstant("RSCRIPT", "/usr/bin/Rscript");
+		else if (fileExists("/usr/local/bin/Rscript"))
+			defineConstant("RSCRIPT", "/usr/local/bin/Rscript");
+		else
+			stop("Couldn't find Rscript.");
+	}
+	
+	// CHECKS	
+	defineConstant("EXPECTED_NUM_OFFSPRING_MULTIPLIER", 2.0); // this*p is used in the Poisson distribution if VIABILITY_SELECTION=True
+	defineConstant("PANMICTIC_CHECK", F); // remove all spatial processes
+	// don't use if VIABILITY_SELECTION is true
+	defineConstant("RELEASE_DRIVE_EVERYWHERE", F); // if F, only release between -a/2 and a/2
+	defineConstant("b", 0.45); // intro frequency if RELEASE_DRIVE_EVERYWHERE is true. If not, this is 1 inside the release square.
+	
+	// Chromosome of length 1. The mutation can either be drive or wt.
+	initializeMutationRate(0.0);
+	initializeRecombinationRate(0.0);
+	wt = initializeMutationType("m1", 0.5, "f", 0.0);
+	dr = initializeMutationType("m2", 0.5, "f", 0.0);
+	variations = c(wt, dr);
+	
+	variations.mutationStackPolicy = "l";
+	variations.mutationStackGroup = 1;
+	
+	initializeGenomicElementType("g1", variations, c(1, 1));
+	initializeGenomicElement(g1, 0, CHROM_LENGTH-1);
+	
+	// Interaction for mating and local competition
+	initializeInteractionType(1, "x", reciprocal=T, maxDistance=m);
+
+}
+
+//// HELPER FUNC FOR CONSTANTS THAT MAY ASLO BE CONFIGURED VIA COMMAND LINE.
+function (void) defineCfgParam(string$ name, lifs value) {
+	if (!exists(name))
+		defineConstant(name, value);
+}
+
+
+1 {
+	sim.addSubpop("p1", POPSIZE);
+	
+	all = p1.individuals;
+	all.x = runif(POPSIZE, min = 0, max = 1);
+	
+	all.genomes.addNewDrawnMutation(m1, seqLen(CHROM_LENGTH));
+	all.tagF = wt_homozygote_fitness;
+	
+	if (LIVEPLOT){
+		
+		// PATH TO PLOT FOR GENOTYPE COUNTS
+		defineConstant("pngPath", writeTempFile("plot_", ".png", ""));
+		// If we're running in SLiMgui, open a plot window
+		if (exists("slimgui")) slimgui.openDocument(pngPath);
+		
+		// PATH TO PLOT FOR OVERALL DRIVE RATE
+		defineConstant("pngPathForDriveRate",writeTempFile("plot2_", ".png", ""));
+		if (exists("slimgui")) slimgui.openDocument(pngPathForDriveRate);
+		
+		// PATH TO PLOT FOR THE DRIVE FREQUENCY WITHIN THE WINDOW
+		defineConstant("pngPathForu",writeTempFile("plot3_", ".png", ""));
+		if (exists("slimgui")) slimgui.openDocument(pngPathForu);
+	
+	}
+
+}
+
+reproduction(NULL, "F") {
+	
+	
+	if (!PANMICTIC_CHECK){
+		all_neighbors = i1.nearestNeighbors(individual, subpop.individualCount);
+		neighbors = all_neighbors[all_neighbors.sex == "M"]; // male neighbors
+		num_neighbors = length(neighbors);
+		// females in empty areas cannot mate
+		if (num_neighbors == 0){
+			catn("empty area - can't mate"); // should be rare
+			return;
+		}
+		// sample any random male from the mating radius
+		mate_id = sample(x = seqLen(num_neighbors), size = 1);
+		selected_mate = neighbors[mate_id];
+	} else {
+		// male can be anywhere if this is panmictic
+		all = p1.individuals;
+		males = all[all.sex=="M"];
+		mate_id = sample(x = seqLen(length(males)), size = 1);
+		selected_mate = males[mate_id];
+	}
+	
+	// the expected number of offspring depends on the number of individuals surrounding the female
+	if (!PANMICTIC_CHECK){
+		adult_density_force = i1.totalOfNeighborStrengths(individual);
+		competition_ratio = adult_density_force / EXPECTED_ADULT_COMPETITION;
+		actual_competition_factor = GROWTH_AT_ZERO_DENSITY/ ((GROWTH_AT_ZERO_DENSITY-1) * competition_ratio + 1);
+		actual_competition_factor_exponentiated = actual_competition_factor^EXPONENT_OF_COMPETITION_FACTOR;
+		p = actual_competition_factor_exponentiated; // fitness doesn't affect fecundity, but the # offspring is
+		expected_value = p*EXPECTED_NUM_OFFSPRING_MULTIPLIER;
+	} else {
+		expected_value = 2;
+	}
+	
+	num_offspring = rpois(1,expected_value);
+	
+	for (i in seqLen(num_offspring)) {
+		offspring = subpop.addCrossed(individual, selected_mate);
+	}
+
+}
+
+1: modifyChild() {
+	
+	// tag the child with their fitness value
+	gen = sim.generation;
+	wildtype = child.countOfMutationsOfType(m1) == 2*CHROM_LENGTH;
+	drive_hom = child.countOfMutationsOfType(m2) == 2*CHROM_LENGTH;
+	drive_het = (child.countOfMutationsOfType(m1) == CHROM_LENGTH) & (child.countOfMutationsOfType(m2) == CHROM_LENGTH);
+	if (wildtype){
+		child.tagF = wt_homozygote_fitness;
+	} else if (drive_hom) {
+		child.tagF = drive_homozygote_fitness;
+	} else if (drive_het) {
+		child.tagF = drive_heterozygote_fitness;
+	} else {
+		print("Unknown genotype -- there are " + child.countOfMutationsOfType(m1) + " wt mutations and " + child.countOfMutationsOfType(m2) + " drives"); // check - should never happen
+	}
+	
+	position = parent1.x; // no displacement here
+	
+	child.setSpatialPosition(p1.pointPeriodic(position));
+	
+	return T;
+}
+
+
+// Kill off adults and let juvenile survival depend on their genotype fitness value relative to d/d
+early() {
+	
+	gen = sim.generation;
+	all = p1.individuals;
+	all[all.age > 0].fitnessScaling = 0.0;
+	
+	juveniles = all[all.age==0];
+	
+	// probability of juvenial survival is now dependent on relative fitness value
+	if (!USE_SCALED_FITNESS){
+		juveniles.fitnessScaling = juveniles.tagF/drive_homozygote_fitness;
+	} else {
+		
+		drive_homozygotes = all[all.countOfMutationsOfType(m2) == 2*CHROM_LENGTH];
+		drive_heterozygotes = all[all.countOfMutationsOfType(m2)==CHROM_LENGTH];
+		wildtypes = all[all.countOfMutationsOfType(m1) == 2*CHROM_LENGTH];
+		drive_allele_freq = (2*length(drive_homozygotes) + length(drive_heterozygotes))/(2*p1.individualCount);
+		mean_fitness = (drive_homozygote_fitness* (drive_allele_freq^2)) + (drive_heterozygote_fitness*2*drive_allele_freq*(1-drive_allele_freq)) + (wt_homozygote_fitness*(1-drive_allele_freq)^2);
+		
+		//catn("GENERATION " + sim.generation);
+		//catn("BEFORE VIABILITY SELECTION, THE RATE OF THE DRIVE IS:: " + drive_allele_freq);
+		
+		
+		
+		if (gen >= 11){
+			// GET THE PREDICTED FREQUENCIES FOR THE END OF THE SIMULATION
+			// X1: x < -a/2
+			all_x1 = all[all.x >= X1-MIDPOINT_WINDOW_WIDTH & all.x <= X1+MIDPOINT_WINDOW_WIDTH];
+			Nx1 = length(all_x1); // total in window
+			drive_homz_x1 = drive_homozygotes[drive_homozygotes.x >= X1-MIDPOINT_WINDOW_WIDTH  & drive_homozygotes.x <= X1+MIDPOINT_WINDOW_WIDTH];
+			drive_hetz_x1 = drive_heterozygotes[drive_heterozygotes.x >= X1-MIDPOINT_WINDOW_WIDTH & drive_heterozygotes.x <= X1+MIDPOINT_WINDOW_WIDTH];
+			wildtypes_x1 = wildtypes[wildtypes.x >= X1-MIDPOINT_WINDOW_WIDTH & wildtypes.x <= X1+MIDPOINT_WINDOW_WIDTH];
+			r = (2*length(drive_homz_x1) + length(drive_hetz_x1))/(2*Nx1);
+			x1_mean_fitness = (drive_homozygote_fitness* (r^2)) + (drive_heterozygote_fitness*2*r*(1-r)) + (wt_homozygote_fitness*(1-r)^2);
+			x1_predicted_drive_allele_freq = (1/x1_mean_fitness)*((drive_homozygote_fitness*(r^2)) + (drive_heterozygote_fitness * r*(1 - r)));
+			x1_predicted_viability_DD_freq = (drive_homozygote_fitness/x1_mean_fitness)*(r^2);
+			x1_predicted_viability_DWT_freq = (drive_heterozygote_fitness/x1_mean_fitness)*(2*r*(1-r));
+			x1_predicted_viability_WT_freq = (wt_homozygote_fitness/x1_mean_fitness)*(1-r)^2;
+			
+			if (gen == 11){
+				sim.setValue("early_x1_drive_freq", c(r));
+				sim.setValue("early_x1_dd_freq", c(x1_predicted_viability_DD_freq));
+				sim.setValue("early_x1_dwt_freq", c(x1_predicted_viability_DWT_freq));
+				sim.setValue("early_x1_wtwt_freq", c(x1_predicted_viability_WT_freq));
+			} else {
+				sim.setValue("early_x1_drive_freq", c(sim.getValue("early_x1_drive_freq"),r));
+				sim.setValue("early_x1_dd_freq", c(sim.getValue("early_x1_dd_freq"),x1_predicted_viability_DD_freq));
+				sim.setValue("early_x1_dwt_freq", c(sim.getValue("early_x1_dwt_freq"),x1_predicted_viability_DWT_freq));
+				sim.setValue("early_x1_wtwt_freq", c(sim.getValue("early_x1_wtwt_freq"),x1_predicted_viability_WT_freq));
+			}
+			
+			// X2: -a/2 <= x <= a/2
+			all_x2 = all[all.x >= X2-MIDPOINT_WINDOW_WIDTH & all.x <= X2+MIDPOINT_WINDOW_WIDTH];
+			Nx2 = length(all_x2); // total in window
+			drive_homz_x2 = drive_homozygotes[drive_homozygotes.x >= X2-MIDPOINT_WINDOW_WIDTH  & drive_homozygotes.x <= X2+MIDPOINT_WINDOW_WIDTH];
+			drive_hetz_x2 = drive_heterozygotes[drive_heterozygotes.x >= X2-MIDPOINT_WINDOW_WIDTH & drive_heterozygotes.x <= X2+MIDPOINT_WINDOW_WIDTH];
+			wildtypes_x2 = wildtypes[wildtypes.x >= X2-MIDPOINT_WINDOW_WIDTH & wildtypes.x <= X2+MIDPOINT_WINDOW_WIDTH];
+			r = (2*length(drive_homz_x2) + length(drive_hetz_x2))/(2*Nx2);
+			x2_predicted_HWE_DD_freq = r^2;
+			x2_predicted_HWE_DWT_freq = 2*r*(1-r);
+			x2_predicted_HWE_WT_freq = (1-r)^2;
+			x2_mean_fitness = (drive_homozygote_fitness*x2_predicted_HWE_DD_freq) + (drive_heterozygote_fitness*x2_predicted_HWE_DWT_freq) + (wt_homozygote_fitness*x2_predicted_HWE_WT_freq);
+			x2_predicted_drive_allele_freq = (1/x2_mean_fitness)*((drive_homozygote_fitness*(r^2)) + (drive_heterozygote_fitness * r*(1 - r)));
+			x2_predicted_viability_DD_freq = (drive_homozygote_fitness/x2_mean_fitness)*x2_predicted_HWE_DD_freq;
+			x2_predicted_viability_DWT_freq = (drive_heterozygote_fitness/x2_mean_fitness)*x2_predicted_HWE_DWT_freq;
+			x2_predicted_viability_WT_freq = (wt_homozygote_fitness/x2_mean_fitness)*x2_predicted_HWE_WT_freq;
+			
+			if (gen == 11){
+				sim.setValue("early_x2_drive_freq", c(r));
+				sim.setValue("early_x2_dd_freq", c(x2_predicted_viability_DD_freq));
+				sim.setValue("early_x2_dwt_freq", c(x2_predicted_viability_DWT_freq));
+				sim.setValue("early_x2_wtwt_freq", c(x2_predicted_viability_WT_freq));
+			} else {
+				sim.setValue("early_x2_drive_freq", c(sim.getValue("early_x2_drive_freq"),r));
+				sim.setValue("early_x2_dd_freq", c(sim.getValue("early_x2_dd_freq"),x2_predicted_viability_DD_freq));
+				sim.setValue("early_x2_dwt_freq", c(sim.getValue("early_x2_dwt_freq"),x2_predicted_viability_DWT_freq));
+				sim.setValue("early_x2_wtwt_freq", c(sim.getValue("early_x2_wtwt_freq"),x2_predicted_viability_WT_freq));
+			}
+			
+			// X3: x > a/2
+			all_x3 = all[all.x >= X3-MIDPOINT_WINDOW_WIDTH & all.x <= X3+MIDPOINT_WINDOW_WIDTH];
+			Nx3 = length(all_x3); // total in window
+			drive_homz_x3 = drive_homozygotes[drive_homozygotes.x >= X3-MIDPOINT_WINDOW_WIDTH  & drive_homozygotes.x <= X3+MIDPOINT_WINDOW_WIDTH];
+			drive_hetz_x3 = drive_heterozygotes[drive_heterozygotes.x >= X3-MIDPOINT_WINDOW_WIDTH & drive_heterozygotes.x <= X3+MIDPOINT_WINDOW_WIDTH];
+			wildtypes_x3 = wildtypes[wildtypes.x >= X3-MIDPOINT_WINDOW_WIDTH & wildtypes.x <= X3+MIDPOINT_WINDOW_WIDTH];
+			r = (2*length(drive_homz_x3) + length(drive_hetz_x3))/(2*Nx3);
+			x3_predicted_HWE_DD_freq = r^2;
+			x3_predicted_HWE_DWT_freq = 2*r*(1-r);
+			x3_predicted_HWE_WT_freq = (1-r)^2;
+			x3_mean_fitness = (drive_homozygote_fitness*x3_predicted_HWE_DD_freq) + (drive_heterozygote_fitness*x3_predicted_HWE_DWT_freq) + (wt_homozygote_fitness*x3_predicted_HWE_WT_freq);
+			x3_predicted_drive_allele_freq = (1/x3_mean_fitness)*((drive_homozygote_fitness*(r^2)) + (drive_heterozygote_fitness * r*(1 - r)));
+			x3_predicted_viability_DD_freq = (drive_homozygote_fitness/x3_mean_fitness)*x3_predicted_HWE_DD_freq;
+			x3_predicted_viability_DWT_freq = (drive_heterozygote_fitness/x3_mean_fitness)*x3_predicted_HWE_DWT_freq;
+			x3_predicted_viability_WT_freq = (wt_homozygote_fitness/x3_mean_fitness)*x3_predicted_HWE_WT_freq;
+			if (gen == 11){
+				sim.setValue("early_x3_drive_freq", c(r));
+				sim.setValue("early_x3_dd_freq", c(x3_predicted_viability_DD_freq));
+				sim.setValue("early_x3_dwt_freq", c(x3_predicted_viability_DWT_freq));
+				sim.setValue("early_x3_wtwt_freq", c(x3_predicted_viability_WT_freq));
+			} else {
+				sim.setValue("early_x3_drive_freq", c(sim.getValue("early_x3_drive_freq"),r));
+				sim.setValue("early_x3_dd_freq", c(sim.getValue("early_x3_dd_freq"),x3_predicted_viability_DD_freq));
+				sim.setValue("early_x3_dwt_freq", c(sim.getValue("early_x3_dwt_freq"),x3_predicted_viability_DWT_freq));
+				sim.setValue("early_x3_wtwt_freq", c(sim.getValue("early_x3_wtwt_freq"),x3_predicted_viability_WT_freq));
+			}
+		
+		}
+		
+		
+		juveniles.fitnessScaling = juveniles.tagF/mean_fitness;
+	
+	}
+}
+
+
+// non-WF specific
+// output the generation, population size, and frequency of the drive allele
+// evaluate spatial distances for the next round of reproduction
+// end the simulation if the drive is lost or fixed
+late() {
+	
+	gen = sim.generation;
+	all = p1.individuals;
+	N = p1.individualCount;
+	drive_homozygotes = all[all.countOfMutationsOfType(m2) == 2*CHROM_LENGTH];
+	drive_heterozygotes = all[all.countOfMutationsOfType(m2)==CHROM_LENGTH];
+	wildtypes = all[all.countOfMutationsOfType(m1) == 2*CHROM_LENGTH];
+	all.color = "blue";
+	drive_homozygotes.color = "red";
+	drive_heterozygotes.color = "orange";
+	drive_allele_freq = (2*length(drive_homozygotes) + length(drive_heterozygotes))/(2*N);
+	//catn("AFTER VIABILITY SELECTION, THE RATE OF THE DRIVE IS:: " + drive_allele_freq);
+	
+	
+	// convert all individuals within the [0.5 - a/2, 0.5 + a/2] square to drive homozygotes
+	if (gen == DRIVE_RELEASE_GENERATION){
+		all_in_range = all[all.x >= drive_x_min & all.x <= drive_x_max];
+		all_in_range.genomes.addNewDrawnMutation(m2, seqLen(CHROM_LENGTH));
+		
+		lower = min(all_in_range.x);
+		upper = max(all_in_range.x);
+		catn("Bounds of drive in generation 10: " + lower + " to " + upper);
+	}
+	
+	if (OUTPUT_WINDOW_POINTS & gen >= DRIVE_RELEASE_GENERATION){
+		
+		// X1: x < -a/2 --> observed frequencies
+		all_x1 = all[all.x >= X1-MIDPOINT_WINDOW_WIDTH & all.x <= X1+MIDPOINT_WINDOW_WIDTH];
+		Nx1 = length(all_x1); // total in window
+		drive_homz_x1 = drive_homozygotes[drive_homozygotes.x >= X1-MIDPOINT_WINDOW_WIDTH  & drive_homozygotes.x <= X1+MIDPOINT_WINDOW_WIDTH];
+		drive_hetz_x1 = drive_heterozygotes[drive_heterozygotes.x >= X1-MIDPOINT_WINDOW_WIDTH & drive_heterozygotes.x <= X1+MIDPOINT_WINDOW_WIDTH];
+		wildtypes_x1 = wildtypes[wildtypes.x >= X1-MIDPOINT_WINDOW_WIDTH & wildtypes.x <= X1+MIDPOINT_WINDOW_WIDTH];
+		x1_DD_freq = length(drive_homz_x1)/Nx1;
+		x1_DWT_freq = length(drive_hetz_x1)/Nx1;
+		x1_WT_freq = length(wildtypes_x1)/Nx1;
+		drive_allele_freq = (2*length(drive_homz_x1) + length(drive_hetz_x1))/(2*Nx1);
+ 
+		x1_predicted_rate_based_on_early = sim.getValue("early_x1_drive_freq")[length(sim.getValue("early_x1_drive_freq"))-1];
+
+		x1_predicted_viability_DD_freq = sim.getValue("early_x1_dd_freq")[length(sim.getValue("early_x1_dd_freq"))-1];
+		x1_predicted_viability_DWT_freq = sim.getValue("early_x1_dwt_freq")[length(sim.getValue("early_x1_dwt_freq"))-1];
+		x1_predicted_viability_WT_freq = sim.getValue("early_x1_wtwt_freq")[length(sim.getValue("early_x1_wtwt_freq"))-1];
+
+		// Output
+		catn("X1:: " + X1+" GEN:: " + sim.generation + " obs_drive_freq:: " + drive_allele_freq + " predicted_viability_drive_freq:: " + x1_predicted_rate_based_on_early + " obs_freq(DD):: " + x1_DD_freq + " viability_exp_freq(DD):: " + x1_predicted_viability_DD_freq + " obs_freq(DWT):: " + x1_DWT_freq  + " viability_exp_freq(DWT):: " + x1_predicted_viability_DWT_freq + " obs_freq(WT):: " + x1_WT_freq  + " viability_exp_freq(WT):: " + x1_predicted_viability_WT_freq);
+		
+		
+		// X2: -a/2 <= x <= a/2
+		all_x2 = all[all.x >= X2-MIDPOINT_WINDOW_WIDTH & all.x <= X2+MIDPOINT_WINDOW_WIDTH];
+		Nx2 = length(all_x2); // total in window
+		drive_homz_x2 = drive_homozygotes[drive_homozygotes.x >= X2-MIDPOINT_WINDOW_WIDTH  & drive_homozygotes.x <= X2+MIDPOINT_WINDOW_WIDTH];
+		drive_hetz_x2 = drive_heterozygotes[drive_heterozygotes.x >= X2-MIDPOINT_WINDOW_WIDTH & drive_heterozygotes.x <= X2+MIDPOINT_WINDOW_WIDTH];
+		wildtypes_x2 = wildtypes[wildtypes.x >= X2-MIDPOINT_WINDOW_WIDTH & wildtypes.x <= X2+MIDPOINT_WINDOW_WIDTH];
+		x2_DD_freq = length(drive_homz_x2)/Nx2;
+		x2_DWT_freq = length(drive_hetz_x2)/Nx2;
+		x2_WT_freq = length(wildtypes_x2)/Nx2;
+		drive_allele_freq = (2*length(drive_homz_x2) + length(drive_hetz_x2))/(2*Nx2);
+
+		x2_predicted_rate_based_on_early = sim.getValue("early_x2_drive_freq")[length(sim.getValue("early_x2_drive_freq"))-1];
+
+		x2_predicted_viability_DD_freq = sim.getValue("early_x2_dd_freq")[length(sim.getValue("early_x2_dd_freq"))-1];
+		x2_predicted_viability_DWT_freq = sim.getValue("early_x2_dwt_freq")[length(sim.getValue("early_x2_dwt_freq"))-1];
+		x2_predicted_viability_WT_freq = sim.getValue("early_x2_wtwt_freq")[length(sim.getValue("early_x2_wtwt_freq"))-1];
+
+		// Output
+		catn("X2:: " + X2 + " GEN:: " + sim.generation + " obs_drive_freq:: " + drive_allele_freq + " predicted_viability_drive_freq:: " + x2_predicted_rate_based_on_early + " obs_freq(DD):: " + x2_DD_freq  + " viability_exp_freq(DD):: " + x2_predicted_viability_DD_freq + " obs_freq(DWT):: " + x2_DWT_freq  + " viability_exp_freq(DWT):: " + x2_predicted_viability_DWT_freq + " obs_freq(WT):: " + x2_WT_freq + " viability_exp_freq(WT):: " + x2_predicted_viability_WT_freq);
+		
+		
+		// X3: x > a/2
+		all_x3 = all[all.x >= X3-MIDPOINT_WINDOW_WIDTH & all.x <= X3+MIDPOINT_WINDOW_WIDTH];
+		Nx3 = length(all_x3); // total in window
+		drive_homz_x3 = drive_homozygotes[drive_homozygotes.x >= X3-MIDPOINT_WINDOW_WIDTH  & drive_homozygotes.x <= X3+MIDPOINT_WINDOW_WIDTH];
+		drive_hetz_x3 = drive_heterozygotes[drive_heterozygotes.x >= X3-MIDPOINT_WINDOW_WIDTH & drive_heterozygotes.x <= X3+MIDPOINT_WINDOW_WIDTH];
+		wildtypes_x3 = wildtypes[wildtypes.x >= X3-MIDPOINT_WINDOW_WIDTH & wildtypes.x <= X3+MIDPOINT_WINDOW_WIDTH];
+		x3_DD_freq = length(drive_homz_x3)/Nx3;
+		x3_DWT_freq = length(drive_hetz_x3)/Nx3;
+		x3_WT_freq = length(wildtypes_x3)/Nx3;
+		
+		drive_allele_freq = (2*length(drive_homz_x3) + length(drive_hetz_x3))/(2*Nx3);
+		
+		x3_predicted_rate_based_on_early = sim.getValue("early_x3_drive_freq")[length(sim.getValue("early_x3_drive_freq"))-1];
+
+		x3_predicted_viability_DD_freq = sim.getValue("early_x3_dd_freq")[length(sim.getValue("early_x3_dd_freq"))-1];
+		x3_predicted_viability_DWT_freq = sim.getValue("early_x3_dwt_freq")[length(sim.getValue("early_x3_dwt_freq"))-1];
+		x3_predicted_viability_WT_freq = sim.getValue("early_x3_wtwt_freq")[length(sim.getValue("early_x3_wtwt_freq"))-1];
+
+		// Output
+		catn("X3:: " + X3 +" GEN:: " + sim.generation +  " obs_drive_freq:: " + drive_allele_freq + " predicted_viability_drive_freq:: " + x3_predicted_rate_based_on_early + " obs_freq(DD):: " + x3_DD_freq  + " viability_exp_freq(DD):: " + x3_predicted_viability_DD_freq + " obs_freq(DWT):: " + x3_DWT_freq  + " viability_exp_freq(DWT):: " + x3_predicted_viability_DWT_freq + " obs_freq(WT):: " + x3_WT_freq   + " viability_exp_freq(WT):: " + x3_predicted_viability_WT_freq);
+		
+		
+	
+	}
+	
+	
+	// DISPERSAL
+	for (ind in all){
+		distance = rexp(1,mu = sigma);
+		// if this draw is 1, go right. If it's 0, go left.
+		right = rbinom(1, 1, 0.5);
+		if (right){
+			position = ind.x + distance;
+		} else {
+			position = ind.x - distance;
+		}
+		ind.setSpatialPosition(p1.pointPeriodic(position));
+	}
+	
+	
+	if (!PANMICTIC_CHECK){
+		i1.evaluate();
+	}
+
+}
+
+
+//Stop the simulation after 100 generations
+110 late() { sim.simulationFinished(); }

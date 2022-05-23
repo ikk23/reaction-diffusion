@@ -452,3 +452,75 @@ res = compile_and_average_csvs_and_plot(a=0.25, cutoff_gen = 50)
 knitr::include_graphics("../diagnostics-may21/plots/a0.25_num_drive_alleles_cutoff_gen50.png")
 ```
 
+## Plot the 4 metrics for a = 0.0688 and 0.07 (why the weird V?)
+
+### Function for plotting
+```{r}
+plot_four_stats = function(avg_data, p_increase,cutoff_gen = 10,save_data = TRUE){
+  short_data = avg_data %>% filter(gen <= cutoff_gen)
+  a = short_data$a[1]
+  # Need to manipulate the dataset for color-plotting
+  n = 4*(cutoff_gen+1)
+  gen_vector = rep(-1,n)
+  count_vector = rep(-1,n)
+  statistic_vector = rep("*",n)
+  gen_starts = seq(1, n, by=4)
+  for (i in 1:length(gen_starts)){
+    row_start = gen_starts[i]
+    row_end = row_start + 3
+    generation = i - 1 # 0-based
+    gen_vector[row_start:row_end] = rep(generation,4)
+    
+    count_vector[row_start] = avg_data$avg_num_dd[i]
+    statistic_vector[row_start] = "avg_num_dd"
+    
+    count_vector[row_start + 1] = avg_data$avg_num_dwt[i]
+    statistic_vector[row_start + 1] = "avg_num_dwt"
+    
+    count_vector[row_start+2] = avg_data$avg_num_d_alleles[i]
+    statistic_vector[row_start + 2] = "avg_num_d_alleles"
+    
+    count_vector[row_start+3] = avg_data$avg_d_fitness[i]
+    statistic_vector[row_start +3] = "avg_d_fitness"
+  }
+  
+  data_new_format = tibble(gen = gen_vector,
+                           count = count_vector,
+                           statistic = statistic_vector)
+  p = ggplot(data_new_format,aes(x = gen, y = count, color = statistic)) + geom_line() + theme_minimal() + ggtitle(paste0("a = ",a,"    P(increase) = ",p_increase*100,"%"))
+  if (save_data){
+    plot_name = paste0("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/bistable-R-waves/four_plots/figures/a",a,"_cutoff_gen_",cutoff_gen,"_4_stats.png")
+    ggsave(plot = p, filename = plot_name)
+    print(paste("Writing out",plot_name))
+  }
+  return(p)
+}
+```
+
+### a = 0.0688
+
+```{r eval=F}
+avg_data = read_csv("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/diagnostics-may21/averaged_csvs/a0.0688_averaged_csv_may_21.csv")
+p_increase = 0.52
+
+p = plot_four_stats(avg_data, p_increase, 50, FALSE)
+#ggsave(plot = p, filename = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/diagnostics-may21/plots/a0.0688_four_metrics_cutoff_gen50.png")
+```
+
+```{r}
+knitr::include_graphics("../diagnostics-may21/plots/a0.0688_four_metrics_cutoff_gen50.png")
+```
+
+### a = 0.07
+
+```{r eval=F}
+avg_data = read_csv("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/diagnostics-may21/averaged_csvs/a0.07_averaged_csv_may_21.csv")
+p_increase = 0.58
+
+p = plot_four_stats(avg_data, p_increase, 50, FALSE)
+#ggsave(plot = p, filename = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/diagnostics-may21/plots/a0.07_four_metrics_cutoff_gen50.png")
+```
+
+```{r}
+knitr::include_graphics("../diagnostics-may21/plots/a0.07_four_metrics_cutoff_gen50.png")
+```
