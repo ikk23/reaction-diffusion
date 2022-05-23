@@ -68,5 +68,6 @@
 ## Diagnostics (5/21)
 
 * [Disabling viability selection in generation 10 --> number of drive alleles plots](diagnostics-may21/disable-gen10.md)
+* [HW & viability selection predictions vs the observed genotype frequencies](compare-hwe-freqs/slim-notes.md)
 
 
