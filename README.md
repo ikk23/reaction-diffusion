@@ -62,6 +62,7 @@
 
 ## Drive allele fitness and other metrics (5/15+)
 
+* [Wave width](bistable-R-waves/wave_width.md)
 * [Drive fitness](bistable-R-waves/overall-drive-fitness.md)
 * [Four metrics - overall number of drive alleles, number of dd, number of dwt, and drive allele fitness](bistable-R-waves/4_graphs_5_a.md)
 
