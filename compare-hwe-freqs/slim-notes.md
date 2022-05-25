@@ -884,3 +884,176 @@ print(x3_percent_error_dd_plot)
 Percent error increases as the generation increases, but it’s lower than
 it was before. More faith that these HWE frequencies (with viability
 selection applied) predicts the late() frequencies well.
+
+### a = 0.0688 – fixing fitnessScaling s.t. they’re all divided by the maximum fitness. Before, whenever the fitnessScaling wAA/bar(w) value was above 1, it’d be taken as 100% survival. This made d/d and wt/wt have equal fitness.
+
+``` bash
+A=0.0688
+REPLICATE=1
+TEXT=/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/compare-hwe-freqs/slim-pc-output/a0.0688_fix_fitness.txt
+CSV=/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/compare-hwe-freqs/slim-pc-csvs/a0.0688_fix_fitness.csv
+
+python parse_slim_output.py $A $REPLICATE $TEXT > $CSV
+```
+
+``` r
+output = read_csv("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/compare-hwe-freqs/slim-pc-csvs/a0.0688_fix_fitness.csv")
+```
+
+    ## Rows: 300 Columns: 12
+    ## ── Column specification ────────────────────────────────────────────────────────
+    ## Delimiter: ","
+    ## dbl (12): a, replicate_number, x, gen, d_allele_freq, exp_d_allele_freq, dd_...
+    ## 
+    ## ℹ Use `spec()` to retrieve the full column specification for this data.
+    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+
+``` r
+x1_list = create_all_plots(output, 0.47, 50)
+```
+
+    ## Warning: Removed 50 row(s) containing missing values (geom_path).
+    ## Removed 50 row(s) containing missing values (geom_path).
+
+![](slim-notes_files/figure-gfm/unnamed-chunk-21-1.png)<!-- -->
+
+    ## Warning: Removed 50 row(s) containing missing values (geom_path).
+    ## Removed 50 row(s) containing missing values (geom_path).
+
+![](slim-notes_files/figure-gfm/unnamed-chunk-21-2.png)<!-- -->
+
+    ## Warning: Removed 50 row(s) containing missing values (geom_path).
+    ## Removed 50 row(s) containing missing values (geom_path).
+
+![](slim-notes_files/figure-gfm/unnamed-chunk-21-3.png)<!-- -->
+
+    ## Warning: Removed 50 row(s) containing missing values (geom_path).
+    ## Removed 50 row(s) containing missing values (geom_path).
+
+![](slim-notes_files/figure-gfm/unnamed-chunk-21-4.png)<!-- -->
+
+``` r
+x2_list = create_all_plots(output, 0.5, 50)
+```
+
+    ## Warning: Removed 50 row(s) containing missing values (geom_path).
+    ## Removed 50 row(s) containing missing values (geom_path).
+
+![](slim-notes_files/figure-gfm/unnamed-chunk-21-5.png)<!-- -->
+
+    ## Warning: Removed 50 row(s) containing missing values (geom_path).
+    ## Removed 50 row(s) containing missing values (geom_path).
+
+![](slim-notes_files/figure-gfm/unnamed-chunk-21-6.png)<!-- -->
+
+    ## Warning: Removed 50 row(s) containing missing values (geom_path).
+    ## Removed 50 row(s) containing missing values (geom_path).
+
+![](slim-notes_files/figure-gfm/unnamed-chunk-21-7.png)<!-- -->
+
+    ## Warning: Removed 50 row(s) containing missing values (geom_path).
+    ## Removed 50 row(s) containing missing values (geom_path).
+
+![](slim-notes_files/figure-gfm/unnamed-chunk-21-8.png)<!-- -->
+
+``` r
+x3_list = create_all_plots(output, 0.54, 50)
+```
+
+    ## Warning: Removed 50 row(s) containing missing values (geom_path).
+    ## Removed 50 row(s) containing missing values (geom_path).
+
+![](slim-notes_files/figure-gfm/unnamed-chunk-21-9.png)<!-- -->
+
+    ## Warning: Removed 50 row(s) containing missing values (geom_path).
+    ## Removed 50 row(s) containing missing values (geom_path).
+
+![](slim-notes_files/figure-gfm/unnamed-chunk-21-10.png)<!-- -->
+
+    ## Warning: Removed 50 row(s) containing missing values (geom_path).
+    ## Removed 50 row(s) containing missing values (geom_path).
+
+![](slim-notes_files/figure-gfm/unnamed-chunk-21-11.png)<!-- -->
+
+    ## Warning: Removed 50 row(s) containing missing values (geom_path).
+    ## Removed 50 row(s) containing missing values (geom_path).
+
+![](slim-notes_files/figure-gfm/unnamed-chunk-21-12.png)<!-- -->
+
+``` r
+csv_deviation_hwes = output %>% mutate(d_freq_percent_error = abs(exp_d_allele_freq-d_allele_freq)/exp_d_allele_freq,
+                                        dd_freq_percent_error = abs(exp_dd_freq - dd_freq)/exp_dd_freq,
+                                        dwt_freq_percent_error = abs(exp_dwt_freq - dwt_freq)/exp_dwt_freq,
+                                        wtwt_freq_percent_error = abs(exp_wtwt_freq - wtwt_freq)/exp_wtwt_freq)
+
+x1_percent_error_d_plot = csv_deviation_hwes %>% filter(x == 0.47) %>%
+  ggplot(aes(x = gen, y = d_freq_percent_error)) + theme_minimal() + xlab("gen") + ylab("% error") + ylim(0,1) +
+  xlim(0,50) + ggtitle("a = 0.0688 & x = 0.47 % error for d_freq") + geom_line(color = "green") 
+
+x1_percent_error_dd_plot = csv_deviation_hwes %>% filter(x == 0.47) %>%
+  ggplot(aes(x = gen, y = dd_freq_percent_error)) + theme_minimal() + xlab("gen") + ylab("% error") + ylim(0,1) +
+  xlim(0,50) + ggtitle("a = 0.0688 & x = 0.47 % error for dd_freq") + geom_line(color = "red") 
+
+
+x2_percent_error_d_plot = csv_deviation_hwes %>% filter(x == 0.5) %>%
+  ggplot(aes(x = gen, y = d_freq_percent_error)) + theme_minimal() + xlab("gen") + ylab("% error") + ylim(0,1) +
+  xlim(0,50) + ggtitle("a = 0.0688 & x = 0.5 % error for d_freq") + geom_line(color = "green") 
+
+x2_percent_error_dd_plot = csv_deviation_hwes %>% filter(x == 0.5) %>%
+  ggplot(aes(x = gen, y = dd_freq_percent_error)) + theme_minimal() + xlab("gen") + ylab("% error") + ylim(0,1) +
+  xlim(0,50) + ggtitle("a = 0.0688 & x = 0.5 % error for dd_freq") + geom_line(color = "red") 
+
+x3_percent_error_d_plot = csv_deviation_hwes %>% filter(x == 0.54) %>%
+  ggplot(aes(x = gen, y = d_freq_percent_error)) + theme_minimal() + xlab("gen") + ylab("% error") + ylim(0,1) +
+  xlim(0,50) + ggtitle("a = 0.0688 & x = 0.54 % error for d_freq") + geom_line(color = "green") 
+
+x3_percent_error_dd_plot = csv_deviation_hwes %>% filter(x == 0.54) %>%
+  ggplot(aes(x = gen, y = dd_freq_percent_error)) + theme_minimal() + xlab("gen") + ylab("% error") + ylim(0,1) +
+  xlim(0,50) + ggtitle("a = 0.0688 & x = 0.54 % error for dd_freq") + geom_line(color = "red") 
+
+print(x1_percent_error_d_plot)
+```
+
+    ## Warning: Removed 50 row(s) containing missing values (geom_path).
+
+![](slim-notes_files/figure-gfm/unnamed-chunk-22-1.png)<!-- -->
+
+``` r
+print(x1_percent_error_dd_plot)
+```
+
+    ## Warning: Removed 50 row(s) containing missing values (geom_path).
+
+![](slim-notes_files/figure-gfm/unnamed-chunk-22-2.png)<!-- -->
+
+``` r
+print(x2_percent_error_d_plot)
+```
+
+    ## Warning: Removed 50 row(s) containing missing values (geom_path).
+
+![](slim-notes_files/figure-gfm/unnamed-chunk-22-3.png)<!-- -->
+
+``` r
+print(x2_percent_error_dd_plot)
+```
+
+    ## Warning: Removed 50 row(s) containing missing values (geom_path).
+
+![](slim-notes_files/figure-gfm/unnamed-chunk-22-4.png)<!-- -->
+
+``` r
+print(x3_percent_error_d_plot)
+```
+
+    ## Warning: Removed 50 row(s) containing missing values (geom_path).
+
+![](slim-notes_files/figure-gfm/unnamed-chunk-22-5.png)<!-- -->
+
+``` r
+print(x3_percent_error_dd_plot)
+```
+
+    ## Warning: Removed 50 row(s) containing missing values (geom_path).
+
+![](slim-notes_files/figure-gfm/unnamed-chunk-22-6.png)<!-- -->
