@@ -19,4 +19,8 @@ knitr::opts_chunk$set(echo = TRUE)
   + Average over the 100 m* replicates; then plot the average number of drive alleles over time.
     * Does this increase monotonically?
 
-## Python 
+## Python script
+
+* Run SLiM for 100 generations
+* Just control `DRIVE_DROP_SIZE`
+* 

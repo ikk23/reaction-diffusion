@@ -429,3 +429,57 @@ print(plot_popsize)
 ![](two_step_density_control_files/figure-gfm/unnamed-chunk-16-3.png)<!-- -->
 Population size increases more because the wild-types have lower
 viability selection before the drive is present.
+
+## drop size of 100
+
+``` bash
+SLIM_CONSOLE=/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/new-slim-diffusion-files/text_out/output.txt
+OUTPUT_CSV=/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/new-slim-diffusion-files/csv_out/k_uhat0.2_m100.csv
+
+cd /Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/new-slim-diffusion-files
+python single-run-number-drive-alleles.py $SLIM_CONSOLE > $OUTPUT_CSV
+```
+
+``` r
+output = read_csv("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/new-slim-diffusion-files/csv_out/k_uhat0.2_m100.csv")
+```
+
+    ## Rows: 110 Columns: 7
+    ## ── Column specification ────────────────────────────────────────────────────────
+    ## Delimiter: ","
+    ## dbl (7): gen, popsize, num_dd, num_dwt, num_wtwt, num_d_alleles, rate_d_alleles
+    ## 
+    ## ℹ Use `spec()` to retrieve the full column specification for this data.
+    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+
+``` r
+plot_num_drive_alleles = ggplot(output, aes(x = gen, y = num_d_alleles)) + theme_minimal() +
+  geom_line(color = "red") + xlab("gen") + ylab("number of drive alleles") + ggtitle("Drop size of 100 into 30,000 \nuhat=k=0.2") +
+  geom_vline(xintercept = 0) + geom_hline(yintercept = 0)
+print(plot_num_drive_alleles)
+```
+
+![](two_step_density_control_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
+
+``` r
+plot_rate_drive_alleles = ggplot(output, aes(x = gen, y = rate_d_alleles)) + theme_minimal() +
+  geom_line(color = "orange") + xlab("gen") + ylab("drive allele frequency") + ggtitle("Drop size of 100 into 30,000 \nuhat=k=0.2") +
+  geom_vline(xintercept = 0) + geom_hline(yintercept = 0)
+print(plot_rate_drive_alleles) 
+```
+
+![](two_step_density_control_files/figure-gfm/unnamed-chunk-18-2.png)<!-- -->
+
+``` r
+plot_popsize = ggplot(output, aes(x = gen, y = popsize)) + theme_minimal() +
+  geom_line(color = "purple") + xlab("gen") + ylab("population size") + ggtitle("Drop size of 100 into 30,000 \nuhat=k=0.2") +
+  geom_vline(xintercept = 0) + geom_hline(yintercept = 0) + ylim(min(output$popsize), max(output$popsize))
+
+print(plot_popsize) 
+```
+
+    ## Warning: Removed 1 rows containing missing values (geom_hline).
+
+![](two_step_density_control_files/figure-gfm/unnamed-chunk-18-3.png)<!-- -->
+Good – after the drive is lost, the population size goes back to being
+mostly stable.
