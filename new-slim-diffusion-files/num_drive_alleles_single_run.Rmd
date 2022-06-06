@@ -1,0 +1,140 @@
+---
+title: "Single run of SLiM -- number of drive alleles"
+author: "Isabel Kim"
+date: "5/30/2022"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Parameters
+
+* sigma = 0.01 (D = 0.00005)
+* k = 0.2
+* uhat = 20%
+  + d/d viability probability = 100%
+  + d/wt viability probability = 74.2%
+  + wt/wt viability probability = 80.6%
+* mating radius = interaction distance = 0.001
+* growth at zero density = 2
+* generations where local density control is turned off in `reproduction()` = 5
+  + from gen11-gen15
+* wild-type population size = 30,000
+
+## Python script planning
+
+* Standard output line: `GEN:: 10 N:: 20333 NUM_DD:: 3000 NUM_DWT:: 0 NUM_WTWT:: 20333 NUM_D_ALLELES:: 6000 RATE_D:: 0.147543`
+  + Python should grab lines that start with `GEN::` and in a csv output:
+    1. Generation
+    2. Population size
+    3. Number of d/d
+    4. Number of d/wt
+    5. Number of wt/wt
+    6. Number of drive alleles
+    7. Rate of drive
+* Python script `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/new-slim-diffusion-files/single-run-number-drive-alleles.py`
+  + Pass in the path to the SLiM console text file. Pipe the output to a csv.
+
+## Function to calculate the drop size given a desired introduction frequency
+
+```{r}
+drop_size_given_u0 = function(intro_freq,num_wts=30000){
+  numerator = intro_freq*num_wts
+  denominator = 1-intro_freq
+  sol = numerator/denominator
+  size = round(sol)
+  return(size)
+}
+```
+
+
+## Single run: introduction frequency of 25%
+
+```{r}
+drop_size_given_u0(0.25)
+```
+
+### Generations of no local density control = 5
+
+* Text output file: `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/new-slim-diffusion-files/slim-output-u0-25.txt`
+
+```{bash eval=F}
+SLIM_CONSOLE=/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/new-slim-diffusion-files/slim-output-u0-25.txt
+OUTPUT_CSV=/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/new-slim-diffusion-files/slim-output-u0-25.csv
+
+cd /Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/new-slim-diffusion-files
+python single-run-number-drive-alleles.py $SLIM_CONSOLE > $OUTPUT_CSV
+```
+
+```{r}
+library(tidyverse)
+
+output = read_csv("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/new-slim-diffusion-files/slim-output-u0-25.csv")
+
+plot_num_drive_alleles = ggplot(output, aes(x = gen, y = num_d_alleles)) + theme_minimal() +
+  geom_line(color = "red") + xlab("gen") + ylab("number of drive alleles") + geom_vline(xintercept=6) + ggtitle("introduction frequency of 25% \nlocal density control begins again at gen6")
+
+#ggsave(plot = plot_num_drive_alleles, filename = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/new-slim-diffusion-files/figures/off_gens_11_to_15.png")
+
+print(plot_num_drive_alleles)
+
+plot_N_over_time = ggplot(output, aes(x = gen, y = popsize)) + theme_minimal() +
+  geom_line(color = "purple") + xlab("gen") + ylab("population size") + geom_vline(xintercept=6) + ggtitle("introduction frequency of 25% \nlocal density control begins again at gen6")
+print(plot_N_over_time)
+```
+
+Problem -- the number of drive alleles changes a lot once the local density control switch is turned back on. Population size declines a lot then increases at generation 5.
+
+Turn this off for only 1 generation? Or use global density control during the time where local density control is off?
+
+### Global density control; local is still off for 5 generations
+
+* SLiM console text file: `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/new-slim-diffusion-files/slim-output-u0-25-global-control.txt`
+
+```{bash eval=F}
+SLIM_CONSOLE=/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/new-slim-diffusion-files/slim-output-u0-25-global-control.txt
+OUTPUT_CSV=/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/new-slim-diffusion-files/slim-output-u0-25-global-control.csv
+
+python single-run-number-drive-alleles.py $SLIM_CONSOLE > $OUTPUT_CSV
+```
+
+```{r}
+output = read_csv("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/new-slim-diffusion-files/slim-output-u0-25-global-control.csv")
+
+plot_num_drive_alleles = ggplot(output, aes(x = gen, y = num_d_alleles)) + theme_minimal() +
+  geom_line(color = "red") + xlab("gen") + ylab("number of drive alleles") + geom_vline(xintercept=6) + ggtitle("introduction frequency of 25% \nlocal density control begins again at gen6 \nbut there's global density control during this time")
+
+print(plot_num_drive_alleles)
+#ggsave(plot = plot_num_drive_alleles, filename = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/new-slim-diffusion-files/figures/off_gens_11_to_15_global_density_control.png")
+
+plot_N_over_time = ggplot(output, aes(x = gen, y = popsize)) + theme_minimal() +
+  geom_line(color = "purple") + xlab("gen") + ylab("population size") + geom_vline(xintercept=6) + ggtitle("introduction frequency of 25% \nlocal density control begins again at gen6 \nbut there's global density control during this time")
+print(plot_N_over_time)
+```
+
+Still big dips
+
+### Try just 1 generation without local density control (generation 11)
+```{bash eval=F}
+SLIM_CONSOLE=/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/new-slim-diffusion-files/slim-output-u0-25-1gen-only.txt
+OUTPUT_CSV=/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/new-slim-diffusion-files/slim-output-u0-25-1gen-only.csv
+
+python single-run-number-drive-alleles.py $SLIM_CONSOLE > $OUTPUT_CSV
+```
+
+```{r}
+output = read_csv("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/new-slim-diffusion-files/slim-output-u0-25-1gen-only.csv")
+
+plot_num_drive_alleles = ggplot(output, aes(x = gen, y = num_d_alleles)) + theme_minimal() +
+  geom_line(color = "red") + xlab("gen") + ylab("number of drive alleles") + geom_vline(xintercept=2) + ggtitle("introduction frequency of 25% \nlocal density control begins again at gen2")
+
+print(plot_num_drive_alleles)
+#ggsave(plot = plot_num_drive_alleles, filename = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/new-slim-diffusion-files/figures/off_in_gen11.png")
+
+plot_N_over_time = ggplot(output, aes(x = gen, y = popsize)) + theme_minimal() +
+  geom_line(color = "purple") + xlab("gen") + ylab("population size") + geom_vline(xintercept=2) + ggtitle("introduction frequency of 25% \nlocal density control begins again at gen2")
+print(plot_N_over_time)
+```
+

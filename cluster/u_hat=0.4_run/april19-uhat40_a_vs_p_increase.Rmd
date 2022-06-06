@@ -59,7 +59,14 @@ a_observed is almost the same value as it was in the last SLiM model.
 
 ```{r}
 knitr::include_graphics("../../cluster/u_hat=0.4_run/figures/revised_april19_zoomed_in_a_vs_p_increase_uhat4.png")
+
+library(tidyverse)
+csv = read_csv("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/cluster/u_hat=0.4_run/csvs/summary_uhat40_april19_a_full_vs_outcome.csv")
+
+g = ggplot(data = csv, aes(x = a, y = p_increase)) + geom_point(color = "red") + geom_line(color = "red") + xlim(0,0.2) + xlab("release width (a)") + ylab("Fraction of runs where drive spread") + theme_minimal() + geom_vline(xintercept = 0) + geom_hline(yintercept = 0) + geom_vline(xintercept = 0.0256, color = "yellow") + ggtitle("Invasion frequency of 40%")
+ggsave(plot = g, filename = "/Users/isabelkim/Desktop/6:3 - cb student seminar/figures/a_vs_p_increase_result.png")
 ```
+
 * P(increase) = 0.0 at a*=0.025
 * P(increase) = ~0.25 at a=0.0654
 * P(increase) = 0.5 at a=0.0694

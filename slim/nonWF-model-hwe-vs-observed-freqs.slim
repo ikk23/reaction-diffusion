@@ -5,10 +5,10 @@ initialize() {
 	initializeSex("A");
 	
 	// Parameters that can be changed at the command line
-	defineCfgParam("a", 0.0688);
+	defineCfgParam("a", 0.0256);
 	defineCfgParam("sigma",0.01);
 	defineCfgParam("k", 0.2);
-	defineCfgParam("u_hat", 0.40);
+	defineCfgParam("u_hat", 0.4);
 	// save the boundaries for the drive release
 	defineConstant("drive_x_min", 0.5 - (a/2));
 	defineConstant("drive_x_max", 0.5 + (a/2));
@@ -20,7 +20,7 @@ initialize() {
 	defineConstant("m", 0.001); // mating radius
 	catn("-----------------------------------");
 	print(paste("Frequency threshold of:", u_hat, " and alpha of: " + alpha));
-	defineConstant("POPSIZE", 10000);
+	defineConstant("POPSIZE",30000);
 	defineConstant("CHROM_LENGTH", 1);
 	d_d_fitness = 	1 + (2*alpha*k);
 	d_wt_fitness = 1 + ((alpha-1)*k);
@@ -61,7 +61,7 @@ initialize() {
 	
 	// CHECKS	
 	defineConstant("EXPECTED_NUM_OFFSPRING_MULTIPLIER", 2.0); // this*p is used in the Poisson distribution if VIABILITY_SELECTION=True
-	defineConstant("PANMICTIC_CHECK", T); // remove all spatial processes
+	defineConstant("PANMICTIC_CHECK", F); // remove all spatial processes
 	// don't use if VIABILITY_SELECTION is true
 	defineConstant("RELEASE_DRIVE_EVERYWHERE", F); // if F, only release between -a/2 and a/2
 	defineConstant("b", 0.38); // intro frequency if RELEASE_DRIVE_EVERYWHERE is true. If not, this is 1 inside the release square.
@@ -84,7 +84,7 @@ initialize() {
 
 }
 
-//// HELPER FUNC FOR CONSTANTS THAT MAY ASLO BE CONFIGURED VIA COMMAND LINE.
+//// HELPER FUNC FOR CONSTANTS THAT MAY ALSO BE CONFIGURED VIA COMMAND LINE.
 function (void) defineCfgParam(string$ name, lifs value) {
 	if (!exists(name))
 		defineConstant(name, value);
@@ -203,7 +203,6 @@ early() {
 	wildtypes = all[all.countOfMutationsOfType(m1) == 2*CHROM_LENGTH];
 	drive_allele_freq = (2*length(drive_homozygotes) + length(drive_heterozygotes))/(2*p1.individualCount);
 	mean_fitness = (drive_homozygote_fitness* (drive_allele_freq^2)) + (drive_heterozygote_fitness*2*drive_allele_freq*(1-drive_allele_freq)) + (wt_homozygote_fitness*(1-drive_allele_freq)^2);
-	catn("GEN:: " + gen + " early mean fitness = " + mean_fitness);
 	
 	if (HW_CHECK){
 		
@@ -441,4 +440,4 @@ late() {
 
 
 //Stop the simulation after 100 generations
-30 late() { sim.simulationFinished(); }
+110 late() { sim.simulationFinished(); }
