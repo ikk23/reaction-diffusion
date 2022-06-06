@@ -4,9 +4,9 @@ initialize() {
 	initializeSex("A");
 	
 	// Dispersal and fitness parameters
-	defineCfgParam("sigma", 0.01); // sd of the Normal dispersal kernel; D = sigma^2
-	defineCfgParam("k", 0.2);
-	defineCfgParam("u_hat", 0.2);
+	defineCfgParam("sigma", 0.01); // sd of the Normal dispersal kernel; D = (1/2)*(sigma^2)
+	defineCfgParam("k", 0.0);
+	defineCfgParam("u_hat", 0.0);
 	defineConstant("alpha", 1 - 2*u_hat);
 	d_d_fitness = 	1 + (2*alpha*k);
 	d_wt_fitness = 1 + ((alpha-1)*k);
@@ -17,22 +17,32 @@ initialize() {
 	defineConstant("wt_homozygote_fitness", fitnesses[2]);
 	catn("dd_fitness: " + drive_homozygote_fitness/drive_homozygote_fitness + " dwt_fitness: " + drive_heterozygote_fitness/drive_homozygote_fitness + " wtwt_fitness: " + wt_homozygote_fitness/drive_homozygote_fitness);
 	
+	// Population sizes
+	defineConstant("WT_POPULATION_SIZE",30000);
+	defineConstant("DRIVE_DROP_SIZE", 1000); // this is equal to "m" in the f(x,t) formula
+	defineConstant("GLOBAL_CAPACITY", WT_POPULATION_SIZE); // used in global density fitnessScaling
+	
+	// Reproduction() code variables	
+	defineConstant("LOCAL_INTERACTION_RADIUS", 0.01); // for local competition / female fecundity
+	defineConstant("MATING_INTERACTION_RADIUS", 0.001); // for sampling male mates
+	
+	// exp_num_offspring = BASELINE_NUM_OFFSPRING + MAX_ADDITIONAL_NUM_OFFSPRING(e^{EXPONENTIAL_DECAY_FACTOR*ni/nexp})
+	defineConstant("BASELINE_NUM_OFFSPRING", 3);
+	defineConstant("MAX_ADDITIONAL_NUM_OFFSPRING", 10);
+	defineConstant("EXPONENTIAL_DECAY_FACTOR", 5); // 
+	
+	// if USE_GLOBAL_EXPECTED_ADULT_COMPETITION=F, use p1.individualCount instead
+	defineConstant("USE_GLOBAL_EXPECTED_ADULT_COMPETITION",F);
+	defineConstant("EXPECTED_ADULT_COMPETITION", (WT_POPULATION_SIZE+DRIVE_DROP_SIZE)*(2*LOCAL_INTERACTION_RADIUS));
+	
+	
+	
+	
 	defineConstant("X2", 1); // bounds of the simulation are from 0 to X2
 	defineConstant("TRACK_NAA_PRIME", F); // whether to output genotype counts in a grid of cells during generation 10 after dispersal
 	defineConstant("NCELLS", 50); // grid of x-values to measure nAA
-	
-	// Population sizes
-	defineConstant("WT_POPULATION_SIZE",30000);
-	defineConstant("DRIVE_DROP_SIZE", 100); // this is equal to "m" in the f(x,t) formula
 	defineConstant("WILDTYPE_DENSITY", WT_POPULATION_SIZE/NCELLS);
-	defineConstant("LOCAL_INTERACTION_RADIUS", 0.001); // FOR LOCAL DENSITY
-	defineConstant("MATING_INTERACTION_RADIUS", 0.001); // FOR MATING
 	
-	defineConstant("GROWTH_AT_ZERO_DENSITY", 2);
-	defineConstant("EXPONENT_OF_COMPETITION_FACTOR", 1);
-	
-	defineConstant("USE_GLOBAL_EXPECTED_ADULT_COMPETITION",F);
-	defineConstant("EXPECTED_ADULT_COMPETITION", (WT_POPULATION_SIZE+DRIVE_DROP_SIZE)*(2*LOCAL_INTERACTION_RADIUS));
 	
 	// Chromosome of length 1. The mutation can either be drive or wt.
 	initializeMutationRate(0.0);
@@ -99,22 +109,18 @@ reproduction(NULL, "F") {
 	mate_id = sample(x = seqLen(num_neighbors), size = 1);
 	selected_mate = neighbors[mate_id];
 	
-	
 	adult_density_force = i1.totalOfNeighborStrengths(individual);
-	
 	if (USE_GLOBAL_EXPECTED_ADULT_COMPETITION){
-		expected = EXPECTED_ADULT_COMPETITION;
+		expected_local_density = EXPECTED_ADULT_COMPETITION;
 	} else {
-		expected = (2*LOCAL_INTERACTION_RADIUS)*p1.individualCount;
+		expected_local_density = (2*LOCAL_INTERACTION_RADIUS)*p1.individualCount;
 	}
 	
-	competition_ratio = adult_density_force / expected;
-	actual_competition_factor = GROWTH_AT_ZERO_DENSITY/ ((GROWTH_AT_ZERO_DENSITY-1) * competition_ratio + 1);
-	actual_competition_factor_exponentiated = actual_competition_factor^EXPONENT_OF_COMPETITION_FACTOR;
-	p = actual_competition_factor_exponentiated;
-	expected_value = p*2;
+	competition_ratio = adult_density_force / expected_local_density;
+	exp_num_offspring = BASELINE_NUM_OFFSPRING + (MAX_ADDITIONAL_NUM_OFFSPRING*exp(-EXPONENTIAL_DECAY_FACTOR*competition_ratio));
+	num_offspring = rpois(1,exp_num_offspring);
 	
-	num_offspring = rpois(1,expected_value);
+	
 	
 	for (i in seqLen(num_offspring)) {
 		offspring = subpop.addCrossed(individual, selected_mate);
@@ -150,8 +156,13 @@ early() {
 	all = p1.individuals;
 	all[all.age > 0].fitnessScaling = 0.0;
 	
+	// also applying global density control
+	
+	
 	juveniles = all[all.age==0];
-	juveniles.fitnessScaling = juveniles.tagF/drive_homozygote_fitness;
+	juveniles.fitnessScaling = (juveniles.tagF/drive_homozygote_fitness)*(GLOBAL_CAPACITY / length(juveniles));
+
+
 }
 
 
@@ -183,7 +194,9 @@ late(){
 		drive_homozygotes.color = "red";
 		drive_heterozygotes.color = "orange";
 		
+		
 		// Output
+		N = p1.individualCount;
 		num_dd = length(drive_homozygotes);
 		num_dwt = length(drive_heterozygotes);
 		num_wtwt = length(wildtypes);
@@ -200,25 +213,6 @@ late(){
 		position = ind.x + (direction*distance);
 		ind.setSpatialPosition(p1.pointPeriodic(position));
 	}
-	
-	if (gen == 10){
-		sample_size = 10;
-		i1.evaluate();
-		female_drives = drive_homozygotes_in_drop[drive_homozygotes_in_drop.sex=="F"];
-		sampled_female_ids = sample(x = seqLen(length(female_drives)), size = sample_size);
-		sampled_females = female_drives[sampled_female_ids];
-		for (i in seqLen(sample_size)){
-			female = sampled_females[i];
-			adult_density_force = i1.totalOfNeighborStrengths(female);
-			competition_ratio = adult_density_force / EXPECTED_ADULT_COMPETITION;
-			actual_competition_factor = GROWTH_AT_ZERO_DENSITY/ ((GROWTH_AT_ZERO_DENSITY-1) * competition_ratio + 1);
-			actual_competition_factor_exponentiated = actual_competition_factor^EXPONENT_OF_COMPETITION_FACTOR;
-			catn("Number around d/d female = " + adult_density_force + " competition factor = " + actual_competition_factor_exponentiated);
-		}
-	}
-	
-	
-	
 	
 	if (gen >= 10 & TRACK_NAA_PRIME){
 		// Divide x into a grid of unit cells
@@ -279,8 +273,8 @@ late(){
 	
 	i1.evaluate();
 	i2.evaluate();
-	
+
 }
 
 
-210 late() { sim.simulationFinished(); }
+410 late() { sim.simulationFinished(); }
