@@ -1,0 +1,22 @@
+---
+title: "Cluster"
+author: "Isabel Kim"
+date: "6/6/2022"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Goal
+
+* Vary the drop size (m)
+  + Do 20 replicates of each
+  + Calculate the P(increase) over all replicates
+* Determine the "critical m" at which P(increase) = 90%
+  + Go back to this m*, running like 100 replicates
+  + Average over the 100 m* replicates; then plot the average number of drive alleles over time.
+    * Does this increase monotonically?
+
+## Python 

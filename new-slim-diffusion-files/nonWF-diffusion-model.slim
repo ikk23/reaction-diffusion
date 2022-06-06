@@ -5,8 +5,11 @@ initialize() {
 	
 	// Dispersal and fitness parameters
 	defineCfgParam("sigma", 0.01); // sd of the Normal dispersal kernel; D = (1/2)*(sigma^2)
-	defineCfgParam("k", 0.0);
-	defineCfgParam("u_hat", 0.0);
+	defineCfgParam("k", 0.2);
+	defineCfgParam("u_hat", 0.2);
+	
+	defineCfgParam("DRIVE_DROP_SIZE", 1000); // this is equal to "m" in the f(x,t) formula
+
 	defineConstant("alpha", 1 - 2*u_hat);
 	d_d_fitness = 	1 + (2*alpha*k);
 	d_wt_fitness = 1 + ((alpha-1)*k);
@@ -19,7 +22,6 @@ initialize() {
 	
 	// Population sizes
 	defineConstant("WT_POPULATION_SIZE",30000);
-	defineConstant("DRIVE_DROP_SIZE", 1000); // this is equal to "m" in the f(x,t) formula
 	defineConstant("GLOBAL_CAPACITY", WT_POPULATION_SIZE); // used in global density fitnessScaling
 	
 	// Reproduction() code variables	
@@ -173,7 +175,7 @@ late(){
 	
 	if (gen < 10){
 		all.color = "blue";
-		catn("Generation:: " + gen + " N:: " + N);
+		catn("GEN:: " + gen + " N:: " + N + " NUM_DD:: " + 0 + " NUM_DWT:: " + 0 + " NUM_WTWT:: " + N + " NUM_D_ALLELES:: " + 0 + " RATE_D:: " + 0.0);
 	} else {
 		// Add drive
 		if (gen == 10){
@@ -276,5 +278,5 @@ late(){
 
 }
 
-
-410 late() { sim.simulationFinished(); }
+// End after 100 generations
+110 late() { sim.simulationFinished(); }
