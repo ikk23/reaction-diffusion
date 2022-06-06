@@ -5,6 +5,7 @@
 * [SLiM model](new-slim-diffusion-files/nonWF-diffusion-model.slim)
 * [Initial attempts to control N](new-slim-diffusion-files/methods_to_regulate_N.md)
 * [2-step density control - R markdown of observations](new-slim-diffusion-files/two_step_density_control.md)
+* [Cluster management](new-slim-diffusion-files/cluster_vary_m.md)
 
 ## R scripts:
 * [Simulating reaction-diffusion waves](scripts/numerical-reaction-diffusion-functions.R)
