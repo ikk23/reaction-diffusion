@@ -7,7 +7,7 @@
 * [Initial attempts to control N](new-slim-diffusion-files/methods_to_regulate_N.md)
 * [2-step density control - R markdown of observations](new-slim-diffusion-files/two_step_density_control.md)
 * [Cluster management](new-slim-diffusion-files/cluster_vary_m.md)
-* [Cluster output from week of June 6](new-slim-diffusion-files/compiled_cluster_output_june6_to_7.md)
+* [Cluster output from week of June 6 (also includes cell counts)](new-slim-diffusion-files/compiled_cluster_output_june6_to_7.md)
 
 ## R scripts:
 * [Simulating reaction-diffusion waves](scripts/numerical-reaction-diffusion-functions.R)
