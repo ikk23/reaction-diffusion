@@ -1,0 +1,239 @@
+initialize() {
+	initializeSLiMModelType("nonWF");
+	initializeSLiMOptions(dimensionality="x", periodicity="x");
+	initializeSex("A");
+	
+	// Dispersal and fitness parameters
+	defineCfgParam("sigma", 0.01); // sd of the Normal dispersal kernel; D = (1/2)*(sigma^2)
+	defineCfgParam("k", 0.2);
+	defineCfgParam("u_hat", 0.2);
+	
+	defineCfgParam("DRIVE_DROP_SIZE", 300); // this is equal to "m" in the f(x,t) formula
+
+	defineConstant("alpha", 1 - 2*u_hat);
+	d_d_fitness = 	1 + (2*alpha*k);
+	d_wt_fitness = 1 + ((alpha-1)*k);
+	wt_wt_fitness = 1;
+	fitnesses = c(d_d_fitness, d_wt_fitness, wt_wt_fitness);
+	defineConstant("drive_homozygote_fitness", fitnesses[0]);
+	defineConstant("drive_heterozygote_fitness", fitnesses[1]);
+	defineConstant("wt_homozygote_fitness", fitnesses[2]);
+	catn("dd_fitness: " + drive_homozygote_fitness/drive_homozygote_fitness + " dwt_fitness: " + drive_heterozygote_fitness/drive_homozygote_fitness + " wtwt_fitness: " + wt_homozygote_fitness/drive_homozygote_fitness);
+	
+	// Population sizes
+	defineConstant("WT_POPULATION_SIZE",30000);
+	defineConstant("GLOBAL_CAPACITY", WT_POPULATION_SIZE); // used in global density fitnessScaling
+	
+	// Reproduction() code variables	
+	defineConstant("LOCAL_INTERACTION_RADIUS", 0.01); // for local competition / female fecundity
+	defineConstant("MATING_INTERACTION_RADIUS", 0.001); // for sampling male mates
+	
+	// exp_num_offspring = BASELINE_NUM_OFFSPRING + MAX_ADDITIONAL_NUM_OFFSPRING(e^{EXPONENTIAL_DECAY_FACTOR*ni/nexp})
+	defineConstant("BASELINE_NUM_OFFSPRING", 3);
+	defineConstant("MAX_ADDITIONAL_NUM_OFFSPRING", 10);
+	defineConstant("EXPONENTIAL_DECAY_FACTOR", 5); // 
+	
+	// if USE_GLOBAL_EXPECTED_ADULT_COMPETITION=F, use p1.individualCount instead
+	defineConstant("USE_GLOBAL_EXPECTED_ADULT_COMPETITION",F);
+	defineConstant("EXPECTED_ADULT_COMPETITION", (WT_POPULATION_SIZE+DRIVE_DROP_SIZE)*(2*LOCAL_INTERACTION_RADIUS));
+	
+	
+	// Chromosome of length 1. The mutation can either be drive or wt.
+	initializeMutationRate(0.0);
+	initializeRecombinationRate(0.0);
+	wt = initializeMutationType("m1", 0.5, "f", 0.0);
+	dr = initializeMutationType("m2", 0.5, "f", 0.0);
+	variations = c(wt, dr);
+	
+	variations.mutationStackPolicy = "l";
+	variations.mutationStackGroup = 1;
+	
+	initializeGenomicElementType("g1", variations, c(1, 1));
+	initializeGenomicElement(g1, 0, 0);
+	
+	// Interaction for mating and local competition
+	initializeInteractionType(1, "x", reciprocal=T, maxDistance= LOCAL_INTERACTION_RADIUS);
+	initializeInteractionType(2, "x", reciprocal=T, maxDistance=MATING_INTERACTION_RADIUS);
+}
+
+//// HELPER FUNCTION FOR CONSTANTS THAT MAY ASLO BE CONFIGURED VIA COMMAND LINE.
+function (void) defineCfgParam(string$ name, lifs value) {
+	if (!exists(name))
+		defineConstant(name, value);
+}
+
+// FUNCTION FOR CALCULATING THE EXPECTED NUMBER OF DRIVE HOMOZYGOTES IN GEN10 AFTER DISPERSAL
+// f(x,t) = [m/sqrt(4*PI*D*t)][exp(-0.25(x^2/ (Dt))]
+function (float) numAA(float x){
+	D = 0.5*(sigma^2);
+	t = 1; // 1 round of dispersal
+	m = DRIVE_DROP_SIZE;
+	term1 = m/sqrt(4*PI*D*t);
+	
+	x_adjust = x - 0.5; // such that the "release point" was 0
+	term2 = exp(-0.25*((x_adjust^2)/(D*t)));
+	sol = term1*term2;
+	return sol;
+}
+
+
+// Create a population of wild-type individuals, scattered randomly
+1 {
+	sim.addSubpop("p1", WT_POPULATION_SIZE);
+	p1.setSpatialBounds(c(0.0, 1.0));
+	
+	all = p1.individuals;
+	all.x = runif(WT_POPULATION_SIZE, min = 0, max = 1.0);
+	
+	all.genomes.addNewDrawnMutation(m1, 0);
+	all.tagF = wt_homozygote_fitness;
+}
+
+reproduction(NULL, "F") {
+	gen = sim.generation;
+	
+	// females select a random male mate
+	all_neighbors = i2.nearestNeighbors(individual, subpop.individualCount);
+	neighbors = all_neighbors[all_neighbors.sex == "M"];
+	num_neighbors = length(neighbors);
+	if (num_neighbors == 0){
+		catn("empty area - can't mate");
+		return;
+	}
+	mate_id = sample(x = seqLen(num_neighbors), size = 1);
+	selected_mate = neighbors[mate_id];
+	
+	adult_density_force = i1.totalOfNeighborStrengths(individual);
+	if (USE_GLOBAL_EXPECTED_ADULT_COMPETITION){
+		expected_local_density = EXPECTED_ADULT_COMPETITION;
+	} else {
+		expected_local_density = (2*LOCAL_INTERACTION_RADIUS)*p1.individualCount;
+	}
+	
+	competition_ratio = adult_density_force / expected_local_density;
+	exp_num_offspring = BASELINE_NUM_OFFSPRING + (MAX_ADDITIONAL_NUM_OFFSPRING*exp(-EXPONENTIAL_DECAY_FACTOR*competition_ratio));
+	num_offspring = rpois(1,exp_num_offspring);
+	
+	for (i in seqLen(num_offspring)) {
+		offspring = subpop.addCrossed(individual, selected_mate);
+	}
+}
+
+1: modifyChild() {
+	
+	// tag the child with their fitness value and place them at their mother's x-position
+	gen = sim.generation;
+	wildtype = child.countOfMutationsOfType(m1) == 2;
+	drive_hom = child.countOfMutationsOfType(m2) == 2;
+	drive_het = (child.countOfMutationsOfType(m1) == 1) & (child.countOfMutationsOfType(m2) == 1);
+	if (wildtype){
+		child.tagF = wt_homozygote_fitness;
+	} else if (drive_hom) {
+		child.tagF = drive_homozygote_fitness;
+	} else {
+		child.tagF = drive_heterozygote_fitness;
+	}
+	position = parent1.x;
+	
+	child.setSpatialPosition(p1.pointPeriodic(position));
+	
+	return T;
+}
+
+
+early() {
+	// kill off adults
+	// juvenile survival depends on fitness value
+	gen = sim.generation;
+	all = p1.individuals;
+	all[all.age > 0].fitnessScaling = 0.0;
+	
+	// also applying global density control
+	
+	
+	juveniles = all[all.age==0];
+	juveniles.fitnessScaling = (juveniles.tagF/drive_homozygote_fitness)*(GLOBAL_CAPACITY / length(juveniles));
+
+
+}
+
+
+late(){
+	gen = sim.generation;
+	all = p1.individuals;
+	N = p1.individualCount;
+	
+	if (gen < 10){
+		all.color = "blue";
+		catn("GEN:: " + gen + " N:: " + N + " NUM_DD:: " + 0 + " NUM_DWT:: " + 0 + " NUM_WTWT:: " + N + " NUM_D_ALLELES:: " + 0 + " RATE_D:: " + 0.0);
+	} else {
+		// Add drive
+		if (gen == 10){
+			midpoint = (1.0-0)/2;
+			sim.addSubpop("p2", DRIVE_DROP_SIZE);
+			drive_homozygotes_in_drop = p2.individuals;
+			drive_homozygotes_in_drop.genomes.addNewDrawnMutation(m2, 0);
+			drive_homozygotes_in_drop.tagF = drive_homozygote_fitness;
+			p1.takeMigrants(drive_homozygotes_in_drop);
+			drive_homozygotes_in_drop.x = midpoint; // place ALL drive individuals at the midpoint position
+		}
+		// Color rules
+		all = p1.individuals;  // redefine with the drive individuals dropped in
+		drive_homozygotes = all[all.countOfMutationsOfType(m2) == 2];
+		drive_heterozygotes = all[all.countOfMutationsOfType(m2)==1];
+		wildtypes = all[all.countOfMutationsOfType(m1) == 2];
+		all.color = "blue";
+		drive_homozygotes.color = "red";
+		drive_heterozygotes.color = "orange";
+		
+		
+		// Output
+		N = p1.individualCount;
+		num_dd = length(drive_homozygotes);
+		num_dwt = length(drive_heterozygotes);
+		num_wtwt = length(wildtypes);
+		num_drive_alleles = (2*num_dd) + num_dwt;
+		rate_of_drive = num_drive_alleles/(2*N);
+		
+		catn("GEN:: " + gen + " N:: " + N + " NUM_DD:: " + num_dd + " NUM_DWT:: " + num_dwt + " NUM_WTWT:: " + num_wtwt + " NUM_D_ALLELES:: " + num_drive_alleles + " RATE_D:: " + rate_of_drive);
+	}
+	
+	// Regardless of the generation, calculate the population sizes in each cell
+	NCELLS = 10;
+	all = p1.individuals;
+	pos_vec = 0:(NCELLS - 1);
+	cell_width = 1.0/NCELLS;
+	positions = pos_vec * cell_width;
+	
+	
+	cell_sizes = rep(-1,10);
+	
+	for (i in 0:(NCELLS-1)) {
+		x_left = positions[i];
+		x_right = x_left + cell_width;
+		all_in_cell = all[(all.x >= x_left) & (all.x < x_right)];
+		N_cell = length(all_in_cell);
+		cell_sizes[i] = N_cell;
+	}
+	catn();
+	catn("CELL1:: " + cell_sizes[0] + " CELL2:: " + cell_sizes[1] + " CELL3:: " + cell_sizes[2] + " CELL4:: " + cell_sizes[3] + " CELL5:: " + cell_sizes[4] + " CELL6:: " + cell_sizes[5] + " CELL7:: " + cell_sizes[6] + " CELL8:: " + cell_sizes[7] + " CELL9:: " + cell_sizes[8] + " CELL10:: " + cell_sizes[9] + " GENERATION:: " + gen);
+	catn();
+	
+	
+	// End each generation with Gaussian displacement & calculation of new mating distances
+	for (ind in all){
+		distance = rnorm(1, 0, sigma);
+		direction = sample(c(-1,1),1);
+		position = ind.x + (direction*distance);
+		ind.setSpatialPosition(p1.pointPeriodic(position));
+	}
+	
+	
+	
+	i1.evaluate();
+	i2.evaluate();
+
+}
+
+// End after 100 generations
+410 late() { sim.simulationFinished(); }

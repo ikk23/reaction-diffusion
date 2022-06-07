@@ -90,6 +90,39 @@ knitr::include_graphics("../new-slim-diffusion-files/cluster_output/avg_genotype
 
 ## Generation-by-generation stats for a single replicate only - for 3 drop size values
 
+### Cell counts
+
+Separated the SLiM landscape into 10 cells – from \[0,0.1), \[0.1,
+0.2),…,\[0.9,1.0) – and got the population size in each cell. Also
+plotted the expected cell count under constant density. Let the
+simulation run for 400 generations after the drop.
+
+``` r
+knitr::include_graphics("../new-slim-diffusion-files/figures/cell_counts_m300_run_till_gen410.png")
+```
+
+![](../new-slim-diffusion-files/figures/cell_counts_m300_run_till_gen410.png)<!-- -->
+
+``` r
+knitr::include_graphics("../new-slim-diffusion-files/figures/cell_counts_m625_run_till_gen410.png")
+```
+
+![](../new-slim-diffusion-files/figures/cell_counts_m625_run_till_gen410.png)<!-- -->
+
+``` r
+knitr::include_graphics("../new-slim-diffusion-files/figures/cell_counts_m800_run_till_gen410.png")
+```
+
+![](../new-slim-diffusion-files/figures/cell_counts_m800_run_till_gen410.png)<!-- -->
+
+Vertical black line represents the generation at which the drive fixes
+or is lost.
+
+The population is clustered around 0.4-0.6 when the drive is spreading.
+By the time the drive has fixed, the population density becomes \~equal
+again. When the drop size is small, or the drive is lost, the population
+density remains constant.
+
 ### Number of drive alleles
 
 ``` r
