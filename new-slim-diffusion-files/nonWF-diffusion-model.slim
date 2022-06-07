@@ -122,8 +122,6 @@ reproduction(NULL, "F") {
 	exp_num_offspring = BASELINE_NUM_OFFSPRING + (MAX_ADDITIONAL_NUM_OFFSPRING*exp(-EXPONENTIAL_DECAY_FACTOR*competition_ratio));
 	num_offspring = rpois(1,exp_num_offspring);
 	
-	
-	
 	for (i in seqLen(num_offspring)) {
 		offspring = subpop.addCrossed(individual, selected_mate);
 	}
