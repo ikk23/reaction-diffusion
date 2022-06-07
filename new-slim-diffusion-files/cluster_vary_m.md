@@ -243,3 +243,356 @@ Monotonic increase in the number of drive alleles
     -   `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/new-slim-diffusion-files/slurm_scripts/slurm_june6_m300_only.sh`
     -   `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/new-slim-diffusion-files/slurm_scripts/slurm_june6_m625.sh`
     -   Submitted both at 8:46pm
+
+### Output
+
+-   Compiled csvs:
+    -   `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/new-slim-diffusion-files/cluster_output/june7_uhat_k_0.2_m300_only.csv`
+    -   `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/new-slim-diffusion-files/cluster_output/june7_uhat_k_0.2_m625_only.csv`
+-   Averaged csvs:
+    -   `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/new-slim-diffusion-files/cluster_output/summary_june7_uhat_k_0.2_m300_only.csv`
+    -   `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/new-slim-diffusion-files/cluster_output/summary_june7_uhat_k_0.2_m625_only.csv`
+
+``` r
+# Compile csvs
+library(tidyverse)
+dir = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/new-slim-diffusion-files/cluster_output/raw/"
+for (i in 1:4){
+  name_m300 = paste0(dir,"m300_",i,".csv")
+  name_m625 = paste0(dir,"m625_",i,".csv")
+  csv_m300 = read_csv(name_m300)
+  csv_m625 = read_csv(name_m625)
+  if (i == 1){
+    compiled_output_m300 = csv_m300
+    compiled_output_m625 = csv_m625
+  } else {
+    compiled_output_m300 = rbind(compiled_output_m300,csv_m300)
+    compiled_output_m625 = rbind(compiled_output_m625,csv_m625)
+  }
+}
+# Add column for replicate number
+starts_m300 = seq(1, nrow(compiled_output_m300), by = 110)
+ends_m300 = starts_m300 + 109
+starts_m625 = seq(1, nrow(compiled_output_m625), by = 110)
+ends_m625 = starts_m625 + 109
+
+nparams_m300 = length(starts_m300)
+nparams_m625 = length(starts_m625) # both are 100
+
+replicate_number_m300 = rep(-1,11000)
+replicate_number_m625 = rep(-1,11000)
+
+for (j in 1:nparams_m300){
+  s = starts_m300[j]
+  e = ends_m300[j]
+  replicate_number_m300[s:e] = j
+  replicate_number_m625[s:e] = j
+}
+compiled_output_edit_m300 = compiled_output_m300 %>% add_column(replicate = replicate_number_m300)
+compiled_output_edit_m625 = compiled_output_m625 %>% add_column(replicate = replicate_number_m625)
+# Write both of them out
+# write_csv(x = compiled_output_edit_m300, file = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/new-slim-diffusion-files/cluster_output/june7_uhat_k_0.2_m300_only.csv")
+#write_csv(x = compiled_output_edit_m625, file = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/new-slim-diffusion-files/cluster_output/june7_uhat_k_0.2_m625_only.csv")
+
+# Averaged csvs
+m300 = compiled_output_edit_m300
+m625 = compiled_output_edit_m625
+
+generation_vector_m300 = min(m300$gen):max(m300$gen)
+avg_popsize_m300 = rep(-1, 110)
+avg_num_dd_m300 = rep(-1, 110)
+avg_num_dwt_m300 = rep(-1, 110)
+avg_num_wtwt_m300 = rep(-1, 110)
+avg_num_d_alleles_m300 = rep(-1, 110)
+avg_rate_d_alleles_m300 = rep(-1, 110)
+num_replicates_m300 = rep(-1, 110)
+
+generation_vector_m625 = min(m625$gen):max(m625$gen)
+avg_popsize_m625 = rep(-1,110)
+avg_num_dd_m625 = rep(-1,110)
+avg_num_dwt_m625 = rep(-1,110)
+avg_num_wtwt_m625 = rep(-1,110)
+avg_num_d_alleles_m625 = rep(-1,110)
+avg_rate_d_alleles_m625 = rep(-1,110)
+num_replicates_m625 = rep(-1,110)
+
+for (i in 1:110){
+  g_m300 = generation_vector_m300[i]
+  g_m625 = generation_vector_m625[i]
+  
+  rows_m300 = m300 %>% filter(gen == g_m300)
+  rows_m625 = m625 %>% filter(gen == g_m625)
+  
+  avg_popsize_m300[i] = mean(rows_m300$popsize)
+  avg_popsize_m625[i] = mean(rows_m625$popsize)
+  
+  avg_num_dd_m300[i] = mean(rows_m300$num_dd)
+  avg_num_dd_m625[i] = mean(rows_m625$num_dd)
+  
+  avg_num_dwt_m300[i] = mean(rows_m300$num_dwt)
+  avg_num_dwt_m625[i] = mean(rows_m625$num_dwt)
+  
+  avg_num_wtwt_m300[i] = mean(rows_m300$num_wtwt)
+  avg_num_wtwt_m625[i] = mean(rows_m625$num_wtwt)
+  
+  avg_num_d_alleles_m300[i] = mean(rows_m300$num_d_alleles)
+  avg_num_d_alleles_m625[i] = mean(rows_m625$num_d_alleles)
+  
+  avg_rate_d_alleles_m300[i] = mean(rows_m300$rate_d_alleles)
+  avg_rate_d_alleles_m625[i] = mean(rows_m625$rate_d_alleles)
+
+  num_replicates_m300[i] = nrow(rows_m300)
+  num_replicates_m625[i] = nrow(rows_m625)
+}
+
+avg_csv_m300 = tibble(gen = generation_vector_m300,
+                 avg_popsize = avg_popsize_m300,
+                 avg_num_dd = avg_num_dd_m300,
+                 avg_num_dwt = avg_num_dwt_m300,
+                 avg_num_wtwt = avg_num_wtwt_m300,
+                 avg_num_d_alleles = avg_num_d_alleles_m300,
+                 avg_rate_d_alleles = avg_rate_d_alleles_m300,
+                 num_replicates = num_replicates_m300)
+avg_csv_m625 = tibble(gen = generation_vector_m625,
+                 avg_popsize = avg_popsize_m625,
+                 avg_num_dd = avg_num_dd_m625,
+                 avg_num_dwt = avg_num_dwt_m625,
+                 avg_num_wtwt = avg_num_wtwt_m625,
+                 avg_num_d_alleles = avg_num_d_alleles_m625,
+                 avg_rate_d_alleles = avg_rate_d_alleles_m625,
+                 num_replicates = num_replicates_m625)
+# write out
+#write_csv(x = avg_csv_m300, file = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/new-slim-diffusion-files/cluster_output/summary_june7_uhat_k_0.2_m300_only.csv")
+#write_csv(x = avg_csv_m625, file = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/new-slim-diffusion-files/cluster_output/summary_june7_uhat_k_0.2_m625_only.csv")
+
+# Plot 1 replicate only 
+r = sample(generation_vector_m625,1) # replicate 84
+
+m300_one_rep = m300 %>% filter(replicate == 84)
+m625_one_rep = m625 %>% filter(replicate == 84)
+
+# Number of drive alleles 
+drives_m300 = ggplot(m300_one_rep, aes(x = gen, y = num_d_alleles)) + 
+  geom_line(color = "red") +
+  geom_point(color = "red") +
+  xlab("Generation") + ylab("Number of drive alleles") + 
+  ggtitle("Drop size of 300, 1 replicate only") + theme_minimal() + 
+  geom_hline(yintercept = 0) + geom_vline(xintercept = 0)
+#ggsave(plot = drives_m300, filename = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/new-slim-diffusion-files/cluster_output/num_drive_alleles_1_rep_only_m300.png")
+
+drives_m625 = ggplot(m625_one_rep, aes(x = gen, y = num_d_alleles)) + 
+  geom_line(color = "red") + geom_point(color = "red") + 
+  xlab("Generation") + ylab("Number of drive alleles") + 
+  ggtitle("Drop size of 625, 1 replicate only") + 
+  theme_minimal() + geom_hline(yintercept = 0) + geom_vline(xintercept = 0)
+#ggsave(plot = drives_m625, filename = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/new-slim-diffusion-files/cluster_output/num_drive_alleles_1_rep_only_m625.png")
+
+popsize_m300 = ggplot(m300_one_rep, aes(x = gen, y = popsize)) + 
+  geom_line(color = "purple") + geom_point(color = "purple") + xlab("Generation") + 
+  ylab("Population size") + ggtitle("Drop size of 300, 1 replicate only") + 
+  theme_minimal() + 
+  geom_vline(xintercept = 0) + ylim(min(m300_one_rep$popsize), max(m300_one_rep$popsize))
+ggsave(plot = popsize_m300, filename = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/new-slim-diffusion-files/cluster_output/popsize_1_rep_only_m300.png")
+
+popsize_m625 = ggplot(m625_one_rep, aes(x = gen, y = popsize)) + 
+  geom_line(color = "purple") + geom_point(color = "purple") + xlab("Generation") + 
+  ylab("Population size") + ggtitle("Drop size of 625, 1 replicate only") + 
+  theme_minimal() + 
+  geom_vline(xintercept = 0) + ylim(min(m625_one_rep$popsize), max(m625_one_rep$popsize))
+
+ggsave(plot = popsize_m625, filename = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/new-slim-diffusion-files/cluster_output/popsize_1_rep_only_m625.png")
+
+
+# Plot averaged stats
+avg_d_m300 = ggplot(avg_csv_m300, aes(x = gen, y = avg_num_d_alleles)) + geom_line(color = "red") + geom_point(color = "red") + xlab("Generation") + ylab("Average number of drive alleles") + ggtitle("Drop size of 300, averaged 100 replicates") + theme_minimal() + geom_hline(yintercept = 0) + geom_vline(xintercept = 0)
+#ggsave(plot = avg_d_m300, filename = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/new-slim-diffusion-files/cluster_output/avg_num_drive_alleles_m300.png")
+avg_d_m625 = ggplot(avg_csv_m625, aes(x = gen, y = avg_num_d_alleles)) + geom_line(color = "red") + geom_point(color = "red") + xlab("Generation") + ylab("Average number of drive alleles") + ggtitle("Drop size of 625, averaged 100 replicates") + theme_minimal() + geom_hline(yintercept = 0) + geom_vline(xintercept = 0)
+#ggsave(plot = avg_d_m625, filename = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/new-slim-diffusion-files/cluster_output/avg_num_drive_alleles_m625.png")
+
+avg_popsize_m300 = ggplot(avg_csv_m300, aes(x = gen, y = avg_popsize)) + 
+  geom_line(color = "purple") + 
+  geom_point(color = "purple") + 
+  xlab("Generation") + ylab("Average population size") + 
+  ggtitle("Drop size of 300, averaged 100 replicates") + theme_minimal() + 
+  geom_hline(yintercept = 0) + geom_vline(xintercept = 0) + 
+  ylim(min(avg_csv_m300$avg_popsize), max(avg_csv_m300$avg_popsize))
+#ggsave(plot = avg_popsize_m300, filename = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/new-slim-diffusion-files/cluster_output/avg_popsize_m300.png")
+avg_popsize_m625 = ggplot(avg_csv_m625, aes(x = gen, y = avg_popsize)) + 
+  geom_line(color = "purple") + 
+  geom_point(color = "purple") + 
+  xlab("Generation") + ylab("Average population size") + 
+  ggtitle("Drop size of 625, averaged 100 replicates") + theme_minimal() + 
+  geom_hline(yintercept = 0) + geom_vline(xintercept = 0) + 
+  ylim(min(avg_csv_m625$avg_popsize), max(avg_csv_m625$avg_popsize))
+#ggsave(plot = avg_popsize_m625, filename = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/new-slim-diffusion-files/cluster_output/avg_popsize_m625.png")
+
+
+avg_dd_m300 = ggplot(avg_csv_m300, aes(x = gen)) + 
+  geom_line(aes(y = avg_num_dd),color = "red") + 
+  geom_line(aes(y = avg_num_dwt), color = "orange") + 
+  geom_line(aes(y = avg_num_wtwt), color = "blue") + 
+  xlab("Generation") + ylab("Average count") + 
+  ggtitle("Drop size of 300, averaged 100 replicates \nblue = wt, red = d/d, orange = d/wt") + 
+  theme_minimal() + geom_hline(yintercept = 0) + 
+  geom_vline(xintercept = 0)
+#ggsave(plot = avg_dd_m300, filename = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/new-slim-diffusion-files/cluster_output/avg_genotype_counts_m300.png")
+
+avg_dd_m625 = ggplot(avg_csv_m625, aes(x = gen)) + 
+  geom_line(aes(y = avg_num_dd),color = "red") + 
+  geom_line(aes(y = avg_num_dwt), color = "orange") + 
+  geom_line(aes(y = avg_num_wtwt), color = "blue") + 
+  xlab("Generation") + ylab("Average count") + 
+  ggtitle("Drop size of 625, averaged 100 replicates \nblue = wt, red = d/d, orange = d/wt") + 
+  theme_minimal() +
+  geom_vline(xintercept = 0)
+
+
+#ggsave(plot = avg_dd_m625, filename = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/new-slim-diffusion-files/cluster_output/avg_genotype_counts_m625.png")
+```
+
+Averaged plots
+
+``` r
+knitr::include_graphics("../new-slim-diffusion-files/cluster_output/avg_num_drive_alleles_m300.png")
+```
+
+![](../new-slim-diffusion-files/cluster_output/avg_num_drive_alleles_m300.png)<!-- -->
+
+``` r
+knitr::include_graphics("../new-slim-diffusion-files/cluster_output/avg_num_drive_alleles_m625.png")
+```
+
+![](../new-slim-diffusion-files/cluster_output/avg_num_drive_alleles_m625.png)<!-- -->
+
+``` r
+knitr::include_graphics("../new-slim-diffusion-files/cluster_output/avg_popsize_m300.png")
+```
+
+![](../new-slim-diffusion-files/cluster_output/avg_popsize_m300.png)<!-- -->
+
+``` r
+knitr::include_graphics("../new-slim-diffusion-files/cluster_output/avg_popsize_m625.png")
+```
+
+![](../new-slim-diffusion-files/cluster_output/avg_popsize_m625.png)<!-- -->
+
+``` r
+knitr::include_graphics("../new-slim-diffusion-files/cluster_output/avg_genotype_counts_m300.png")
+```
+
+![](../new-slim-diffusion-files/cluster_output/avg_genotype_counts_m300.png)<!-- -->
+
+``` r
+knitr::include_graphics("../new-slim-diffusion-files/cluster_output/avg_genotype_counts_m625.png")
+```
+
+![](../new-slim-diffusion-files/cluster_output/avg_genotype_counts_m625.png)<!-- -->
+
+One replicate plots
+
+``` r
+knitr::include_graphics("../new-slim-diffusion-files/cluster_output/num_drive_alleles_1_rep_only_m300.png")
+```
+
+![](../new-slim-diffusion-files/cluster_output/num_drive_alleles_1_rep_only_m300.png)<!-- -->
+
+``` r
+knitr::include_graphics("../new-slim-diffusion-files/cluster_output/num_drive_alleles_1_rep_only_m625.png")
+```
+
+![](../new-slim-diffusion-files/cluster_output/num_drive_alleles_1_rep_only_m625.png)<!-- -->
+
+``` r
+knitr::include_graphics("../new-slim-diffusion-files/cluster_output/popsize_1_rep_only_m300.png")
+```
+
+![](../new-slim-diffusion-files/cluster_output/popsize_1_rep_only_m300.png)<!-- -->
+
+``` r
+knitr::include_graphics("../new-slim-diffusion-files/cluster_output/popsize_1_rep_only_m625.png")
+```
+
+![](../new-slim-diffusion-files/cluster_output/popsize_1_rep_only_m625.png)<!-- -->
+
+## Calculate P(increase) for the 3 different drop-sizes
+
+-   m300 =
+    `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/new-slim-diffusion-files/cluster_output/june7_uhat_k_0.2_m300_only.csv`
+-   m625 =
+    `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/new-slim-diffusion-files/cluster_output/june7_uhat_k_0.2_m625_only.csv`
+-   m800 =
+    `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/new-slim-diffusion-files/cluster_output/june6_uhat_k_0.2_m800_only.csv`
+
+``` r
+library(tidyverse)
+m300 = read_csv("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/new-slim-diffusion-files/cluster_output/june7_uhat_k_0.2_m300_only.csv")
+replicate_vector = min(m300$replicate):max(m300$replicate) # 100
+outcome = rep("*",100)
+for (i in 1:100){
+  rows = m300 %>% filter(replicate == i)
+  initial_drive_rate = rows %>% filter(gen == 0) %>% .$rate_d_alleles
+  final_drive_rate = rows %>% filter(gen == max(rows$gen)) %>% .$rate_d_alleles
+  if (initial_drive_rate >= final_drive_rate){
+    outcome[i] = "decrease"
+  } else {
+    outcome[i] = "increase"
+  }
+  if (final_drive_rate == 1){
+    outcome[i] = "increase"
+  }
+}
+p_increase = mean(outcome == "increase")
+
+m625 = read_csv("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/new-slim-diffusion-files/cluster_output/june7_uhat_k_0.2_m625_only.csv")
+replicate_vector = min(m625$replicate):max(m625$replicate) # 100
+outcome = rep("*",100)
+for (i in 1:100){
+  rows = m625 %>% filter(replicate == i)
+  initial_drive_rate = rows %>% filter(gen == 0) %>% .$rate_d_alleles
+  final_drive_rate = rows %>% filter(gen == max(rows$gen)) %>% .$rate_d_alleles
+  if (initial_drive_rate >= final_drive_rate){
+    outcome[i] = "decrease"
+  } else {
+    outcome[i] = "increase"
+  }
+  if (final_drive_rate == 1){
+    outcome[i] = "increase"
+  }
+}
+p_increase = mean(outcome == "increase")
+
+
+m800 = read_csv("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/new-slim-diffusion-files/cluster_output/june6_uhat_k_0.2_m800_only.csv")
+replicate_vector = min(m800$replicate):max(m800$replicate) # 100
+outcome = rep("*",100)
+for (i in 1:100){
+  rows = m800 %>% filter(replicate == i)
+  initial_drive_rate = rows %>% filter(gen == 0) %>% .$rate_d_alleles
+  final_drive_rate = rows %>% filter(gen == max(rows$gen)) %>% .$rate_d_alleles
+  if (initial_drive_rate >= final_drive_rate){
+    outcome[i] = "decrease"
+  } else {
+    outcome[i] = "increase"
+  }
+  if (final_drive_rate == 1){
+    outcome[i] = "increase"
+  }
+}
+p_increase = mean(outcome == "increase")
+```
+
+-   For m=300, P(increase) = 0%.
+-   For m=625, P(increase) = 22%
+-   For m=800, P(increase) = 97%
+
+View a decrease for m800
+
+``` r
+rep18 = m800 %>% filter(replicate == 18)
+
+drives = ggplot(rep18, aes(x = gen, y = num_d_alleles)) + 
+  geom_line(color = "red") + geom_point(color = "red") + 
+  xlab("Generation") + ylab("Number of drive alleles") + 
+  ggtitle("Drop size of 800, 1 replicate only") + 
+  theme_minimal() + geom_hline(yintercept = 0) + geom_vline(xintercept = 0)
+```
