@@ -3,6 +3,7 @@
 ## June 2022: New particle diffusion model
 
 * [SLiM model](new-slim-diffusion-files/nonWF-diffusion-model.slim)
+  + [Order of operations](new-slim-diffusion-files/slim-model-writeup.md)
 * [Initial attempts to control N](new-slim-diffusion-files/methods_to_regulate_N.md)
 * [2-step density control - R markdown of observations](new-slim-diffusion-files/two_step_density_control.md)
 * [Cluster management](new-slim-diffusion-files/cluster_vary_m.md)
