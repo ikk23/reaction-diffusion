@@ -6,6 +6,7 @@
   + [Order of operations](new-slim-diffusion-files/slim-model-writeup.md)
 * [Initial attempts to control N](new-slim-diffusion-files/methods_to_regulate_N.md)
 * [2-step density control - R markdown of observations](new-slim-diffusion-files/two_step_density_control.md)
+  + [Cell counts over time with this 2-step density control](new-slim-diffusion-files/check_clustering.md)
 * [Cluster management](new-slim-diffusion-files/cluster_vary_m.md)
 * [Cluster output from week of June 6 (also includes cell counts)](new-slim-diffusion-files/compiled_cluster_output_june6_to_7.md)
 
