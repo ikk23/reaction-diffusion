@@ -9,6 +9,7 @@
   + [Cell counts over time with this 2-step density control](new-slim-diffusion-files/check_clustering.md)
 * [Cluster management](new-slim-diffusion-files/cluster_vary_m.md)
 * [Cluster output from week of June 6 (also includes cell counts)](new-slim-diffusion-files/compiled_cluster_output_june6_to_7.md)
+* [Finding the critical value of *m* that leads to no change in the total number of drive alleles and then testing out the outcomes of this and other m on the cluster](new-slim-diffusion-files/cluster/alpha_k_0.2_sigma_0.01.md)
 
 ## R scripts:
 * [Simulating reaction-diffusion waves](scripts/numerical-reaction-diffusion-functions.R)
