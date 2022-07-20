@@ -7,9 +7,8 @@ initialize() {
 	defineCfgParam("sigma", 0.01); // sd of the Normal dispersal kernel; D = (1/2)*(sigma^2)
 	defineCfgParam("k", 0.2);
 	defineCfgParam("u_hat", 0.2);
+	defineCfgParam("DRIVE_DROP_SIZE", 1200); // this is equal to "m" in the f(x,t) formula
 	
-	defineCfgParam("DRIVE_DROP_SIZE", 100); // this is equal to "m" in the f(x,t) formula
-
 	defineConstant("alpha", 1 - 2*u_hat);
 	d_d_fitness = 	1 + (2*alpha*k);
 	d_wt_fitness = 1 + ((alpha-1)*k);
@@ -25,7 +24,7 @@ initialize() {
 	defineConstant("GLOBAL_CAPACITY", WT_POPULATION_SIZE); // used in global density fitnessScaling
 	
 	// Reproduction() code variables	
-	defineConstant("LOCAL_INTERACTION_RADIUS", 0.01); // for local competition / female fecundity
+	defineConstant("LOCAL_INTERACTION_RADIUS", 0.001); // for local competition / female fecundity
 	defineConstant("MATING_INTERACTION_RADIUS", 0.001); // for sampling male mates
 	
 	// exp_num_offspring = BASELINE_NUM_OFFSPRING + MAX_ADDITIONAL_NUM_OFFSPRING(e^{EXPONENTIAL_DECAY_FACTOR*ni/nexp})
@@ -37,13 +36,9 @@ initialize() {
 	defineConstant("USE_GLOBAL_EXPECTED_ADULT_COMPETITION",F);
 	defineConstant("EXPECTED_ADULT_COMPETITION", (WT_POPULATION_SIZE+DRIVE_DROP_SIZE)*(2*LOCAL_INTERACTION_RADIUS));
 	
-	
-	
-	
-	defineConstant("X2", 1); // bounds of the simulation are from 0 to X2
-	defineConstant("TRACK_NAA_PRIME", F); // whether to output genotype counts in a grid of cells during generation 10 after dispersal
-	defineConstant("NCELLS", 50); // grid of x-values to measure nAA
-	defineConstant("WILDTYPE_DENSITY", WT_POPULATION_SIZE/NCELLS);
+	defineConstant("TRACK_COUNTS", F); // whether to output genotype counts in a grid of cells during generation 10 after dispersal
+	defineConstant("NCELLS", 100); // grid of x-values to measure nAA
+	defineConstant("WILDTYPE_DENSITY", WT_POPULATION_SIZE/(NCELLS));
 	
 	
 	// Chromosome of length 1. The mutation can either be drive or wt.
@@ -70,28 +65,166 @@ function (void) defineCfgParam(string$ name, lifs value) {
 		defineConstant(name, value);
 }
 
-// FUNCTION FOR CALCULATING THE EXPECTED NUMBER OF DRIVE HOMOZYGOTES IN GEN10 AFTER DISPERSAL
-// f(x,t) = [m/sqrt(4*PI*D*t)][exp(-0.25(x^2/ (Dt))]
-function (float) numAA(float x){
+// EXPECTED NUMBER OF DRIVE HOMOZYGOTES IN GEN10 AFTER DISPERSAL
+function (float) numAA_after_dispersal(float x){
 	D = 0.5*(sigma^2);
-	t = 1; // 1 round of dispersal
 	m = DRIVE_DROP_SIZE;
-	term1 = m/sqrt(4*PI*D*t);
+	term1 = m/sqrt(4*PI*D);
 	
 	x_adjust = x - 0.5; // such that the "release point" was 0
-	term2 = exp(-0.25*((x_adjust^2)/(D*t)));
+	term2 = exp(-0.25*((x_adjust^2)/(D)));
 	sol = term1*term2;
 	return sol;
 }
+
+// EXPECTED NUMBER OF DRIVE HETEROZYGOTES IN GEN10 AFTER DISPERSAL
+function (float) numAa_after_dispersal(float x){
+	return 0.0;
+}
+
+
+// EXPECTED NUMBER OF WILD-TYPES IN GEN10 AFTER DISPERSAL
+function (float) numaa_after_dispersal(float x){
+	return WILDTYPE_DENSITY;
+}
+
+
+// EXPECTED NUMBER OF DRIVE HOMOZYGOTES IN GEN11 early()
+function (float) numAA_after_reproduction(float x){
+	D = 0.5*(sigma^2);
+	m = DRIVE_DROP_SIZE;
+	x_adjust = x - 0.5; // such that the "release point" was 0
+	rho = WILDTYPE_DENSITY;
+	
+	factor1_numerator = (m*exp((-x_adjust^2)/(4*D))) + (rho*sqrt(4*PI*D));
+	factor2_numerator = (m^2)*exp((-x_adjust^2)/(2*D));
+	num = factor1_numerator*factor2_numerator;
+	
+	denominator_term1_inner = (m*exp((-x_adjust^2)/(4*D))) + (rho*sqrt(4*PI*D));
+	denominator_term1 = denominator_term1_inner^2;
+	denominator_term2 = sqrt(4*PI*D);
+	denom = denominator_term1*denominator_term2;
+	
+	sol = num/denom;
+	
+	return sol;
+}
+
+// EXPECTED NUMBER OF DRIVE HETEROZYGOTES IN GEN11 early()
+function (float) numAa_after_reproduction(float x){
+	D = 0.5*(sigma^2);
+	m = DRIVE_DROP_SIZE;
+	x_adjust = x - 0.5; // such that the "release point" was 0
+	rho = WILDTYPE_DENSITY;
+	
+	denominator_term1_inner = (m*exp((-x_adjust^2)/(4*D))) + (rho*sqrt(4*PI*D));
+	denominator_term1 = denominator_term1_inner^2;
+	denominator_term2 = sqrt(4*PI*D);
+	denom = denominator_term1*denominator_term2;
+	
+	numerator_factor1 = (m*exp((-x_adjust^2)/(4*D))) + (rho*sqrt(4*PI*D));
+	numerator_factor2 = 2*m*rho*exp((-x_adjust^2)/(4*D))*sqrt(4*PI*D);
+	numerator = numerator_factor1*numerator_factor2;
+	
+	sol = numerator/denom;
+	return sol;
+}
+
+// EXPECTED NUMBER OF WILD-TYPES IN GEN11 early()
+function (float) numaa_after_reproduction(float x){
+	D = 0.5*(sigma^2);
+	m = DRIVE_DROP_SIZE;
+	x_adjust = x - 0.5; // such that the "release point" was 0
+	rho = WILDTYPE_DENSITY;
+	
+	denominator_term1_inner = (m*exp((-x_adjust^2)/(4*D))) + (rho*sqrt(4*PI*D));
+	denominator_term1 = denominator_term1_inner^2;
+	denominator_term2 = sqrt(4*PI*D);
+	denom = denominator_term1*denominator_term2;
+	
+	term1_num = (m*exp((-x_adjust^2)/(4*D))) + (rho*sqrt(4*PI*D));
+	term2_num = 4*PI*D*(rho^2);
+	num = term1_num*term2_num;
+	
+	sol = num/denom;
+	
+	return sol;
+}
+
+
+// EXPECTED NUMBER OF DRIVE HOMOZYGOTES IN GEN11 late()
+function (float) numAA_after_viability(float x){
+	D = 0.5*(sigma^2);
+	m = DRIVE_DROP_SIZE;
+	x_adjust = x - 0.5; // such that the "release point" was 0
+	rho = WILDTYPE_DENSITY;
+	
+	f1_numerator = (1+(2*alpha*k));
+	f2 = (m^2)*exp((-x_adjust^2)/(2*D));
+	f3 = (m*exp((-x_adjust^2)/(4*D))) + (rho*sqrt(4*PI*D));
+	numerator = f1_numerator*f2*f3;
+	
+	f1_denom = sqrt(4*PI*D)*(1 + (2*alpha*k))*(m^2)*exp((-x_adjust^2)/(2*D));
+	f2_denom = 8*PI*D*rho*m*exp((-x_adjust^2)/(4*D))*(1 + ((alpha-1)*k));
+	f3_denom = 4*PI*D*(rho^2)*sqrt(4*PI*D);
+	denom = f1_denom+f2_denom+f3_denom;
+	
+	sol = numerator/denom;
+	
+	return sol;
+}
+
+
+// EXPECTED NUMBER OF DRIVE HETEROZYGOTES IN GEN11 late()
+function (float) numAa_after_viability(float x){
+	D = 0.5*(sigma^2);
+	m = DRIVE_DROP_SIZE;
+	x_adjust = x - 0.5; // such that the "release point" was 0
+	rho = WILDTYPE_DENSITY;
+	
+	f1_num = 1 + ((alpha-1)*k);
+	f2_num = (m*exp((-x_adjust^2)/(4*D))) + (rho*sqrt(4*PI*D));
+	f3_num = 2*m*rho*exp((-x_adjust^2)/(4*D));
+	num = f1_num*f2_num*f3_num;
+	
+	denom_t1 = (1+(2*alpha*k))*(m^2)*exp((-x_adjust^2)/(2*D));
+	denom_t2 = (1 + ((alpha-1)*k))*2*m*rho*exp((-x_adjust^2)/(4*D))*sqrt(4*PI*D);
+	denom_t3 = 4*PI*D*(rho^2);
+	denom = denom_t1+denom_t2+denom_t3;
+	
+	sol = num/denom;
+	return sol;
+}
+
+// EXPECTED NUMBER OF WILD-TYPES IN GEN11 late()
+function (float) numaa_after_viability(float x){
+	D = 0.5*(sigma^2);
+	m = DRIVE_DROP_SIZE;
+	x_adjust = x - 0.5; // such that the "release point" was 0
+	rho = WILDTYPE_DENSITY;
+	
+	f1_denom = sqrt(4*PI*D)*(1 + (2*alpha*k))*(m^2)*exp((-x_adjust^2)/(2*D));
+	f2_denom = 8*PI*D*rho*m*exp((-x_adjust^2)/(4*D))*(1 + ((alpha-1)*k));
+	f3_denom = 4*PI*D*(rho^2)*sqrt(4*PI*D);
+	denom = f1_denom+f2_denom+f3_denom;
+	
+	num_f1 = 4*PI*D*(rho^2);
+	num_f2 = (m*exp((-x_adjust^2)/(4*D))) + (rho*sqrt(4*PI*D));
+	num = num_f1*num_f2;
+	sol = num/denom;
+	
+	return sol;
+}
+
 
 
 // Create a population of wild-type individuals, scattered randomly
 1 {
 	sim.addSubpop("p1", WT_POPULATION_SIZE);
-	p1.setSpatialBounds(c(0.0, X2));
+	p1.setSpatialBounds(c(0.0, 1.0));
 	
 	all = p1.individuals;
-	all.x = runif(WT_POPULATION_SIZE, min = 0, max = X2);
+	all.x = runif(WT_POPULATION_SIZE, min = 0, max = 1.0);
 	
 	all.genomes.addNewDrawnMutation(m1, 0);
 	all.tagF = wt_homozygote_fitness;
@@ -154,6 +287,51 @@ early() {
 	// juvenile survival depends on fitness value
 	gen = sim.generation;
 	all = p1.individuals;
+	
+	if (gen == 11 & TRACK_COUNTS){
+		// Divide x into a grid of unit cells
+		// in each cell, measure the number of drive homozygotes, drive heterozygotes, and wild-types, as well as the rates
+		pos_vec = 0:(NCELLS - 1);
+		cell_width = 1.0/NCELLS;
+		positions = pos_vec * cell_width; // left-hand side
+		
+		for (i in 0:(NCELLS-1)) {
+			x_left = positions[i];
+			x_right = x_left + cell_width;
+			all_in_cell = all[(all.x >= x_left) & (all.x < x_right)];
+			popsize_in_cell = length(all_in_cell);
+			
+			wildtypes_in_cell = all_in_cell[all_in_cell.countOfMutationsOfType(m1) == 2];
+			num_wildtypes_in_cell = length(wildtypes_in_cell); // observed naa'(x,t=0) or naa(x,t=1)
+			
+			
+			drive_homozygotes_in_cell = all_in_cell[all_in_cell.countOfMutationsOfType(m2) == 2];
+			num_homz_in_cell = length(drive_homozygotes_in_cell); // observed nAA'(x,t=0) or nAA(x,t=1)
+			
+			drive_heterozygotes_in_cell = all_in_cell[(all_in_cell.countOfMutationsOfType(m1) == 1) & (all_in_cell.countOfMutationsOfType(m2) == 1)];
+			num_hetz_in_cell = length(drive_heterozygotes_in_cell); // observed nAa'(x,t=0) or nAa(x,t=1)
+			
+			
+			cell_midpoint = (x_left+x_right)/2;
+			
+			
+			expected_dd_count = numAA_after_reproduction(cell_midpoint);
+			expected_dwt_count = numAa_after_reproduction(cell_midpoint);
+			expected_wtwt_count = numaa_after_reproduction(cell_midpoint);
+			
+			weighted_observed_dd_count = num_homz_in_cell/cell_width;
+			weighted_observed_dwt_count = num_hetz_in_cell/cell_width;
+			weighted_observed_wtwt_count = num_wildtypes_in_cell/cell_width;
+			
+			catn("GEN11_after_reproduction:: X1:: "+ x_left + " X2:: " + x_right + " MIDPT:: " + cell_midpoint+" N_DD:: " + weighted_observed_dd_count +" EXP_N_DD:: " + expected_dd_count + " N_DWT:: " + weighted_observed_dwt_count + " EXP_N_DWT:: " + expected_dwt_count + " N_WTWT:: " + weighted_observed_wtwt_count + " EXP_N_WTWT:: " + expected_wtwt_count);
+		}
+	
+	}
+	
+	
+	
+	
+	
 	all[all.age > 0].fitnessScaling = 0.0;
 	
 	// also applying global density control
@@ -161,6 +339,9 @@ early() {
 	
 	juveniles = all[all.age==0];
 	juveniles.fitnessScaling = (juveniles.tagF/drive_homozygote_fitness)*(GLOBAL_CAPACITY / length(juveniles));
+
+
+
 
 
 }
@@ -173,11 +354,11 @@ late(){
 	
 	if (gen < 10){
 		all.color = "blue";
-		catn("GEN:: " + gen + " N:: " + N + " NUM_DD:: " + 0 + " NUM_DWT:: " + 0 + " NUM_WTWT:: " + N + " NUM_D_ALLELES:: " + 0 + " RATE_D:: " + 0.0);
+		//catn("GEN:: " + gen + " N:: " + N + " NUM_DD:: " + 0 + " NUM_DWT:: " + 0 + " NUM_WTWT:: " + N + " NUM_D_ALLELES:: " + 0 + " RATE_D:: " + 0.0);
 	} else {
 		// Add drive
 		if (gen == 10){
-			midpoint = (X2-0)/2;
+			midpoint = (1.0-0)/2;
 			sim.addSubpop("p2", DRIVE_DROP_SIZE);
 			drive_homozygotes_in_drop = p2.individuals;
 			drive_homozygotes_in_drop.genomes.addNewDrawnMutation(m2, 0);
@@ -203,8 +384,10 @@ late(){
 		num_drive_alleles = (2*num_dd) + num_dwt;
 		rate_of_drive = num_drive_alleles/(2*N);
 		
-		catn("GEN:: " + gen + " N:: " + N + " NUM_DD:: " + num_dd + " NUM_DWT:: " + num_dwt + " NUM_WTWT:: " + num_wtwt + " NUM_D_ALLELES:: " + num_drive_alleles + " RATE_D:: " + rate_of_drive);
+		
+		catn("GEN:: " + (gen-10) + " N:: " + N + " NUM_DD:: " + num_dd + " NUM_DWT:: " + num_dwt + " NUM_WTWT:: " + num_wtwt + " NUM_D_ALLELES:: " + num_drive_alleles + " RATE_D:: " + rate_of_drive);
 	}
+	
 	
 	// End each generation with Gaussian displacement & calculation of new mating distances
 	for (ind in all){
@@ -214,59 +397,51 @@ late(){
 		ind.setSpatialPosition(p1.pointPeriodic(position));
 	}
 	
-	if (gen >= 10 & TRACK_NAA_PRIME){
+	if (gen >= 10 & TRACK_COUNTS){
 		// Divide x into a grid of unit cells
 		// in each cell, measure the number of drive homozygotes, drive heterozygotes, and wild-types, as well as the rates
 		pos_vec = 0:(NCELLS - 1);
 		cell_width = 1.0/NCELLS;
 		positions = pos_vec * cell_width; // left-hand side
 		
-		cell_count_vector = c();
-		dd_count_vector = c();
-		dwt_count_vector = c();
-		wtwt_count_vector = c();
-		drive_allele_count_vector = c();
-		dd_freq_vector = c();
-		dwt_freq_vector = c();
-		wtwt_freq_vector = c();
-		d_allele_freq_vector = c();
-		
 		for (i in 0:(NCELLS-1)) {
 			x_left = positions[i];
 			x_right = x_left + cell_width;
 			all_in_cell = all[(all.x >= x_left) & (all.x < x_right)];
 			popsize_in_cell = length(all_in_cell);
+			
 			wildtypes_in_cell = all_in_cell[all_in_cell.countOfMutationsOfType(m1) == 2];
-			num_wildtypes_in_cell = length(wildtypes_in_cell);
+			num_wildtypes_in_cell = length(wildtypes_in_cell); // observed naa'(x,t=0) or naa(x,t=1)
+			
+			
 			drive_homozygotes_in_cell = all_in_cell[all_in_cell.countOfMutationsOfType(m2) == 2];
-			num_homz_in_cell = length(drive_homozygotes_in_cell);
+			num_homz_in_cell = length(drive_homozygotes_in_cell); // observed nAA'(x,t=0) or nAA(x,t=1)
+			
 			drive_heterozygotes_in_cell = all_in_cell[(all_in_cell.countOfMutationsOfType(m1) == 1) & (all_in_cell.countOfMutationsOfType(m2) == 1)];
-			num_hetz_in_cell = length(drive_heterozygotes_in_cell);
+			num_hetz_in_cell = length(drive_heterozygotes_in_cell); // observed nAa'(x,t=0) or nAa(x,t=1)
 			
-			drive_allele_count_in_cell = (2*num_homz_in_cell) + num_hetz_in_cell;
-			
-			cell_count_vector = c(cell_count_vector, popsize_in_cell);
-			dd_count_vector = c(dd_count_vector, num_homz_in_cell);
-			dwt_count_vector = c(dwt_count_vector, num_hetz_in_cell);
-			wtwt_count_vector = c(wtwt_count_vector, num_wildtypes_in_cell);
-			drive_allele_count_vector = c(drive_allele_count_vector,drive_allele_count_in_cell);
-			dd_freq_vector = c(dd_freq_vector, num_homz_in_cell/popsize_in_cell);
-			dwt_freq_vector = c(dwt_freq_vector, num_hetz_in_cell/popsize_in_cell);
-			wtwt_freq_vector = c(wtwt_freq_vector, num_wildtypes_in_cell/popsize_in_cell);
-			d_allele_freq_vector = c(d_allele_freq_vector, drive_allele_count_in_cell/(2*popsize_in_cell));
 			
 			cell_midpoint = (x_left+x_right)/2;
 			
+			
 			// GEN10 predictions
 			if (gen == 10){
-				expected_dd_count = numAA(cell_midpoint);
-				expected_wt_count = WILDTYPE_DENSITY;
-				expected_dd_rate = expected_dd_count/(expected_dd_count+expected_wt_count);
-				catn("GEN:: " + (gen-10) + " X1:: " +x_left + " X2:: " + x_right + " (MIDPT:: " + cell_midpoint+") N:: " + popsize_in_cell + " N_DD:: " + num_homz_in_cell/cell_width +" (FREQ_DD:: " + (num_homz_in_cell/popsize_in_cell) + ") N_DWT:: " + num_hetz_in_cell/cell_width + " (FREQ_DWT:: " +(num_hetz_in_cell/popsize_in_cell) + ") N_WTWT:: " + num_wildtypes_in_cell/cell_width + " FREQ_WTWT:: " + (num_wildtypes_in_cell/popsize_in_cell) + ") RATE_DR:: " + (drive_allele_count_in_cell/(2*popsize_in_cell)) + " EXPECTED_N_DD:: " + expected_dd_count + " EXPECTED_N_WTWT:: " +expected_wt_count + " EXPECTED_RATE_DD:: " + expected_dd_rate);
-			} else {
-				catn("GEN:: " + (gen-10) + " X1:: " +x_left + " X2:: " + x_right + " (MIDPT:: " + cell_midpoint+") N:: " + popsize_in_cell + " N_DD:: " + num_homz_in_cell +" (FREQ_DD:: " + (num_homz_in_cell/popsize_in_cell) + ") N_DWT:: " + num_hetz_in_cell + " (FREQ_DWT:: " +(num_hetz_in_cell/popsize_in_cell) + ") N_WTWT:: " + num_wildtypes_in_cell + " FREQ_WTWT:: " + (num_wildtypes_in_cell/popsize_in_cell) + ") RATE_DR:: " + (drive_allele_count_in_cell/(2*popsize_in_cell)));
+				expected_dd_count = numAA_after_dispersal(cell_midpoint);
+				expected_dwt_count = numAa_after_dispersal(cell_midpoint);
+				expected_wtwt_count = numaa_after_dispersal(cell_midpoint);
+				status = "after_dispersal";
+			} else if (gen == 11) {
+				expected_dd_count = numAA_after_viability(cell_midpoint);
+				expected_dwt_count = numAa_after_viability(cell_midpoint);
+				expected_wtwt_count = numaa_after_viability(cell_midpoint);
+				status = "after_viability";
 			}
-		
+			
+			weighted_observed_dd_count = num_homz_in_cell/cell_width;
+			weighted_observed_dwt_count = num_hetz_in_cell/cell_width;
+			weighted_observed_wtwt_count = num_wildtypes_in_cell/cell_width;
+			
+			catn("GEN" + (gen-10) +"_"+status+":: X1:: " + x_left + " X2:: " + x_right + " MIDPT:: " + cell_midpoint+" N_DD:: " + weighted_observed_dd_count +" EXP_N_DD:: " + expected_dd_count + " N_DWT:: " + weighted_observed_dwt_count + " EXP_N_DWT:: " + expected_dwt_count + " N_WTWT:: " + weighted_observed_wtwt_count + " EXP_N_WTWT:: " + expected_wtwt_count);
 		}
 	
 	}

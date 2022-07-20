@@ -1,0 +1,4 @@
+python python_drive_num_drive_alleles_100_gens.py -DRIVE_DROP_SIZE 800
+python python_drive_num_drive_alleles_100_gens.py -DRIVE_DROP_SIZE 1134
+python python_drive_num_drive_alleles_100_gens.py -DRIVE_DROP_SIZE 1210
+python python_drive_num_drive_alleles_100_gens.py -DRIVE_DROP_SIZE 1600
