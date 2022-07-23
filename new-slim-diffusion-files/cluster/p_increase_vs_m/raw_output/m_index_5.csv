@@ -1,0 +1,21 @@
+m, replicate_number,gen10_to_gen11_change,outcome_after_100_gens
+300,0,7,decrease
+300,1,21,decrease
+300,2,-13,decrease
+300,3,-51,decrease
+300,4,-14,decrease
+300,5,-104,decrease
+300,6,-6,decrease
+300,7,-31,decrease
+300,8,-17,decrease
+300,9,-38,decrease
+300,10,-9,decrease
+300,11,-18,decrease
+300,12,29,decrease
+300,13,-25,decrease
+300,14,9,decrease
+300,15,-98,decrease
+300,16,1,decrease
+300,17,1,decrease
+300,18,-15,decrease
+300,19,-47,decrease

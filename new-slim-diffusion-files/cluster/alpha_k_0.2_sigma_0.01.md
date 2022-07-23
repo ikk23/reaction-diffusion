@@ -524,3 +524,194 @@ knitr::include_graphics("../../new-slim-diffusion-files/cluster/drive_alleles_ea
 -   But whether this increased or decreased does not seem to be
     predictive of whether the drive will ultimately spread or fail,
     zooming out to 100 generations.
+
+## Create P(increase) vs m graphs –> find the m\* that leads to P(increase) = 50%
+
+-   Data:
+    `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/new-slim-diffusion-files/cluster/change_in_drive_alleles_gen10_to_gen11/output/full_csv_k_alpha_0.2_sigma_0.01_m_500_to_1900.csv`
+
+``` r
+library(tidyverse)
+data = read_csv("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/new-slim-diffusion-files/cluster/change_in_drive_alleles_gen10_to_gen11/output/full_csv_k_alpha_0.2_sigma_0.01_m_500_to_1900.csv")
+m_values = unique(data$m)
+```
+
+Only have the first generation change for these; can’t evaluate
+P(increase). Only have data from the 4 m’s to do this.
+
+-   m-specific data:
+    -   `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/new-slim-diffusion-files/cluster/drive_alleles_each_generation/raw_output/m800.csv`
+    -   `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/new-slim-diffusion-files/cluster/drive_alleles_each_generation/raw_output/m1134.csv`
+    -   `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/new-slim-diffusion-files/cluster/drive_alleles_each_generation/raw_output/m1210.csv`
+    -   `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/new-slim-diffusion-files/cluster/drive_alleles_each_generation/raw_output/m1600.csv`
+
+``` r
+library(tidyverse)
+m800 = read_csv("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/new-slim-diffusion-files/cluster/drive_alleles_each_generation/raw_output/m800.csv") %>% filter(!is.na(generation))
+m1134 = read_csv("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/new-slim-diffusion-files/cluster/drive_alleles_each_generation/raw_output/m1134.csv") %>% filter(!is.na(generation))
+m1210 =  read_csv("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/new-slim-diffusion-files/cluster/drive_alleles_each_generation/raw_output/m1210.csv") %>% filter(!is.na(generation))
+m1600 = read_csv("/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/new-slim-diffusion-files/cluster/drive_alleles_each_generation/raw_output/m1600.csv") %>% filter(!is.na(generation))
+
+m800_outcomes = rep("*",20)
+m1134_outcomes = rep("*", 20)
+m1210_outcomes = rep("*", 20)
+m1600_outcomes = rep("*", 20)
+replicate_numbers = unique(m800$replicate_number)
+for (i in 1:20){
+  r = replicate_numbers[i]
+  
+  # m800
+  m800_this_rep = m800 %>% filter(replicate_number == r)
+  m800_start = m800_this_rep$num_drive_alleles[1]
+  m800_end = m800_this_rep$num_drive_alleles[nrow(m800_this_rep)]
+  if (m800_start < m800_end){
+    outcome = "increase"
+  } else if (m800_start > m800_end){
+    outcome = "decrease"
+  } else {
+    outcome = "constant"
+  }
+  m800_outcomes[i] = outcome
+  
+  # m1134
+  m1134_this_rep = m1134 %>% filter(replicate_number == r)
+  m1134_start = m1134_this_rep$num_drive_alleles[1]
+  m1134_end = m1134_this_rep$num_drive_alleles[nrow(m1134_this_rep)]
+  if (m1134_start < m1134_end){
+    outcome = "increase"
+  } else if (m1134_start > m1134_end){
+    outcome = "decrease"
+  } else {
+    outcome = "constant"
+  }
+  m1134_outcomes[i] = outcome
+  
+  # m1210
+  m1210_this_rep = m1210 %>% filter(replicate_number == r)
+  m1210_start = m1210_this_rep$num_drive_alleles[1]
+  m1210_end = m1210_this_rep$num_drive_alleles[nrow(m1210_this_rep)]
+  if (m1210_start < m1210_end){
+    outcome = "increase"
+  } else if (m1210_start > m1210_end){
+    outcome = "decrease"
+  } else {
+    outcome = "constant"
+  }
+  m1210_outcomes[i] = outcome
+  
+  # m1600
+  m1600_this_rep = m1600 %>% filter(replicate_number == r)
+  m1600_start = m1600_this_rep$num_drive_alleles[1]
+  m1600_end = m1600_this_rep$num_drive_alleles[nrow(m1600_this_rep)]
+  if (m1600_start < m1600_end){
+    outcome = "increase"
+  } else if (m1600_start > m1600_end){
+    outcome = "decrease"
+  } else {
+    outcome = "constant"
+  }
+  m1600_outcomes[i] = outcome
+  
+}
+
+
+p_increase_m800 = mean(m800_outcomes == "increase")
+p_increase_m1134 = mean(m1134_outcomes == "increase")
+p_increase_m1210 = mean(m1210_outcomes == "increase")
+p_increase_m1600 = mean(m1600_outcomes == "increase")
+
+p = tibble(m = c(800, 1134, 1210, 1600), p_increase = c(p_increase_m800, p_increase_m1134, p_increase_m1210, p_increase_m1600)) %>% 
+  ggplot(aes(x = m, y = p_increase)) + 
+  geom_line(color = "red") + 
+  geom_point(color = "red") + 
+  theme_minimal() + ylim(0,1)
+#ggsave(plot = p, filename = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/new-slim-diffusion-files/cluster/drive_alleles_each_generation/figs/four_ms_p_increase.png")
+```
+
+``` r
+knitr::include_graphics("../../new-slim-diffusion-files/cluster/drive_alleles_each_generation/figs/four_ms_p_increase.png")
+```
+
+![](../../new-slim-diffusion-files/cluster/drive_alleles_each_generation/figs/four_ms_p_increase.png)<!-- -->
+
+Conclusion: the critical m might be *less* than m = 800. Need to expand
+this range of m, run like 20 replicates per m for 100 generations, and
+record P(increase).
+
+## New cluster run
+
+-   Range of m: 200 to 1000
+    -   Count by 25
+-   20 replicates each
+
+``` r
+python_script = "python_driver_p_increase.py"
+m_seq = seq(200,1000,by=25) # length of 33
+
+
+# Start writing to a new output file
+sink('/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/new-slim-diffusion-files/cluster/p_increase_vs_m/text_file_p_increase.txt')
+
+for (i in 1:length(m_seq)){
+  m = m_seq[i]
+
+  line = paste0("python ",python_script," -DRIVE_DROP_SIZE ",m,"\n")
+
+  cat(line)
+}
+
+# Stop writing to the file
+sink()
+```
+
+### Files:
+
+-   In
+    `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/new-slim-diffusion-files/cluster/p_increase_vs_m/`:
+    -   Python driver: `python_driver_p_increase.py` –> for each of the
+        20 replicates, prints out 1 csv line with m, replicate number,
+        initial generation 10 to generation 11 change in the number of
+        drive alleles, and the outcome after 100 generations
+    -   Text file: `text_file_p_increase.txt`
+    -   SLURM main: `main_p_increase.sh`
+-   SLiM:
+    `/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/new-slim-diffusion-files/nonWF-diffusion-model.slim`
+-   Cluster job submitted at 10:29am 7/21
+    -   Job number: `4572994`
+
+### Analyze results
+
+For each csv file, (1) get the value of m, (2) get the average initial
+change, and (3) get the P(increase)
+
+``` r
+library(tidyverse)
+dir = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/new-slim-diffusion-files/cluster/p_increase_vs_m/raw_output/"
+m_vector = seq(200,1000,by=25)
+m_seq = rep(-1,33)
+average_initial_change = rep(-1,33)
+p_increase_vector = rep(-1,33)
+for (i in 1:33){
+  file = paste0(dir,"m_index_",i,".csv")
+  csv = read_csv(file)
+  m = csv$m[1]
+  avg_change = mean(csv$gen10_to_gen11_change)
+  p_increase = mean(csv$outcome_after_100_gens == "increase")
+  m_seq[i]= m
+  average_initial_change[i] = avg_change
+  p_increase_vector[i] = p_increase
+}
+
+m_consolidated_csv = tibble(m = m_seq, average_gen10_to_gen11_change = average_initial_change, p_increase = p_increase_vector)
+#write_csv(x = m_consolidated_csv, file = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/new-slim-diffusion-files/cluster/p_increase_vs_m/output/m200_to_1000_D_5e-5_k_alpha_0.2.csv")
+
+
+p = ggplot(m_consolidated_csv, aes(x = m, y = p_increase)) + theme_minimal() + geom_line(color = "dodgerblue") + geom_point(color = "dodgerblue") + ylim(0,1) + ggtitle("D = 5e-5, rho = 30000, k=alpha=0.2")
+ggsave(plot = p, filename = "/Users/isabelkim/Desktop/year2/underdominance/reaction-diffusion/new-slim-diffusion-files/cluster/p_increase_vs_m/output/p_increase_vs_m_200_to_1000.png")
+```
+
+``` r
+knitr::include_graphics("../../new-slim-diffusion-files/cluster/p_increase_vs_m/output/p_increase_vs_m_200_to_1000.png")
+```
+
+![](../../new-slim-diffusion-files/cluster/p_increase_vs_m/output/p_increase_vs_m_200_to_1000.png)<!-- -->

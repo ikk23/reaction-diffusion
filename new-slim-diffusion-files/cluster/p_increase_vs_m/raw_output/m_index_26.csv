@@ -1,0 +1,21 @@
+m, replicate_number,gen10_to_gen11_change,outcome_after_100_gens
+825,0,0,decrease
+825,1,-490,decrease
+825,2,50,increase
+825,3,22,increase
+825,4,-60,increase
+825,5,-5,increase
+825,6,-9,increase
+825,7,-410,decrease
+825,8,-110,increase
+825,9,84,increase
+825,10,-181,increase
+825,11,-257,decrease
+825,12,43,increase
+825,13,-477,decrease
+825,14,-545,decrease
+825,15,-59,increase
+825,16,-324,decrease
+825,17,43,increase
+825,18,-357,decrease
+825,19,-498,decrease

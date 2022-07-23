@@ -7,7 +7,7 @@ initialize() {
 	defineCfgParam("sigma", 0.01); // sd of the Normal dispersal kernel; D = (1/2)*(sigma^2)
 	defineCfgParam("k", 0.2);
 	defineCfgParam("u_hat", 0.2);
-	defineCfgParam("DRIVE_DROP_SIZE", 1200); // this is equal to "m" in the f(x,t) formula
+	defineCfgParam("DRIVE_DROP_SIZE", 750); // this is equal to "m" in the f(x,t) formula
 	
 	defineConstant("alpha", 1 - 2*u_hat);
 	d_d_fitness = 	1 + (2*alpha*k);
